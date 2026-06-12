@@ -1,0 +1,146 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: app
+    image: nabzesalamat-app:latest
+    restart: unless-stopped
+    volumes:
+      - app-storage:/var/www/html/storage
+      - ./.env.prod:/var/www/html/.env:ro
+    networks:
+      - NabzeSalamat
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env.prod
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: nginx
+    image: nabzesalamat-nginx:latest
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-80}:80"
+    volumes:
+      - app-storage:/var/www/html/storage:ro
+    depends_on:
+      - app
+    networks:
+      - NabzeSalamat
+    command: >
+      sh -c "ln -sf /var/www/html/storage/app/public /var/www/html/public/storage
+      && nginx -g 'daemon off;'"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  mysql:
+    image: mysql:5.7
+    restart: unless-stopped
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - NabzeSalamat
+    healthcheck:
+      # $$VAR: compose escapes $$ → $, so the container shell expands $MYSQL_ROOT_PASSWORD
+      test: ["CMD-SHELL", "mysqladmin -u root -p$$MYSQL_ROOT_PASSWORD ping --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb
+    volumes:
+      - redis-data:/data
+    networks:
+      - NabzeSalamat
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  queue:
+    image: nabzesalamat-app:latest
+    restart: unless-stopped
+    command: ["php", "artisan", "queue:work", "redis",
+              "--sleep=3", "--tries=3", "--timeout=90", "--max-time=3600"]
+    volumes:
+      - app-storage:/var/www/html/storage
+      - ./.env.prod:/var/www/html/.env:ro
+    networks:
+      - NabzeSalamat
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env.prod
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  scheduler:
+    image: nabzesalamat-app:latest
+    restart: unless-stopped
+    # entrypoint.sh runs migrations then exec's this loop
+    command: ["sh", "-c", "while true; do php artisan schedule:run --no-interaction; sleep 60; done"]
+    volumes:
+      - app-storage:/var/www/html/storage
+      - ./.env.prod:/var/www/html/.env:ro
+    networks:
+      - NabzeSalamat
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env.prod
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+networks:
+  NabzeSalamat:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  redis-data:
+  app-storage:

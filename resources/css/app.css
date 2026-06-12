@@ -1,0 +1,90 @@
+@font-face {
+    font-family: 'PeydaWebFaNum';
+    src: url('../fonts/woff2/PeydaWebFaNum-Thin.woff2') format('woff2'),
+    url('../fonts/woff/PeydaWebFaNum-Thin.woff')  format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'PeydaWebFaNum';
+    src: url('../fonts/woff2/PeydaWebFaNum-ExtraLight.woff2') format('woff2'),
+    url('../fonts/woff/PeydaWebFaNum-ExtraLight.woff')  format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'PeydaWebFaNum';
+    src: url('../fonts/woff2/PeydaWebFaNum-Light.woff2') format('woff2'),
+    url('../fonts/woff/PeydaWebFaNum-Light.woff')  format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'PeydaWebFaNum';
+    src: url('../fonts/woff2/PeydaWebFaNum-Medium.woff2') format('woff2'),
+    url('../fonts/woff/PeydaWebFaNum-Medium.woff')  format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'PeydaWebFaNum';
+    src: url('../fonts/woff2/PeydaWebFaNum-Medium.woff2') format('woff2'),
+    url('../fonts/woff/PeydaWebFaNum-Medium.woff')  format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'PeydaWebFaNum';
+    src: url('../fonts/woff2/PeydaWebFaNum-Bold.woff2') format('woff2'),
+    url('../fonts/woff/PeydaWebFaNum-Bold.woff')  format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'PeydaWebFaNum';
+    src: url('../fonts/woff2/PeydaWebFaNum-Black.woff2') format('woff2'),
+    url('../fonts/woff/PeydaWebFaNum-Black.woff')  format('woff');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes carousel-slide-left {
+    from { transform: translateX(48px); }
+    to   { transform: translateX(0); }
+}
+@keyframes carousel-slide-right {
+    from { transform: translateX(-48px); }
+    to   { transform: translateX(0); }
+}
+.carousel-slide-left  { animation: carousel-slide-left  0.1s ease; }
+.carousel-slide-right { animation: carousel-slide-right 0.1s ease; }
+
+@keyframes slide-up {
+    from { transform: translateY(16px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+.animate-slide-up { animation: slide-up 0.22s ease-out both; }
+
+
+#products-sections-landing,
+#shop-products-section,
+#customerpanel-activities--recentproducts_section,
+#section-blog--recentproducts,
+#section-show--recentproducts{
+    --section-bg : #f2f2f2
+}
+
+#sales-products-section{
+    --section-bg: #B8181E;
+}

@@ -1,0 +1,86 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+      - dev-vendor:/var/www/html/vendor
+      - ./docker/php/php-dev.ini:/usr/local/etc/php/conf.d/custom.ini
+    networks:
+      - NabzeSalamat
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+
+  node:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+      - dev-node-modules:/app/node_modules
+    command: sh -c "npm ci && npm run dev"
+    ports:
+      - "5173:5173"
+    environment:
+      - CHOKIDAR_USEPOLLING=1
+      - CHOKIDAR_INTERVAL=500
+    networks:
+      - NabzeSalamat
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - NabzeSalamat
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    volumes:
+      - dev-mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootsecret
+      MYSQL_DATABASE: nabzesalamat_db
+      MYSQL_USER: sail
+      MYSQL_PASSWORD: password
+    networks:
+      - NabzeSalamat
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-prootsecret"]
+      retries: 3
+      timeout: 5s
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    volumes:
+      - dev-redis-data:/data
+    networks:
+      - NabzeSalamat
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      retries: 3
+      timeout: 5s
+
+networks:
+  NabzeSalamat:
+    driver: bridge
+
+volumes:
+  dev-mysql-data:
+  dev-redis-data:
+  dev-vendor:
+  dev-node-modules:
