@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\BreakingNewsController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\CustomerTicketController;
 use App\Http\Controllers\TicketController;
@@ -70,6 +71,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/maintenance/toggle', [MaintenanceController::class, 'toggle'])
         ->name('maintenance.toggle')
         ->middleware('role:admin');
+
+    // Breaking News (admin only)
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/breaking-news',                     [BreakingNewsController::class, 'index'])  ->name('breaking-news.index');
+        Route::post('/breaking-news',                    [BreakingNewsController::class, 'store'])  ->name('breaking-news.store');
+        Route::put('/breaking-news/{breakingNews}',      [BreakingNewsController::class, 'update']) ->name('breaking-news.update');
+        Route::delete('/breaking-news/{breakingNews}',   [BreakingNewsController::class, 'destroy'])->name('breaking-news.destroy');
+    });
 
     // Role management (admin only)
     Route::middleware('role:admin')->group(function () {

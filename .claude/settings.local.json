@@ -26,7 +26,9 @@
       "Bash(docker compose *)",
       "Bash(Get-ChildItem -Path \"resources\\\\js\\\\Pages\" -Directory)",
       "Bash(rm -f \"resources/js/Pages/Stocks/Index.tsx\" \"resources/js/Pages/Shop/Cart.tsx\" \"resources/js/Pages/Shop/Checkout.tsx\" \"resources/js/Pages/Shop/BankingPlan.tsx\" \"resources/js/Pages/Shop/JobApplication.tsx\" \"resources/js/Pages/Shop/Pay.tsx\" \"resources/js/Pages/Shop/RepresentativeDemand.tsx\" \"resources/js/Pages/Shop/ThankYou.tsx\" \"resources/js/Pages/RepresentativeDemands/Index.tsx\" \"resources/js/Pages/JobApplications/Index.tsx\" \"resources/js/Pages/Payment/KalanoPayment.tsx\" \"resources/js/Pages/PaymentGateways/Create.tsx\" \"resources/js/Pages/PaymentGateways/Edit.tsx\" \"resources/js/Pages/PaymentGateways/Index.tsx\" \"resources/js/Pages/DynamicPricing/Create.tsx\" \"resources/js/Pages/DynamicPricing/Edit.tsx\" \"resources/js/Pages/DynamicPricing/Index.tsx\")",
-      "Bash(rmdir \"resources/js/Pages/Stocks\" \"resources/js/Pages/RepresentativeDemands\" \"resources/js/Pages/JobApplications\" \"resources/js/Pages/Payment\" \"resources/js/Pages/PaymentGateways\" \"resources/js/Pages/DynamicPricing\")"
+      "Bash(rmdir \"resources/js/Pages/Stocks\" \"resources/js/Pages/RepresentativeDemands\" \"resources/js/Pages/JobApplications\" \"resources/js/Pages/Payment\" \"resources/js/Pages/PaymentGateways\" \"resources/js/Pages/DynamicPricing\")",
+      "Bash(dir C:\\\\Users\\\\mohar\\\\PhpstormProjects\\\\NabzeSalamatBlog *)",
+      "Bash(docker exec gsunsalesportal-app-1 *)"
     ]
   }
 }

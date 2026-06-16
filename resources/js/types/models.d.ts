@@ -166,6 +166,16 @@ export interface Ticket {
     messages_count?: number;
 }
 
+export interface BreakingNews {
+    id: number;
+    title: string;
+    url: string | null;
+    is_active: boolean;
+    active_from: string;        // 'YYYY-MM-DD HH:mm'
+    active_until: string | null; // 'YYYY-MM-DD HH:mm' or null
+    created_at: string;
+}
+
 export interface PaginatedData<T> {
     data: T[];
     current_page: number;

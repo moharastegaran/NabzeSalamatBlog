@@ -51,6 +51,14 @@ function IconLogout() {
         </svg>
     );
 }
+function IconBreakingNews() {
+    return (
+        <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+    );
+}
+
 function IconAnnouncements() {
     return (
         <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -174,6 +182,7 @@ function SubNavItem({ href, active, children }: { href: string; active: boolean;
 function SidebarNav({
     canViewUsers, usersOpen, setUsersOpen, canCreateUser,
     canAnnounce,
+    canBreakingNews,
     canGallery,
     canAdmin,
     canAssets,
@@ -190,6 +199,7 @@ function SidebarNav({
     setUsersOpen: (v: boolean) => void;
     canCreateUser: boolean;
     canAnnounce: boolean;
+    canBreakingNews: boolean;
     canGallery: boolean;
     canAdmin: boolean;
     canAssets: boolean;
@@ -400,6 +410,17 @@ function SidebarNav({
                         collapsed={collapsed}
                     >
                         اطلاعیه‌ها
+                    </NavItem>
+                )}
+
+                {canBreakingNews && (
+                    <NavItem
+                        href={route('breaking-news.index')}
+                        active={!!route().current('breaking-news.*')}
+                        icon={<IconBreakingNews />}
+                        collapsed={collapsed}
+                    >
+                        اخبار فوری
                     </NavItem>
                 )}
 
@@ -693,6 +714,8 @@ export default function Authenticated({
     const canAnnounce =
         user.roles?.includes('admin') || user.roles?.includes('cfo');
 
+    const canBreakingNews = canAdmin;
+
     const canGallery =
         user.roles?.includes('admin') || user.roles?.includes('cfo');
 
@@ -740,6 +763,7 @@ export default function Authenticated({
                     setUsersOpen={setUsersOpen}
                     canCreateUser={canCreateUser}
                     canAnnounce={canAnnounce}
+                    canBreakingNews={canBreakingNews}
                     canGallery={canGallery}
                     canAdmin={canAdmin}
                     canAssets={canAssets}

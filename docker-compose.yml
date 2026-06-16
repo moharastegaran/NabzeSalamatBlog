@@ -26,7 +26,7 @@ services:
       - dev-node-modules:/app/node_modules
     command: sh -c "npm ci && npm run dev"
     ports:
-      - "5173:5173"
+      - "5175:5175"
     environment:
       - CHOKIDAR_USEPOLLING=1
       - CHOKIDAR_INTERVAL=500
