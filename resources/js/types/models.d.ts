@@ -15,20 +15,6 @@ export interface Role {
     name: string;
 }
 
-export interface Banking {
-    id: number;
-    parent_id?: number;
-    name: string;
-    description?: string;
-    img?: string;
-    impact_factor?: number;
-    period?: number;
-    ship_after_days?: number;
-    is_active: boolean;
-    parent?: Banking;
-    payment_plans?: Banking[];
-}
-
 export interface Province {
     id: number;
     name: string;

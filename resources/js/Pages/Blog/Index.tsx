@@ -132,7 +132,7 @@ export default function BlogIndex({ posts, activeCategory }: Props) {
                                                     <div className="flex items-center justify-end gap-1">
                                                         {post.status === 'published' && (
                                                             <a
-                                                                href={route('shop.blog.show', post.slug)}
+                                                                href={route('front.blog.show', post.slug)}
                                                                 target="_blank"
                                                                 rel="noreferrer"
                                                                 title="مشاهده"

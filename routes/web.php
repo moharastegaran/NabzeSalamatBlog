@@ -25,21 +25,23 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Maintenance page (exempt from maintenance middleware — avoids redirect loop)
-Route::get('/maintenance', [MaintenanceController::class, 'show'])->name('shop.maintenance');
+Route::get('/maintenance', [MaintenanceController::class, 'show'])->name('front.maintenance');
 
 // Public shop (gated by maintenance mode)
-Route::middleware('shop.maintenance')->group(function () {
-    Route::get('/',            [ShopController::class, 'landing'])->name('shop.landing');
-    Route::get('/shop',        [ShopController::class, 'index'])  ->name('shop.index');
-    Route::get('/shop/search', [ShopController::class, 'search']) ->name('shop.search');
-    Route::get('/shop/{product}', [ShopController::class, 'show'])->name('shop.show');
-    Route::get('/about-us',    [ShopController::class, 'aboutUs'])     ->name('shop.about-us');
-    Route::get('/contact',     [ShopController::class, 'contact'])     ->name('shop.contact');
-    Route::get('/gallery',     [ShopController::class, 'gallery'])     ->name('shop.gallery');
+Route::middleware('front.maintenance')->group(function () {
+    Route::get('/',            [ShopController::class, 'landing'])->name('front.landing');
+    Route::get('/shop',        [ShopController::class, 'index'])  ->name('front.index');
+    Route::get('/shop/search', [ShopController::class, 'search']) ->name('front.search');
+    Route::get('/shop/{product}', [ShopController::class, 'show'])->name('front.show');
+    Route::get('/about-us',    [ShopController::class, 'aboutUs'])     ->name('front.about-us');
+    Route::get('/contact',     [ShopController::class, 'contact'])     ->name('front.contact');
+    Route::get('/gallery',     [ShopController::class, 'gallery'])     ->name('front.gallery');
 
     // Public blog
-    Route::get('/blog',                  [BlogController::class, 'index'])->name('shop.blog.index');
-    Route::get('/blog/{slug}',           [BlogController::class, 'show']) ->name('shop.blog.show');
+    Route::get('/blog',                         [BlogController::class, 'index'])   ->name('front.blog.index');
+    Route::get('/blog/search',                  [BlogController::class, 'search'])  ->name('front.blog.search');
+    Route::get('/blog/category/{slug}',         [BlogController::class, 'category']) ->name('front.blog.category');
+    Route::get('/blog/{slug}',                  [BlogController::class, 'show'])     ->name('front.blog.show');
     Route::post('/blog/{post}/comments', [BlogCommentController::class, 'store'])->name('blog.comments.store');
 });
 
@@ -145,7 +147,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/blog-categories',                       [BlogCategoryController::class, 'store']) ->name('blog.categories.store');
         Route::get('/blog-categories/{blogCategory}/edit',    [BlogCategoryController::class, 'edit'])  ->name('blog.categories.edit');
         Route::put('/blog-categories/{blogCategory}',         [BlogCategoryController::class, 'update'])->name('blog.categories.update');
-        Route::delete('/blog-categories/{blogCategory}',      [BlogCategoryController::class, 'destroy'])->name('blog.categories.destroy');
+        Route::delete('/blog-categories/{blogCategory}',      [BlogCategoryController::class, 'destroy'])     ->name('blog.categories.destroy');
+        Route::delete('/blog-categories',                     [BlogCategoryController::class, 'bulkDestroy'])->name('blog.categories.bulkDestroy');
 
         Route::get('/blog-tags',              [BlogTagController::class, 'index'])  ->name('blog.tags.index');
         Route::post('/blog-tags',             [BlogTagController::class, 'store'])  ->name('blog.tags.store');

@@ -1,4 +1,4 @@
-﻿import logo from '../../images/gsun-texten-logo.png';
+﻿import logo from '../../images/logo.png';
 import { Link, router, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
@@ -492,7 +492,7 @@ function SidebarNav({
             {canWithdrawal && (
                 <div className="shrink-0 border-t border-gray-200 px-3 py-3">
                     <Link
-                        href={route('shop.show', 149)}
+                        href={route('front.show', 149)}
                         title={collapsed ? 'برداشت اعتبار کارت' : undefined}
                         className={`flex items-center rounded-lg py-2.5 text-sm font-medium text-indigo-600 hover:bg-gray-100 hover:text-indigo-700 transition-colors ${
                             collapsed ? 'justify-center px-2' : 'gap-3 px-3'
@@ -553,13 +553,13 @@ function ShopDropdown() {
         <div ref={btnRef} className="relative ml-auto">
             <div className="inline-flex rounded-md border border-[#E31F25] overflow-hidden shadow-sm">
                 <Link
-                    href={route('shop.index')}
+                    href={route('front.index')}
                     className="inline-flex items-center gap-1.5 bg-[#E31F25]/10 px-3 py-1.5 text-sm font-medium text-[#E31F25] hover:bg-[#E31F25]/20 transition-colors"
                 >
                     <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                     </svg>
-                    <span className="hidden sm:inline">فروشگاه</span>
+                    <span className="hidden sm:inline">وبلاگ</span>
                 </Link>
                 <button
                     type="button"
@@ -579,17 +579,17 @@ function ShopDropdown() {
                     className="fixed w-40 rounded-xl border border-gray-100 bg-white py-1 shadow-lg z-[200]"
                 >
                     <Link
-                        href={route('shop.index')}
+                        href={route('front.index')}
                         onClick={() => setOpen(false)}
                         className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                         <svg className="h-4 w-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                         </svg>
-                        فروشگاه
+                        وبلاگ
                     </Link>
                     <Link
-                        href={route('shop.landing')}
+                        href={route('front.landing')}
                         onClick={() => setOpen(false)}
                         className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
@@ -752,7 +752,7 @@ export default function Authenticated({
                     <Link href={route('dashboard')} className="flex items-center gap-3">
                         <img src={logo} alt="Company Logo" className="h-8 w-auto shrink-0" />
                         {!collapsed && (
-                            <span className="text-lg font-bold text-gray-900">پنل فروش اعتباری</span>
+                            <span className="text-lg font-bold text-gray-900">پنل مدیریت سایت</span>
                         )}
                     </Link>
                 </div>

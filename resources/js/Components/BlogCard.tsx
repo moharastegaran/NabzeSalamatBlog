@@ -9,7 +9,7 @@ interface Props {
 export default function BlogCard({ post, className = '' }: Props) {
     return (
         <Link
-            href={route('shop.blog.show', post.slug)}
+            href={route('front.blog.show', post.slug)}
             className={`min-h-[250px] lg:min-h-[450px] group flex flex-col justify-end overflow-hidden rounded-2xl lg:rounded-3xl shadow-none ${className}`}
             style={{
                 backgroundImage: `linear-gradient(0deg,rgba(246, 233, 233, 1) 25%,rgba(246, 233, 233, 0) 60%), url(/storage/${post.featured_image}) `,

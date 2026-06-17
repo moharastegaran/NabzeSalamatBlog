@@ -11,7 +11,7 @@ class MaintenanceController extends Controller
     public function show(): Response|\Illuminate\Http\RedirectResponse
     {
         if (! cache()->get('shop_maintenance', false)) {
-            return redirect()->route('shop.landing');
+            return redirect()->route('front.landing');
         }
 
         return Inertia::render('Front/Maintenance');

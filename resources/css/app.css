@@ -59,6 +59,30 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+    .blog-body { @apply text-gray-700 leading-8 text-base; }
+    .blog-body h1 { @apply text-3xl font-bold text-gray-900 mt-8 mb-4; }
+    .blog-body h2 { @apply text-2xl font-bold text-gray-900 mt-7 mb-3; }
+    .blog-body h3 { @apply text-xl  font-semibold text-gray-800 mt-6 mb-2; }
+    .blog-body h4 { @apply text-lg  font-semibold text-gray-800 mt-5 mb-2; }
+    .blog-body p  { @apply mb-5; }
+    .blog-body a  { @apply text-indigo-600 underline underline-offset-2 hover:text-indigo-800; }
+    .blog-body ul { @apply list-disc mb-5 space-y-1; padding-right: 1.5rem; }
+    .blog-body ol { @apply list-decimal mb-5 space-y-1; padding-right: 1.5rem; }
+    .blog-body li { @apply leading-7; }
+    .blog-body blockquote { @apply border-r-4 border-indigo-300 pr-4 my-6 italic text-gray-600; }
+    .blog-body strong { @apply font-bold text-gray-900; }
+    .blog-body em { @apply italic; }
+    .blog-body img { @apply rounded-xl my-6 max-w-full mx-auto shadow-sm; }
+    .blog-body hr  { @apply my-8 border-gray-200; }
+    .blog-body code { @apply bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono text-rose-600; }
+    .blog-body pre  { @apply bg-gray-900 text-gray-100 rounded-xl p-4 overflow-x-auto my-6 text-sm font-mono; }
+    .blog-body pre code { @apply bg-transparent p-0 text-inherit; }
+    .blog-body table { @apply w-full border-collapse my-6 text-sm; }
+    .blog-body th { @apply border border-gray-200 bg-gray-50 px-3 py-2 text-right font-semibold; }
+    .blog-body td { @apply border border-gray-200 px-3 py-2; }
+}
+
 @keyframes carousel-slide-left {
     from { transform: translateX(48px); }
     to   { transform: translateX(0); }

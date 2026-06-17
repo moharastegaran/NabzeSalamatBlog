@@ -51,7 +51,7 @@ export default function BlogComments({ comments }: Props) {
                                             <td className="px-4 py-3 text-sm text-gray-500">
                                                 {comment.post ? (
                                                     <a
-                                                        href={route('shop.blog.show', comment.post.slug)}
+                                                        href={route('front.blog.show', comment.post.slug)}
                                                         target="_blank"
                                                         rel="noreferrer"
                                                         className="text-indigo-600 hover:underline"

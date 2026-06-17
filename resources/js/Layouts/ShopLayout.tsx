@@ -2,10 +2,10 @@ import { Link, usePage } from '@inertiajs/react';
 import CatMegaMenu, { MENU } from '@/Components/CatMegaMenu';
 import { PropsWithChildren, useState, useEffect, useRef } from 'react';
 import { PageProps } from '@/types';
-import { Product } from '@/types/models';
+import { BlogPost } from '@/types/models';
 import axios from 'axios';
-import logoSrc from '../../images/gsun-notext.png';
-import logoSrc2 from '../../images/gsun-texten-logo.png';
+import logoSrc from '../../images/logo.png';
+import logoSrc2 from '../../images/logo.png';
 import rubikalogo from '../../images/rubika.png';
 import balelogo from '../../images/bale.webp'
 import enamadLogo from '../../images/enamad-temp.png';
@@ -15,7 +15,7 @@ interface Props extends PropsWithChildren {
 }
 
 export default function ShopLayout({ children, cartCount = 0, floatingHeader = false }: Props) {
-    const { auth, paymentBanks = [] } = usePage<PageProps>().props;
+    const { auth } = usePage<PageProps>().props;
     const { url } = usePage();
     const pathname = url.split('?')[0];
 
@@ -35,7 +35,7 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
 
     // ── Search ──
     const [query, setQuery]         = useState('');
-    const [results, setResults]     = useState<Product[]>([]);
+    const [results, setResults]     = useState<BlogPost[]>([]);
     const [dropOpen, setDropOpen]   = useState(false);
     const [searching, setSearching] = useState(false);
     const searchWrap  = useRef<HTMLDivElement>(null);
@@ -60,7 +60,7 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
         searchTimer.current = setTimeout(async () => {
             setSearching(true);
             try {
-                const { data } = await axios.get<Product[]>(route('shop.search'), { params: { q } });
+                const { data } = await axios.get<BlogPost[]>(route('front.blog.search'), { params: { q } });
                 setResults(data);
                 setDropOpen(true);
             } finally {
@@ -108,13 +108,13 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
 
                         {/* Right group: Logo + Nav */}
                         <div className="flex items-center gap-4">
-                            <Link href={route('shop.landing')} className="flex-shrink-0 sm:mr-0 mr-1">
-                                <img src={logoSrc} alt="جی‌سان" className="sm:w-auto w-[100px]" />
+                            <Link href={route('front.landing')} className="flex-shrink-0 sm:mr-0 mr-1">
+                                <img src={logoSrc} alt="جی‌سان" className="w-[70px]" />
                             </Link>
 
                             <nav className="hidden md:flex items-center gap-1">
                                 <Link
-                                    href={route('shop.landing')}
+                                    href={route('front.landing')}
                                     className={isActive('/') ? navActive : navInactive}
                                 >
                                     خانه
@@ -124,70 +124,6 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                                     activeClass={navActive}
                                     isShopActive={isActive('/shop')}
                                 />
-
-                                {/* ── Credit payments mega menu (hover) ── */}
-                                <div className="relative group">
-                                    <button className={`${navInactive} flex items-center gap-1`}>
-                                        آشنایی با طرح‌های اقساطی
-                                        <svg className="w-3 h-3 transition-transform duration-200 group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </button>
-
-                                    {/* Panel — no gap so hover is continuous */}
-                                    <div className="absolute top-full right-0 z-50 pt-1.5
-                                                    invisible opacity-0 translate-y-1 pointer-events-none
-                                                    group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
-                                                    transition-all duration-200 ease-out">
-                                        <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden" style={{ minWidth: '340px' }}>
-
-                                            {/* Header row */}
-                                            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                                                <span className="text-sm font-bold text-[#404040]">روش‌های پرداخت اقساطی</span>
-                                                <Link
-                                                    href={route('shop.index')}
-                                                    className="text-xs text-[#E31F25] hover:underline font-medium"
-                                                >
-                                                    مشاهده محصولات
-                                                </Link>
-                                            </div>
-
-                                            {/* Banking items grid */}
-                                            {paymentBanks.length > 0 ? (
-                                                <div className="p-3 grid grid-cols-3 gap-1.5">
-                                                    {paymentBanks.map(bank => (
-                                                        <Link
-                                                            key={bank.id}
-                                                            href={route('shop.banking.plan', { banking: bank.id })}
-                                                            className="group/card flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-[#FFF5F5] transition-colors"
-                                                        >
-                                                            <div className="w-14 h-14 rounded-xl overflow-hidden bg-[#F2F2F2] flex items-center justify-center flex-shrink-0">
-                                                                {bank.img ? (
-                                                                    <img
-                                                                        src={`/storage/${bank.img}`}
-                                                                        alt={bank.name}
-                                                                        className="w-full h-full object-contain p-1.5"
-                                                                    />
-                                                                ) : (
-                                                                    <svg className="w-7 h-7 text-[#C7C7C7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                                                    </svg>
-                                                                )}
-                                                            </div>
-                                                            <span className="text-xs font-semibold text-[#404040] text-center leading-tight group-hover/card:text-[#E31F25] transition-colors line-clamp-2">
-                                                                {bank.name}
-                                                            </span>
-                                                        </Link>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <p className="px-5 py-6 text-sm text-[#898A89] text-center">
-                                                    روشی ثبت نشده است
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
 
                                 {/* Credit panel dropdown */}
                                 <Link
@@ -229,11 +165,11 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                                 {dropOpen && results.length > 0 && (
                                     <div className="absolute top-full right-0 mt-1.5 w-72 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
                                         {results.map(p => {
-                                            const img = p.images?.[0] ? `/storage/${p.images[0]}` : null;
+                                            const img = p.featured_image ? `/storage/${p.featured_image}` : null;
                                             return (
                                                 <Link
                                                     key={p.id}
-                                                    href={route('shop.show', p.id)}
+                                                    href={route('front.blog.show', p.slug)}
                                                     onClick={() => { setDropOpen(false); setQuery(''); }}
                                                     className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#F2F2F2] transition"
                                                 >
@@ -253,7 +189,7 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                                             );
                                         })}
                                         <Link
-                                            href={route('shop.index', { search: query })}
+                                            href={route('front.blog.index', { search: query })}
                                             onClick={() => setDropOpen(false)}
                                             className="flex items-center justify-center gap-1.5 px-4 py-2.5 border-t border-[#EEEEEE] text-xs text-[#E31F25] hover:bg-[#F2F2F2] transition font-medium"
                                         >
@@ -315,12 +251,12 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                             <div>
                                 <ul className="space-y-3">
                                     <li>
-                                        <Link href={route('shop.about-us')} className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <Link href={route('front.about-us')} className="hover:text-[#B8181E] text-base font-medium transition">
                                            درباره ما
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href={route('shop.contact')} className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <Link href={route('front.contact')} className="hover:text-[#B8181E] text-base font-medium transition">
                                             تماس با ما
                                         </Link>
                                     </li>
@@ -336,12 +272,12 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                             <div>
                                 <ul className="space-y-3">
                                     <li>
-                                        <Link href={route('shop.blog.index')} className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <Link href={route('front.blog.index')} className="hover:text-[#B8181E] text-base font-medium transition">
                                             بلاگ
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href={route('shop.gallery')} className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <Link href={route('front.gallery')} className="hover:text-[#B8181E] text-base font-medium transition">
                                             گالری
                                         </Link>
                                     </li>
@@ -595,7 +531,7 @@ function BottomNav({ cartCount, auth, pathname }: { cartCount: number; auth: Pag
                 <div className="flex items-center justify-around h-16 px-1">
 
                     {/* Home */}
-                    <Link href={route('shop.landing')} className={navItemClass(isActive('/'))}>
+                    <Link href={route('front.landing')} className={navItemClass(isActive('/'))}>
                         <div className={iconClass(isActive('/'))}>
                             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />

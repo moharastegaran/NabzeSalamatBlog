@@ -93,7 +93,7 @@ export default function Error({ status }: Props) {
                     {/* Actions */}
                     <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
                         <Link
-                            href={route('shop.landing')}
+                            href={route('front.landing')}
                             className="inline-flex items-center gap-2 rounded-xl bg-[#E31F25] px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#c41920] transition-colors"
                         >
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

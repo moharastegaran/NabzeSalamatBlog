@@ -15,7 +15,7 @@ class CheckShopMaintenance
                 return $next($request);
             }
 
-            return redirect()->route('shop.maintenance');
+            return redirect()->route('front.maintenance');
         }
 
         return $next($request);

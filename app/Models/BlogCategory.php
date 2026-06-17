@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
@@ -26,8 +27,8 @@ class BlogCategory extends Model
         return $this->hasMany(BlogCategory::class, 'parent_id');
     }
 
-    public function posts(): HasMany
+    public function posts(): BelongsToMany
     {
-        return $this->hasMany(BlogPost::class);
+        return $this->belongsToMany(BlogPost::class, 'blog_post_categories');
     }
 }

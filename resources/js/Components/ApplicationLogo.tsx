@@ -1,6 +1,6 @@
 import { ImgHTMLAttributes } from 'react';
-import gsunLogo from '../../images/gsun-texten-logo.png';
+import logo from '../../images/logo.png';
 
 export default function ApplicationLogo({ className, ...props }: ImgHTMLAttributes<HTMLImageElement>) {
-    return <img src={gsunLogo} alt="Gsun" className={className} {...props} />;
+    return <img src={logo} alt="Nabze Salamat Blog" className={className} {...props} />;
 }

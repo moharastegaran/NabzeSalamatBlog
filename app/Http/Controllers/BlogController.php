@@ -53,6 +53,47 @@ class BlogController extends Controller
         ]);
     }
 
+    public function category(string $slug): Response
+    {
+        $category = BlogCategory::where('slug', $slug)
+            ->with([
+                'parent:id,name,slug',
+                'children' => fn ($q) => $q->withCount(['posts' => fn ($q) => $q->published()])->orderBy('name'),
+            ])
+            ->withCount(['posts' => fn ($q) => $q->published()])
+            ->firstOrFail();
+
+        $posts = BlogPost::published()
+            ->whereHas('categories', fn ($q) => $q->where('blog_categories.id', $category->id))
+            ->with(['author:id,name', 'tags:id,name,slug'])
+            ->withCount('approvedComments')
+            ->latest('published_at')
+            ->paginate(9)
+            ->withQueryString();
+
+        return Inertia::render('Front/Blog/Category', [
+            'category' => $category,
+            'posts'    => $posts,
+        ]);
+    }
+
+    public function search(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $q = trim($request->query('q', ''));
+        if (strlen($q) < 2) return response()->json([]);
+
+        $posts = BlogPost::published()
+            ->where(function ($query) use ($q) {
+                $query->where('title', 'like', "%{$q}%")
+                      ->orWhere('excerpt', 'like', "%{$q}%");
+            })
+            ->latest('published_at')
+            ->limit(8)
+            ->get(['id', 'title', 'slug', 'featured_image']);
+
+        return response()->json($posts);
+    }
+
     public function show(string $slug): Response
     {
         $post = BlogPost::published()

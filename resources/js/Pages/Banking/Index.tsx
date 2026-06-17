@@ -1,7 +1,20 @@
 ﻿import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, useForm } from '@inertiajs/react';
-import { Banking } from '@/types/models';
 import { useState } from 'react';
+
+interface Banking {
+    id: number;
+    parent_id?: number;
+    name: string;
+    description?: string;
+    img?: string;
+    impact_factor?: number;
+    period?: number;
+    ship_after_days?: number;
+    is_active: boolean;
+    parent?: Banking;
+    payment_plans?: Banking[];
+}
 
 interface Props {
     banks: Banking[];

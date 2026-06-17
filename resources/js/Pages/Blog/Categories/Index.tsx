@@ -1,6 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { BlogCategory } from '@/types/models';
 import type { PageProps } from '@/types';
 
@@ -48,10 +48,42 @@ export default function BlogCategoriesIndex({ categories }: Props) {
 
     const flatRows = useMemo(() => buildFlatList(categories), [categories]);
 
+    const [selected, setSelected] = useState<Set<number>>(new Set());
+    const allIds = flatRows.map(r => r.cat.id);
+    const allSelected = allIds.length > 0 && allIds.every(id => selected.has(id));
+    const someSelected = selected.size > 0;
+
+    const toggleAll = () => setSelected(allSelected ? new Set() : new Set(allIds));
+    const toggleOne = (id: number) => setSelected(prev => {
+        const next = new Set(prev);
+        next.has(id) ? next.delete(id) : next.add(id);
+        return next;
+    });
+
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setDropdownOpen(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
     const destroy = (cat: BlogCategory) => {
         if (confirm(`آیا از حذف دسته‌بندی "${cat.name}" اطمینان دارید؟`)) {
             router.delete(route('blog.categories.destroy', cat.id), { preserveScroll: true });
         }
+    };
+
+    const destroySelected = () => {
+        if (!confirm(`آیا از حذف ${selected.size} دسته‌بندی انتخاب‌شده اطمینان دارید؟`)) return;
+        setDropdownOpen(false);
+        router.delete(route('blog.categories.bulkDestroy'), {
+            data: { ids: [...selected] },
+            preserveScroll: true,
+            onSuccess: () => setSelected(new Set()),
+        });
     };
 
     return (
@@ -62,29 +94,75 @@ export default function BlogCategoriesIndex({ categories }: Props) {
                 <div className="mx-auto max-w-5xl sm:px-6 lg:px-8 space-y-4">
 
 
-                    {canCreate && (
-                        <div className="flex justify-end">
+                    <div className="flex items-center justify-end gap-2">
+                        {canDelete && (
+                            <div ref={dropdownRef} className="relative">
+                                <button
+                                    type="button"
+                                    onClick={() => setDropdownOpen(v => !v)}
+                                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                >
+                                    عملیات
+                                    <svg className={`h-4 w-4 text-gray-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                {dropdownOpen && (
+                                    <div className="absolute left-0 z-20 mt-1 w-44 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                                        <button
+                                            type="button"
+                                            onClick={destroySelected}
+                                            disabled={!someSelected}
+                                            className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:text-gray-300"
+                                        >
+                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            حذف انتخاب‌شده‌ها
+                                            {someSelected && <span className="mr-auto text-xs font-medium text-red-400">({selected.size})</span>}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        {canCreate && (
                             <Link
                                 href={route('blog.categories.create')}
                                 className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
                             >
                                 + دسته‌بندی جدید
                             </Link>
-                        </div>
-                    )}
+                        )}
+                    </div>
 
                     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    {['نام', 'آیکون', 'تصویر', 'توضیحات', 'زیر‌دسته‌ها', 'مقالات', ''].map(h => (
+                                    <th className="px-4 py-3 w-10">
+                                        <input
+                                            type="checkbox"
+                                            checked={allSelected}
+                                            onChange={toggleAll}
+                                            className="h-4 w-4 rounded border-gray-300 accent-indigo-600"
+                                        />
+                                    </th>
+                                    {['نام', 'آیکون', 'توضیحات', 'مقالات', ''].map(h => (
                                         <th key={h} className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200 bg-white">
                                 {flatRows.map(({ cat, depth }) => (
-                                    <tr key={cat.id} className="hover:bg-gray-50">
+                                    <tr key={cat.id} className={`hover:bg-gray-50 ${selected.has(cat.id) ? 'bg-indigo-50' : ''}`}>
+                                        <td className="px-4 py-3 w-10">
+                                            <input
+                                                type="checkbox"
+                                                checked={selected.has(cat.id)}
+                                                onChange={() => toggleOne(cat.id)}
+                                                className="h-4 w-4 rounded border-gray-300 accent-indigo-600"
+                                            />
+                                        </td>
                                         <td className="px-4 py-3 text-sm">
                                             <div
                                                 className="flex items-center gap-1.5"
@@ -101,14 +179,8 @@ export default function BlogCategoriesIndex({ categories }: Props) {
                                         <td className="px-4 py-3">
                                             <ThumbCell path={cat.icon} alt="آیکون" />
                                         </td>
-                                        <td className="px-4 py-3">
-                                            <ThumbCell path={cat.thumbnail} alt="تصویر" />
-                                        </td>
                                         <td className="px-4 py-3 text-sm text-gray-500 max-w-[180px] truncate" title={cat.description ?? ''}>
                                             {cat.description ?? '—'}
-                                        </td>
-                                        <td className="px-4 py-3 text-sm text-gray-500 text-center">
-                                            {cat.children_count ?? 0}
                                         </td>
                                         <td className="px-4 py-3 text-sm text-center">
                                             {(cat.posts_count ?? 0) > 0 ? (
@@ -124,6 +196,17 @@ export default function BlogCategoriesIndex({ categories }: Props) {
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center justify-end gap-1">
+                                                <a
+                                                    href={route('front.blog.category', cat.slug)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="rounded p-1.5 text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors"
+                                                    title="مشاهده در سایت"
+                                                >
+                                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    </svg>
+                                                </a>
                                                 {canEdit && (
                                                     <Link
                                                         href={route('blog.categories.edit', cat.id)}
@@ -152,7 +235,7 @@ export default function BlogCategoriesIndex({ categories }: Props) {
                                 ))}
                                 {categories.length === 0 && (
                                     <tr>
-                                        <td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-400">دسته‌بندی‌ای وجود ندارد.</td>
+                                        <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-400">دسته‌بندی‌ای وجود ندارد.</td>
                                     </tr>
                                 )}
                             </tbody>

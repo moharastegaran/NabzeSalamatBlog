@@ -71,4 +71,14 @@ class BlogCategoryController extends Controller
 
         return back()->with('success', "دسته‌بندی \"{$name}\" حذف شد.");
     }
+
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $ids = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer', 'exists:blog_categories,id']])['ids'];
+
+        $count = BlogCategory::whereIn('id', $ids)->count();
+        BlogCategory::whereIn('id', $ids)->delete();
+
+        return back()->with('success', "{$count} دسته‌بندی حذف شد.");
+    }
 }
