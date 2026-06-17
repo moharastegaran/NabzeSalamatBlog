@@ -4,6 +4,7 @@ import { BlogCategory } from '@/types/models';
 import { PageProps } from '@/types';
 import { useState } from 'react';
 import AssetPicker from '@/Components/AssetPicker';
+import MultiSelect from '@/Components/MultiSelect';
 import type { Asset } from '@/types/models';
 
 interface ParentOption {
@@ -17,11 +18,6 @@ interface Props {
     parents: ParentOption[];
 }
 
-function labelFor(opt: ParentOption, all: ParentOption[]): string {
-    if (!opt.parent_id) return opt.name;
-    const parent = all.find(o => o.id === opt.parent_id);
-    return parent ? `${parent.name} / ${opt.name}` : opt.name;
-}
 
 function ImagePreview({ path, onClear, label }: { path: string; onClear: () => void; label: string }) {
     return (
@@ -51,7 +47,7 @@ export default function BlogCategoryEdit({ category, parents }: Props) {
     const [form, setForm] = useState({
         name:        category.name,
         description: category.description ?? '',
-        parent_id:   String(category.parent_id ?? ''),
+        parent_id:   category.parent_id ?? null,
         icon:        category.icon ?? '',
         thumbnail:   category.thumbnail ?? '',
     });
@@ -65,7 +61,7 @@ export default function BlogCategoryEdit({ category, parents }: Props) {
         router.put(route('blog.categories.update', category.id), {
             name:        form.name,
             description: form.description,
-            parent_id:   form.parent_id || null,
+            parent_id:   form.parent_id,
             icon:        form.icon || null,
             thumbnail:   form.thumbnail || null,
         }, {
@@ -103,23 +99,14 @@ export default function BlogCategoryEdit({ category, parents }: Props) {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">دسته‌بندی والد</label>
-                            <div className="relative">
-                                <select
-                                    value={form.parent_id}
-                                    onChange={e => setForm(p => ({ ...p, parent_id: e.target.value }))}
-                                    className={`${inputClass} appearance-none pr-3 pl-8`}
-                                    style={{ background: 'none' }}
-                                >
-                                    <option value="">— بدون والد (دسته اصلی) —</option>
-                                    {parents.map(opt => (
-                                        <option key={opt.id} value={opt.id}>{labelFor(opt, parents)}</option>
-                                    ))}
-                                </select>
-                                <svg className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
-                            {errors.parent_id && <p className="mt-1 text-xs text-red-600">{errors.parent_id}</p>}
+                            <MultiSelect
+                                options={parents}
+                                selected={form.parent_id !== null ? [form.parent_id] : []}
+                                onChange={ids => setForm(p => ({ ...p, parent_id: ids[0] ?? null }))}
+                                isMultiSelect={false}
+                                placeholder="— بدون والد (دسته اصلی) —"
+                                error={errors.parent_id}
+                            />
                         </div>
 
                         <div>

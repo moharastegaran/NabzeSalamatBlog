@@ -1,7 +1,29 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import { useMemo } from 'react';
 import { BlogCategory } from '@/types/models';
 import type { PageProps } from '@/types';
+
+interface FlatRow { cat: BlogCategory; depth: number; }
+
+function buildFlatList(cats: BlogCategory[]): FlatRow[] {
+    const childrenOf = new Map<number | null, BlogCategory[]>();
+    for (const cat of cats) {
+        const bucket = childrenOf.get(cat.parent_id ?? null) ?? [];
+        bucket.push(cat);
+        childrenOf.set(cat.parent_id ?? null, bucket);
+    }
+    const result: FlatRow[] = [];
+    function walk(parentId: number | null, depth: number) {
+        const children = (childrenOf.get(parentId) ?? []).sort((a, b) => a.name.localeCompare(b.name, 'fa'));
+        for (const cat of children) {
+            result.push({ cat, depth });
+            walk(cat.id, depth + 1);
+        }
+    }
+    walk(null, 0);
+    return result;
+}
 
 interface Props {
     categories: BlogCategory[];
@@ -24,6 +46,8 @@ export default function BlogCategoriesIndex({ categories, flash }: Props) {
     const canCreate = auth.user.permissions.includes('blog_categories.create');
     const canEdit   = auth.user.permissions.includes('blog_categories.edit');
     const canDelete = auth.user.permissions.includes('blog_categories.delete');
+
+    const flatRows = useMemo(() => buildFlatList(categories), [categories]);
 
     const destroy = (cat: BlogCategory) => {
         if (confirm(`آیا از حذف دسته‌بندی "${cat.name}" اطمینان دارید؟`)) {
@@ -56,21 +80,26 @@ export default function BlogCategoriesIndex({ categories, flash }: Props) {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    {['نام', 'والد', 'آیکون', 'تصویر', 'توضیحات', 'زیر‌دسته‌ها', 'مقالات', ''].map(h => (
+                                    {['نام', 'آیکون', 'تصویر', 'توضیحات', 'زیر‌دسته‌ها', 'مقالات', ''].map(h => (
                                         <th key={h} className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200 bg-white">
-                                {categories.map(cat => (
+                                {flatRows.map(({ cat, depth }) => (
                                     <tr key={cat.id} className="hover:bg-gray-50">
-                                        <td className="px-4 py-3 text-sm font-medium text-gray-800">{cat.name}</td>
-                                        <td className="px-4 py-3 text-sm text-gray-500">
-                                            {cat.parent ? (
-                                                <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-                                                    {cat.parent.name}
+                                        <td className="px-4 py-3 text-sm">
+                                            <div
+                                                className="flex items-center gap-1.5"
+                                                style={{ paddingRight: `${depth * 1.5}rem` }}
+                                            >
+                                                {depth > 0 && (
+                                                    <span className="flex-none select-none text-gray-300">└─</span>
+                                                )}
+                                                <span className={depth === 0 ? 'font-medium text-gray-800' : 'text-gray-600'}>
+                                                    {cat.name}
                                                 </span>
-                                            ) : '—'}
+                                            </div>
                                         </td>
                                         <td className="px-4 py-3">
                                             <ThumbCell path={cat.icon} alt="آیکون" />
@@ -126,7 +155,7 @@ export default function BlogCategoriesIndex({ categories, flash }: Props) {
                                 ))}
                                 {categories.length === 0 && (
                                     <tr>
-                                        <td colSpan={8} className="px-4 py-8 text-center text-sm text-gray-400">دسته‌بندی‌ای وجود ندارد.</td>
+                                        <td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-400">دسته‌بندی‌ای وجود ندارد.</td>
                                     </tr>
                                 )}
                             </tbody>
