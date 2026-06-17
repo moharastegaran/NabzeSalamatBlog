@@ -9,7 +9,6 @@ const EVENT_LABELS: Record<string, string> = { seminar: 'سمینار', exhibiti
 interface Props {
     items: PaginatedData<GalleryItem>;
     provinces: Province[];
-    flash?: { success?: string; error?: string };
 }
 
 function IconTrash() {
@@ -32,7 +31,7 @@ const selectCls = 'w-full rounded-xl bg-gray-50 border border-gray-200 px-4 py-2
 const inputCls  = 'w-full rounded-xl bg-gray-50 border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E31F25]';
 const labelCls  = 'block text-sm font-medium text-gray-700 mb-1';
 
-export default function GalleryIndex({ items, provinces, flash }: Props) {
+export default function GalleryIndex({ items, provinces }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const [filteredCities, setFilteredCities] = useState<{ id: number; name: string }[]>([]);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -104,13 +103,6 @@ export default function GalleryIndex({ items, provinces, flash }: Props) {
                         افزودن تصویر
                     </button>
                 </div>
-
-                {/* Flash */}
-                {flash?.success && (
-                    <div className="rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
-                        {flash.success}
-                    </div>
-                )}
 
                 {/* Table */}
                 <div className="rounded-2xl bg-white shadow-sm border border-gray-100 overflow-hidden">

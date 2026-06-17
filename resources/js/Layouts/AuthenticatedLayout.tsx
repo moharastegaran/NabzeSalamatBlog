@@ -3,6 +3,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import NotificationBell, { type NotificationItem } from '@/Components/NotificationBell';
+import FlashToast from '@/Components/FlashToast';
 
 function IconDashboard() {
     return (
@@ -818,6 +819,8 @@ export default function Authenticated({
                 <main className="flex-1 overflow-y-auto bg-[#F5F5F5] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb:hover]:bg-gray-400">
                     {children}
                 </main>
+
+                <FlashToast />
             </div>
         </div>
     );

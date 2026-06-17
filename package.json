@@ -34,6 +34,7 @@
         "moment-jalaali": "^0.10.4",
         "num2persian": "^4.3.0",
         "quill": "^2.0.3",
-        "react-apexcharts": "^2.1.0"
+        "react-apexcharts": "^2.1.0",
+        "react-hot-toast": "^2.6.0"
     }
 }

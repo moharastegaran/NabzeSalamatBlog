@@ -20,7 +20,6 @@ interface User {
 interface Props {
     announcements: Announcement[];
     users: User[];
-    flash?: { success?: string };
 }
 
 function IconMegaphone() {
@@ -204,7 +203,7 @@ function AnnouncementRow({ item }: { item: Announcement }) {
     );
 }
 
-export default function AnnouncementsIndex({ announcements, users, flash }: Props) {
+export default function AnnouncementsIndex({ announcements, users }: Props) {
     const { data, setData, post, processing, reset, errors } = useForm({
         message: '',
         user_ids: [] as number[],
@@ -226,11 +225,7 @@ export default function AnnouncementsIndex({ announcements, users, flash }: Prop
             <div className="lg:py-8 lg:px-0 px-4 py-5">
                 <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
 
-                    {flash?.success && (
-                        <div className="mb-5 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700 ring-1 ring-emerald-200">
-                            {flash.success}
-                        </div>
-                    )}
+
 
                     {/* Compose form */}
                     <form onSubmit={submit} className="mb-6">

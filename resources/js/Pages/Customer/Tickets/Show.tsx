@@ -23,7 +23,6 @@ const DEPT_LABELS: Record<TicketDepartment, string> = {
 
 interface Props {
     ticket: Ticket;
-    flash?: { success?: string };
 }
 
 function formatBytes(bytes: number) {
@@ -32,7 +31,7 @@ function formatBytes(bytes: number) {
     return `${(bytes / 1048576).toFixed(1)} MB`;
 }
 
-export default function CustomerTicketShow({ ticket, flash }: Props) {
+export default function CustomerTicketShow({ ticket }: Props) {
     const fileRef = useRef<HTMLInputElement>(null);
     const { data, setData, processing, errors, reset } = useForm<{ body: string; attachments: File[] }>({
         body:        '',
@@ -78,9 +77,7 @@ export default function CustomerTicketShow({ ticket, flash }: Props) {
                     </span>
                 </div>
 
-                {flash?.success && (
-                    <div className="rounded-md bg-green-50 p-3 text-green-700 text-sm">{flash.success}</div>
-                )}
+
 
                 {/* Messages */}
                 <div className="space-y-3">

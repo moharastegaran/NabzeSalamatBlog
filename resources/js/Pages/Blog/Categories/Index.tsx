@@ -27,7 +27,6 @@ function buildFlatList(cats: BlogCategory[]): FlatRow[] {
 
 interface Props {
     categories: BlogCategory[];
-    flash?: { success?: string };
 }
 
 function ThumbCell({ path, alt }: { path?: string | null; alt: string }) {
@@ -41,7 +40,7 @@ function ThumbCell({ path, alt }: { path?: string | null; alt: string }) {
     );
 }
 
-export default function BlogCategoriesIndex({ categories, flash }: Props) {
+export default function BlogCategoriesIndex({ categories }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canCreate = auth.user.permissions.includes('blog_categories.create');
     const canEdit   = auth.user.permissions.includes('blog_categories.edit');
@@ -61,9 +60,7 @@ export default function BlogCategoriesIndex({ categories, flash }: Props) {
 
             <div className="lg:py-8 lg:px-0 px-4 py-5">
                 <div className="mx-auto max-w-5xl sm:px-6 lg:px-8 space-y-4">
-                    {flash?.success && (
-                        <div className="rounded-md bg-green-50 p-4 text-green-700">{flash.success}</div>
-                    )}
+
 
                     {canCreate && (
                         <div className="flex justify-end">

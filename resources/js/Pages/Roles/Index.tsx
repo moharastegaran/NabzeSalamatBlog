@@ -165,7 +165,6 @@ function PermissionCheckboxes({
 }
 
 export default function RolesIndex({ roles, permissions }: Props) {
-    const { flash } = usePage<PageProps>().props;
 
     const [showCreate, setShowCreate]     = useState(false);
     const [editingRole, setEditingRole]   = useState<RoleItem | null>(null);
@@ -214,17 +213,6 @@ export default function RolesIndex({ roles, permissions }: Props) {
 
             <div className="lg:py-8 lg:px-0 px-4 py-5">
                 <div className="mx-auto max-w-5xl sm:px-6 lg:px-8 space-y-6">
-
-                    {flash?.success && (
-                        <div className="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
-                            {flash.success}
-                        </div>
-                    )}
-                    {flash?.error && (
-                        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-                            {flash.error}
-                        </div>
-                    )}
 
                     <div className="flex items-center justify-between">
                         <p className="text-sm text-gray-500">{roles.length} نقش تعریف شده</p>

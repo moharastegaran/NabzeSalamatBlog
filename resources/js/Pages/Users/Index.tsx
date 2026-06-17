@@ -10,7 +10,7 @@ interface Props {
     users: PaginatedData<User>;
     filters: { search?: string; city_id?: string };
     active_city?: string;
-    flash?: { success?: string; password?: string };
+
     roles: RoleOption[];
     can: { create: boolean };
 }
@@ -26,7 +26,7 @@ const ROLE_COLOR_PALETTE = [
 
 interface ResetResult { userName: string; password: string; }
 
-export default function UsersIndex({ users, filters, active_city, flash, roles, can }: Props) {
+export default function UsersIndex({ users, filters, active_city, roles, can }: Props) {
     const { auth } = usePage<PageProps>().props;
 
     const roleLabel = Object.fromEntries(roles.map(r => [r.slug, r.name]));
@@ -91,9 +91,6 @@ export default function UsersIndex({ users, filters, active_city, flash, roles, 
 
             <div className="lg:py-8 lg:px-0 px-4 py-5">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-4">
-                    {flash?.success && (
-                        <div className="rounded-md bg-green-50 p-4 text-green-700">{flash.success}</div>
-                    )}
 
                     {active_city && (
                         <div className="flex items-center gap-2 flex-wrap">

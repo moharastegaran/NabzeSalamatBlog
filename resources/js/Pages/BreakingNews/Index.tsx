@@ -69,7 +69,6 @@ function FieldError({ msg }: { msg?: string }) {
 }
 
 export default function BreakingNewsIndex({ items }: Props) {
-    const { flash } = usePage<PageProps>().props;
 
     const addForm = useForm<FormData>({
         title: '',
@@ -156,16 +155,7 @@ export default function BreakingNewsIndex({ items }: Props) {
             <div className="px-4 py-5 lg:px-0 lg:py-8">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
 
-                    {flash?.success && (
-                        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-                            {flash.success}
-                        </div>
-                    )}
-                    {flash?.error && (
-                        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-                            {flash.error}
-                        </div>
-                    )}
+
 
                     {/* ── Add form ── */}
                     <div className="rounded-xl bg-white shadow-sm">

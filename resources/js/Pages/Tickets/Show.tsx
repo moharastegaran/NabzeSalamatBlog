@@ -24,7 +24,6 @@ const DEPT_LABELS: Record<TicketDepartment, string> = {
 interface Props {
     ticket: Ticket;
     staff: { id: number; name: string }[];
-    flash?: { success?: string };
 }
 
 function formatBytes(bytes: number) {
@@ -33,7 +32,7 @@ function formatBytes(bytes: number) {
     return `${(bytes / 1048576).toFixed(1)} MB`;
 }
 
-export default function TicketShow({ ticket, staff, flash }: Props) {
+export default function TicketShow({ ticket, staff }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canRespond = auth.user.permissions.includes('tickets.respond');
     const canAssign  = auth.user.permissions.includes('tickets.assign');
@@ -81,9 +80,7 @@ export default function TicketShow({ ticket, staff, flash }: Props) {
             <div className="lg:py-8 lg:px-0 px-4 py-5">
                 <div className="mx-auto max-w-5xl sm:px-6 lg:px-8 space-y-6">
 
-                    {flash?.success && (
-                        <div className="rounded-md bg-green-50 p-3 text-green-700 text-sm">{flash.success}</div>
-                    )}
+
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 

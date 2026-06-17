@@ -1,7 +1,6 @@
 ﻿import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { Banking } from '@/types/models';
-import { PageProps } from '@/types';
 import { useState } from 'react';
 
 interface Props {
@@ -322,8 +321,6 @@ function EditModal({ item, onClose }: { item: Banking; onClose: () => void }) {
 }
 
 export default function BankingIndex({ banks, can }: Props) {
-    const { props } = usePage<PageProps>();
-    const flash = props.flash;
 
     const [editingItem, setEditingItem] = useState<Banking | null>(null);
     const [addTarget, setAddTarget] = useState<{ parentId?: number } | null>(null);
@@ -372,10 +369,6 @@ export default function BankingIndex({ banks, can }: Props) {
 
             <div className="lg:py-8 lg:px-0 px-4 py-5">
                 <div className="mx-auto max-w-5xl sm:px-6 lg:px-8 space-y-6">
-
-                    {flash?.success && (
-                        <div className="rounded-md bg-green-50 p-4 text-green-700 text-sm">{flash.success}</div>
-                    )}
 
                     {banks.length === 0 && (
                         <div className="rounded-lg bg-white px-6 py-12 text-center shadow-sm">

@@ -6,10 +6,9 @@ import type { PageProps } from '@/types';
 
 interface Props {
     tags: (BlogTag & { posts_count: number })[];
-    flash?: { success?: string };
 }
 
-export default function BlogTags({ tags, flash }: Props) {
+export default function BlogTags({ tags }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canCreate = auth.user.permissions.includes('tags.create');
     const canDelete = auth.user.permissions.includes('tags.delete');
@@ -47,9 +46,6 @@ export default function BlogTags({ tags, flash }: Props) {
 
             <div className="lg:py-8 lg:px-0 px-4 py-5">
                 <div className="mx-auto max-w-2xl sm:px-6 lg:px-8 space-y-6">
-                    {flash?.success && (
-                        <div className="rounded-md bg-green-50 p-4 text-green-700">{flash.success}</div>
-                    )}
 
                     {/* Add form */}
                     {canCreate && <form onSubmit={store} className="bg-white rounded-xl shadow-sm p-6 flex gap-3">

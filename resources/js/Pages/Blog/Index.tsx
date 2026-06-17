@@ -7,7 +7,6 @@ import type { PageProps } from '@/types';
 interface Props {
     posts: PaginatedData<BlogPost>;
     activeCategory?: { id: number; name: string } | null;
-    flash?: { success?: string };
 }
 
 const statusLabel: Record<string, string> = { draft: 'پیش‌نویس', published: 'منتشر شده' };
@@ -16,7 +15,7 @@ const statusClass: Record<string, string> = {
     published: 'bg-green-50 text-green-700',
 };
 
-export default function BlogIndex({ posts, activeCategory, flash }: Props) {
+export default function BlogIndex({ posts, activeCategory }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canCreate = auth.user.permissions.includes('blog.create');
     const canEdit   = auth.user.permissions.includes('blog.edit');
@@ -48,9 +47,6 @@ export default function BlogIndex({ posts, activeCategory, flash }: Props) {
 
             <div className="lg:py-8 lg:px-0 px-4 py-5">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-4">
-                    {flash?.success && (
-                        <div className="rounded-md bg-green-50 p-4 text-green-700">{flash.success}</div>
-                    )}
 
                     {activeCategory && (
                         <div className="flex items-center gap-2 rounded-md bg-indigo-50 px-4 py-2.5 text-sm text-indigo-700">

@@ -6,10 +6,9 @@ import type { PageProps } from '@/types';
 
 interface Props {
     comments: PaginatedData<BlogComment>;
-    flash?: { success?: string };
 }
 
-export default function BlogComments({ comments, flash }: Props) {
+export default function BlogComments({ comments }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canApprove = auth.user.permissions.includes('comments.approve');
     const canDiscard = auth.user.permissions.includes('comments.discard');
@@ -30,9 +29,6 @@ export default function BlogComments({ comments, flash }: Props) {
 
             <div className="lg:py-8 lg:px-0 px-4 py-5">
                 <div className="mx-auto max-w-5xl sm:px-6 lg:px-8 space-y-4">
-                    {flash?.success && (
-                        <div className="rounded-md bg-green-50 p-4 text-green-700">{flash.success}</div>
-                    )}
 
                     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                         <div className="overflow-x-auto">
