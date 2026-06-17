@@ -281,23 +281,6 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                                 {auth.user ? 'پنل کاربری' : 'ورود/ثبت نام'}
                             </Link>
 
-                            {/* Cart — circular with white bg + shadow */}
-                            <Link
-                                href={route('cart.index')}
-                                className="relative flex-shrink-0 hidden lg:block"
-                                aria-label="سبد خرید"
-                            >
-                                <div className="w-10 h-10 rounded-full bg-white shadow-[0_2px_12px_rgba(0,0,0,0.15)] flex items-center justify-center text-[#404040] hover:shadow-[0_4px_16px_rgba(0,0,0,0.2)] transition-shadow">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                </div>
-                                {cartCount > 0 && (
-                                    <span className="absolute -top-1 -left-1 bg-[#E31F25] text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-bold leading-none">
-                                        {cartCount > 9 ? '۹+' : cartCount.toLocaleString('fa-IR')}
-                                    </span>
-                                )}
-                            </Link>
                         </div>
                     </div>
                 </div>
@@ -396,11 +379,6 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                             <div>
                                 <ul className="space-y-3">
                                     <li>
-                                        <Link href={route('shop.job-application')} className="hover:text-[#B8181E] text-base font-medium transition">
-                                            فرم استخدام
-                                        </Link>
-                                    </li>
-                                    <li>
                                         <a href="#" className="hover:text-[#B8181E] text-base font-medium transition">
                                             رسیدگی به شکایات
                                         </a>
@@ -434,12 +412,12 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                             <p className="lg:text-sm text-base font-normal leading-6 lg:mb- 5 mb-3">
                                 با دریافت نمایندگی، به جمع شرکای تجاری جی‌سان بپیوندید.  بازاری سودآور و پایدار در انتظار شماست.
                             </p>
-                            <Link
-                                href={route('shop.representative')}
+                            <a
+                                href="#"
                                 className="inline-block bg-[#E31F25] hover:bg-[#B8181E] text-white font-bold px-8 py-3 rounded-3xl transition shadow-lg"
                             >
                                 درخواست نمایندگی
-                            </Link>
+                            </a>
                         </div>
 
                         <div className="flex flex-row items-stretch justify-center lg:gap-6 gap-4">
@@ -636,20 +614,6 @@ function BottomNav({ cartCount, auth, pathname }: { cartCount: number; auth: Pag
                         <span className={labelClass(isShopActive || menuOpen)}>فروشگاه</span>
                     </button>
 
-                    {/* Cart */}
-                    <Link href={route('cart.index')} className={navItemClass(isActive('/cart'))}>
-                        <div className={iconClass(isActive('/cart'))}>
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                        </div>
-                        {cartCount > 0 && (
-                            <span className="absolute top-1 right-1/2 translate-x-3 -translate-y-0.5 bg-[#E31F25] text-white text-[9px] rounded-full h-4 w-4 flex items-center justify-center font-bold leading-none">
-                                {cartCount > 9 ? '۹+' : cartCount}
-                            </span>
-                        )}
-                        <span className={labelClass(isActive('/cart'))}>سبد خرید</span>
-                    </Link>
 
                     {/* Auth */}
                     <Link

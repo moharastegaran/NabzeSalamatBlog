@@ -14,7 +14,7 @@ class MaintenanceController extends Controller
             return redirect()->route('shop.landing');
         }
 
-        return Inertia::render('Shop/Maintenance');
+        return Inertia::render('Front/Maintenance');
     }
 
     public function toggle(): RedirectResponse

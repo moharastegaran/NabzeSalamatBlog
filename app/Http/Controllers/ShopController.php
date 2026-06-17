@@ -10,7 +10,7 @@ class ShopController extends Controller
 {
     public function landing(): Response
     {
-        return Inertia::render('Shop/Landing', [
+        return Inertia::render('Front/Landing', [
             'categories'       => [],
             'categoryProducts' => [],
             'paymentBanks'     => [],
@@ -26,7 +26,7 @@ class ShopController extends Controller
 
     public function index(): Response
     {
-        return Inertia::render('Shop/Index', [
+        return Inertia::render('Front/Index', [
             'products'     => [],
             'categories'   => [],
             'filters'      => [],
@@ -49,14 +49,14 @@ class ShopController extends Controller
 
     public function aboutUs(): Response
     {
-        return Inertia::render('Shop/AboutUs', [
+        return Inertia::render('Front/AboutUs', [
             'cartCount' => $this->cartCount(),
         ]);
     }
 
     public function contact(): Response
     {
-        return Inertia::render('Shop/Contact', [
+        return Inertia::render('Front/Contact', [
             'cartCount' => $this->cartCount(),
         ]);
     }
@@ -69,7 +69,7 @@ class ShopController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        return Inertia::render('Shop/Gallery', [
+        return Inertia::render('Front/Gallery', [
             'items'     => $items,
             'cartCount' => $this->cartCount(),
         ]);

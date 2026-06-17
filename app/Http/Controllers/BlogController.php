@@ -42,7 +42,7 @@ class BlogController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'slug']);
 
-        return Inertia::render('Shop/Blog/Index', [
+        return Inertia::render('Front/Blog/Index', [
             'posts'          => $posts,
             'categories'     => $categories,
             'filters'        => [
@@ -81,7 +81,7 @@ class BlogController extends Controller
             ->limit(3)
             ->get(['id', 'title', 'slug', 'excerpt', 'featured_image', 'published_at']);
 
-        return Inertia::render('Shop/Blog/Show', [
+        return Inertia::render('Front/Blog/Show', [
             'post'        => $post,
             'related'     => $related,
             'recentPosts' => $recentPosts,

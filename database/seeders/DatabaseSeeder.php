@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
 
         $adminUser = User::firstOrCreate(
             ['email' => 'admin@salesportal.test'],
-            ['name' => 'Admin', 'password' => Hash::make('password'), 'mobile' => '09000000000']
+            ['name' => 'Admin', 'password' => Hash::make('password'), 'mobile' => '09000000000', 'melli_code' => '1742714439']
         );
         $adminUser->syncRoles('admin');
 
