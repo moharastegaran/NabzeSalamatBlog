@@ -46,20 +46,24 @@ export default function BlogCategoryEdit({ category, parents }: Props) {
 
     const [form, setForm] = useState({
         name:        category.name,
+        slug:        category.slug,
         description: category.description ?? '',
         parent_id:   category.parent_id ?? null,
         icon:        category.icon ?? '',
         thumbnail:   category.thumbnail ?? '',
     });
-    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [errors, setErrors]         = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
     const [pickerOpen, setPickerOpen] = useState<'icon' | 'thumbnail' | null>(null);
+
+    const isValidSlug = (s: string) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         setProcessing(true);
         router.put(route('blog.categories.update', category.id), {
             name:        form.name,
+            slug:        form.slug,
             description: form.description,
             parent_id:   form.parent_id,
             icon:        form.icon || null,
@@ -95,6 +99,25 @@ export default function BlogCategoryEdit({ category, parents }: Props) {
                                 autoFocus
                             />
                             {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                اسلاگ (Slug) <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                dir="ltr"
+                                value={form.slug}
+                                onChange={e => setForm(p => ({ ...p, slug: e.target.value }))}
+                                className={`${inputClass} font-mono ${
+                                    form.slug && !isValidSlug(form.slug) ? 'border-red-400 focus:border-red-500 focus:ring-red-500' : ''
+                                }`}
+                            />
+                            {form.slug && !isValidSlug(form.slug) && !errors.slug && (
+                                <p className="mt-1 text-xs text-amber-600">فقط حروف لاتین کوچک، اعداد و خط تیره مجاز است (مثال: salamat-omumi)</p>
+                            )}
+                            {errors.slug && <p className="mt-1 text-xs text-red-600">{errors.slug}</p>}
                         </div>
 
                         <div>

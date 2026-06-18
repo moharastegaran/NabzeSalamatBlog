@@ -42,16 +42,41 @@ export default function BlogCategoryCreate({ parents }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canUpload = auth.user?.roles?.includes('admin') ?? false;
 
-    const [form, setForm] = useState({ name: '', description: '', parent_id: null as number | null, icon: '', thumbnail: '' });
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    const [processing, setProcessing] = useState(false);
-    const [pickerOpen, setPickerOpen] = useState<'icon' | 'thumbnail' | null>(null);
+    const [form, setForm] = useState({ name: '', slug: '', description: '', parent_id: null as number | null, icon: '', thumbnail: '' });
+    const [errors, setErrors]           = useState<Record<string, string>>({});
+    const [processing, setProcessing]   = useState(false);
+    const [pickerOpen, setPickerOpen]   = useState<'icon' | 'thumbnail' | null>(null);
+    const [slugEdited, setSlugEdited]   = useState(false);
+
+    const toSlug = (s: string) =>
+        s.toLowerCase()
+         .replace(/[^a-z0-9\s-]/g, '')
+         .trim()
+         .replace(/\s+/g, '-')
+         .replace(/-+/g, '-')
+         .replace(/^-+|-+$/g, '');
+
+    const isValidSlug = (s: string) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
+
+    const handleNameChange = (name: string) => {
+        setForm(p => ({
+            ...p,
+            name,
+            slug: slugEdited ? p.slug : toSlug(name),
+        }));
+    };
+
+    const handleSlugChange = (slug: string) => {
+        setSlugEdited(true);
+        setForm(p => ({ ...p, slug }));
+    };
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         setProcessing(true);
         router.post(route('blog.categories.store'), {
             name:        form.name,
+            slug:        form.slug,
             description: form.description,
             parent_id:   form.parent_id,
             icon:        form.icon || null,
@@ -82,11 +107,31 @@ export default function BlogCategoryCreate({ parents }: Props) {
                             <input
                                 type="text"
                                 value={form.name}
-                                onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                                onChange={e => handleNameChange(e.target.value)}
                                 className={inputClass}
                                 autoFocus
                             />
                             {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                اسلاگ (Slug) <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                dir="ltr"
+                                value={form.slug}
+                                onChange={e => handleSlugChange(e.target.value)}
+                                placeholder="example-slug"
+                                className={`${inputClass} font-mono ${
+                                    form.slug && !isValidSlug(form.slug) ? 'border-red-400 focus:border-red-500 focus:ring-red-500' : ''
+                                }`}
+                            />
+                            {form.slug && !isValidSlug(form.slug) && !errors.slug && (
+                                <p className="mt-1 text-xs text-amber-600">فقط حروف لاتین کوچک، اعداد و خط تیره مجاز است (مثال: salamat-omumi)</p>
+                            )}
+                            {errors.slug && <p className="mt-1 text-xs text-red-600">{errors.slug}</p>}
                         </div>
 
                         <div>

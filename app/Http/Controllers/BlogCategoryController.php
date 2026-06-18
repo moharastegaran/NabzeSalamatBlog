@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BlogCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -28,6 +29,7 @@ class BlogCategoryController extends Controller
     {
         $validated = $request->validate([
             'name'        => ['required', 'string', 'max:255'],
+            'slug'        => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', 'unique:blog_categories,slug'],
             'description' => ['nullable', 'string', 'max:500'],
             'parent_id'   => ['nullable', 'exists:blog_categories,id'],
             'icon'        => ['nullable', 'string', 'max:500'],
@@ -53,6 +55,7 @@ class BlogCategoryController extends Controller
     {
         $validated = $request->validate([
             'name'        => ['required', 'string', 'max:255'],
+            'slug'        => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('blog_categories', 'slug')->ignore($blogCategory->id)],
             'description' => ['nullable', 'string', 'max:500'],
             'parent_id'   => ['nullable', 'exists:blog_categories,id'],
             'icon'        => ['nullable', 'string', 'max:500'],
