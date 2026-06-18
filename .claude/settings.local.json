@@ -32,7 +32,8 @@
       "PowerShell(docker compose *)",
       "PowerShell(docker exec nabzesalamatblog-app-1 *)",
       "PowerShell(Copy-Item *)",
-      "Bash(Get-ChildItem *)"
+      "Bash(Get-ChildItem *)",
+      "Bash(docker exec *)"
     ]
   }
 }

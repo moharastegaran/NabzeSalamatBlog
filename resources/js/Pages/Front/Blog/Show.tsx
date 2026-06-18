@@ -1,6 +1,6 @@
-import { Head, Link, router } from '@inertiajs/react';
+﻿import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import ShopLayout from '@/Layouts/ShopLayout';
+import BlogLayout from '@/Layouts/BlogLayout';
 import type { BlogComment, BlogPost, BlogTag } from '@/types/models';
 
 interface Props {
@@ -116,7 +116,7 @@ export default function BlogShow({ post, related, recentPosts }: Props) {
     const comments = post.approved_comments ?? [];
 
     return (
-        <ShopLayout>
+        <BlogLayout>
             <Head title={`${post.title} | وبلاگ`} />
 
             {/* Featured image */}
@@ -355,6 +355,6 @@ export default function BlogShow({ post, related, recentPosts }: Props) {
                     </section>
                 )}
             </div>
-        </ShopLayout>
+        </BlogLayout>
     );
 }

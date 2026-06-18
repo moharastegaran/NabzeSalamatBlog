@@ -1,5 +1,5 @@
-import { Head, Link } from '@inertiajs/react';
-import ShopLayout from '@/Layouts/ShopLayout';
+﻿import { Head, Link } from '@inertiajs/react';
+import BlogLayout from '@/Layouts/BlogLayout';
 import type { BlogCategory, BlogPost, PaginatedData } from '@/types/models';
 
 interface CategoryWithMeta extends BlogCategory {
@@ -106,7 +106,7 @@ function Pagination({ links }: { links: PaginatedData<unknown>['links'] }) {
 
 export default function BlogCategory({ category, posts }: Props) {
     return (
-        <ShopLayout>
+        <BlogLayout>
             <Head title={`${category.name} | وبلاگ`} />
 
             <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -193,6 +193,6 @@ export default function BlogCategory({ category, posts }: Props) {
                     </div>
                 )}
             </div>
-        </ShopLayout>
+        </BlogLayout>
     );
 }

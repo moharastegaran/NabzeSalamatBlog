@@ -1,4 +1,4 @@
-import ShopLayout from '@/Layouts/ShopLayout';
+﻿import BlogLayout from '@/Layouts/BlogLayout';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode } from 'react';
 import { PageProps } from '@/types';
@@ -106,7 +106,7 @@ export default function CustomerLayout({ children }: PropsWithChildren) {
     const user = auth.user;
 
     return (
-        <ShopLayout>
+        <BlogLayout>
             <div className="max-w-shop mx-auto px-4 sm:px-6 lg:px-0 py-8">
 
                 <div className="flex ml-auto mb-12 mt-0">
@@ -183,6 +183,6 @@ export default function CustomerLayout({ children }: PropsWithChildren) {
 
                 </div>
             </div>
-        </ShopLayout>
+        </BlogLayout>
     );
 }

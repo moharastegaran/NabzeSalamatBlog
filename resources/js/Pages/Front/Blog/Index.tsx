@@ -1,6 +1,6 @@
-import { Head, Link, router } from '@inertiajs/react';
+﻿import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import ShopLayout from '@/Layouts/ShopLayout';
+import BlogLayout from '@/Layouts/BlogLayout';
 import type { BlogCategory, BlogPost, PaginatedData } from '@/types/models';
 
 interface Props {
@@ -119,7 +119,7 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
     const activeCategory = filters.category;
 
     return (
-        <ShopLayout>
+        <BlogLayout>
             <Head title="وبلاگ" />
 
             {/* Page header */}
@@ -220,6 +220,6 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                     </div>
                 )}
             </div>
-        </ShopLayout>
+        </BlogLayout>
     );
 }
