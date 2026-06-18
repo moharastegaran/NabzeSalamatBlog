@@ -159,7 +159,7 @@ export interface BreakingNews {
     title: string;
     url: string | null;
     is_active: boolean;
-    active_from: string;        // 'YYYY-MM-DD HH:mm'
+    active_from: string | null; // 'YYYY-MM-DD HH:mm' or null
     active_until: string | null; // 'YYYY-MM-DD HH:mm' or null
     created_at: string;
 }

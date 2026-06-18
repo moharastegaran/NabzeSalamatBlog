@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\BlogCategory;
+use App\Models\BreakingNews;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -44,6 +45,11 @@ class HandleInertiaRequests extends Middleware
                     ->where('status', 'open')
                     ->count()
                 : 0,
+            'breakingNews'    => fn () => BreakingNews::where('is_active', true)
+                ->where(fn ($q) => $q->whereNull('active_from')->orWhere('active_from', '<=', now()))
+                ->where(fn ($q) => $q->whereNull('active_until')->orWhere('active_until', '>=', now()))
+                ->orderByDesc('created_at')
+                ->get(['id', 'title', 'url']),
             'navCategories'   => fn () => BlogCategory::whereNull('parent_id')
                 ->with(['children' => fn ($q) => $q->select('id', 'name', 'slug', 'parent_id')->orderBy('name')])
                 ->select('id', 'name', 'slug', 'icon', 'thumbnail')

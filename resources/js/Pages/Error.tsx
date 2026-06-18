@@ -116,7 +116,7 @@ export default function Error({ status }: Props) {
 
                 {/* Footer note */}
                 <p className="mt-6 text-center text-xs text-gray-400">
-                    فروشگاه جی‌سان &mdash; کد خطا {status}
+                    سایت خبری نبض سلامت &mdash; کد خطا {status}
                 </p>
             </div>
 

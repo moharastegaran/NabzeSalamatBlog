@@ -19,7 +19,7 @@ class BreakingNewsController extends Controller
                 'title'        => $item->title,
                 'url'          => $item->url,
                 'is_active'    => $item->is_active,
-                'active_from'  => $item->active_from->format('Y-m-d H:i'),
+                'active_from'  => $item->active_from?->format('Y-m-d H:i'),
                 'active_until' => $item->active_until?->format('Y-m-d H:i'),
                 'created_at'   => $item->created_at,
             ]);
@@ -35,12 +35,11 @@ class BreakingNewsController extends Controller
             'title'        => ['required', 'string', 'max:255'],
             'url'          => ['nullable', 'url', 'max:500'],
             'is_active'    => ['boolean'],
-            'active_from'  => ['required', 'date', 'after_or_equal:now'],
+            'active_from'  => ['nullable', 'date', 'after_or_equal:now'],
             'active_until' => ['nullable', 'date', 'after:now', 'after:active_from'],
         ], [
             'title.required'             => 'عنوان الزامی است.',
             'url.url'                    => 'آدرس وارد شده معتبر نیست.',
-            'active_from.required'       => 'تاریخ شروع الزامی است.',
             'active_from.after_or_equal' => 'تاریخ شروع باید برابر یا بزرگ‌تر از زمان جاری باشد.',
             'active_until.after'         => 'تاریخ پایان باید بزرگ‌تر از زمان جاری و تاریخ شروع باشد.',
         ]);
@@ -56,13 +55,12 @@ class BreakingNewsController extends Controller
             'title'        => ['required', 'string', 'max:255'],
             'url'          => ['nullable', 'url', 'max:500'],
             'is_active'    => ['boolean'],
-            'active_from'  => ['required', 'date'],
+            'active_from'  => ['nullable', 'date'],
             'active_until' => ['nullable', 'date', 'after:active_from'],
         ], [
-            'title.required'       => 'عنوان الزامی است.',
-            'url.url'              => 'آدرس وارد شده معتبر نیست.',
-            'active_from.required' => 'تاریخ شروع الزامی است.',
-            'active_until.after'   => 'تاریخ پایان باید بزرگ‌تر از تاریخ شروع باشد.',
+            'title.required'     => 'عنوان الزامی است.',
+            'url.url'            => 'آدرس وارد شده معتبر نیست.',
+            'active_until.after' => 'تاریخ پایان باید بزرگ‌تر از تاریخ شروع باشد.',
         ]);
 
         $breakingNews->update($data);

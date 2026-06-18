@@ -1,3 +1,5 @@
+import type { BreakingNews } from './models';
+
 export interface NavCategory {
     id: number;
     name: string;
@@ -30,4 +32,5 @@ export type PageProps<
     shopMaintenance: boolean;
     openTickets: number;
     navCategories: NavCategory[];
+    breakingNews: BreakingNews[];
 };

@@ -28,9 +28,7 @@ function validateForm(data: FormData, requireFuture: boolean): Record<string, st
     const errs: Record<string, string> = {};
     if (!data.title.trim()) errs.title = 'عنوان الزامی است.';
     const now = nowString();
-    if (!data.active_from) {
-        errs.active_from = 'تاریخ شروع الزامی است.';
-    } else if (requireFuture && data.active_from < now) {
+    if (data.active_from && requireFuture && data.active_from < now) {
         errs.active_from = 'تاریخ شروع باید برابر یا بزرگ‌تر از زمان جاری باشد.';
     }
     if (data.active_until) {
@@ -109,7 +107,7 @@ export default function BreakingNewsIndex({ items }: Props) {
             title: item.title,
             url: item.url ?? '',
             is_active: item.is_active,
-            active_from: item.active_from,
+            active_from: item.active_from ?? '',
             active_until: item.active_until ?? '',
         });
         editForm.clearErrors();
@@ -205,9 +203,7 @@ export default function BreakingNewsIndex({ items }: Props) {
                             {/* Datetimes + toggle */}
                             <div className="grid gap-4 sm:grid-cols-3">
                                 <div>
-                                    <label className="mb-1 block text-xs font-medium text-gray-600">
-                                        از تاریخ <span className="text-red-500">*</span>
-                                    </label>
+                                    <label className="mb-1 block text-xs font-medium text-gray-600">از تاریخ (اختیاری)</label>
                                     <PersianDateTimePicker
                                         value={addForm.data.active_from}
                                         onChange={v => { addForm.setData('active_from', v); setAddClientErrors(p => ({ ...p, active_from: '' })); }}
@@ -420,7 +416,7 @@ export default function BreakingNewsIndex({ items }: Props) {
                                                     </td>
                                                     {/* active_from */}
                                                     <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-600">
-                                                        {toJalali(item.active_from, true)}
+                                                        {item.active_from ? toJalali(item.active_from, true) : <span className="text-gray-400">—</span>}
                                                     </td>
                                                     {/* active_until */}
                                                     <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-600">

@@ -6,7 +6,7 @@ import axios from 'axios';
 import logoSrc from '../../images/logo.png';
 
 export default function BlogLayout({ children }: PropsWithChildren) {
-    const { auth, navCategories } = usePage<PageProps>().props;
+    const { auth, navCategories, breakingNews } = usePage<PageProps>().props;
     const { url }  = usePage();
     const pathname = url.split('?')[0];
     const isActive = (path: string) =>
@@ -21,6 +21,20 @@ export default function BlogLayout({ children }: PropsWithChildren) {
     const persianDate = now.toLocaleDateString('fa-IR', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
     });
+
+    // ── Breaking news rotation ────────────────────────────────────────────────
+    const [bnIdx, setBnIdx] = useState(0);
+    const [prevBnIdx, setPrevBnIdx] = useState<number | null>(null);
+    useEffect(() => {
+        if (breakingNews.length <= 1) return;
+        const t = setInterval(() => {
+            setBnIdx(cur => {
+                setPrevBnIdx(cur);
+                return (cur + 1) % breakingNews.length;
+            });
+        }, 4000);
+        return () => clearInterval(t);
+    }, [breakingNews.length]);
 
     // ── Search ────────────────────────────────────────────────────────────────
     const [query,     setQuery]     = useState('');
@@ -269,6 +283,54 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                 </nav>
 
             </header>
+
+            {/* ── Breaking news ── */}
+            {breakingNews.length > 0 && (
+                <div className="max-w-7xl mx-auto" dir="rtl">
+                    <div className="max-w-7xl mx-auto bg-gray-900 px-0 sm:px-0 lg:px-0 mx-8">
+                        <div className="flex items-stretch">
+
+                            {/* Label */}
+                            <div className="flex-shrink-0 bg-[#F24F00] flex items-center gap-2 px-4">
+                                <span className="animate-pulse w-2 h-2 rounded-full bg-white flex-shrink-0" />
+                                <span className="text-white text-xs font-black whitespace-nowrap">اخبار فوری</span>
+                            </div>
+
+                            {/* Rotating item */}
+                            <div className="flex-1 relative h-10 overflow-hidden">
+                                {breakingNews.map((item, i) => {
+                                    const isCurrent = i === bnIdx;
+                                    const isPrev    = i === prevBnIdx;
+                                    return (
+                                        <div
+                                            key={item.id}
+                                            className={`absolute inset-0 flex items-center px-4 transition-all duration-500 ease-in-out ${
+                                                isCurrent ? 'opacity-100 translate-y-0'  :
+                                                isPrev    ? 'opacity-0 -translate-y-3'   :
+                                                            'opacity-0 translate-y-3'
+                                            }`}
+                                        >
+                                            {item.url ? (
+                                                <a
+                                                    href={item.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-gray-200 text-sm hover:text-[#F24F00] transition-colors truncate w-full"
+                                                >
+                                                    {item.title}
+                                                </a>
+                                            ) : (
+                                                <span className="text-gray-200 text-sm truncate w-full">{item.title}</span>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* ══ Page content ══ */}
             <main className="pb-8 lg:pb-0">{children}</main>
