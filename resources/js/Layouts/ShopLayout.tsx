@@ -1,4 +1,4 @@
-import { Link, usePage } from '@inertiajs/react';
+﻿import { Link, usePage } from '@inertiajs/react';
 import CatMegaMenu, { MENU } from '@/Components/CatMegaMenu';
 import { PropsWithChildren, useState, useEffect, useRef } from 'react';
 import { PageProps } from '@/types';
@@ -89,14 +89,14 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
     const inputBorder  = isGlass ? 'border-[#E6E1F4] bg-white' : 'border-gray-200 bg-white';
     const inputText    = isGlass ? 'text-[#404040] placeholder-[#404040]/45' : 'text-[#404040] placeholder-[#B3B3B4]';
 
-    const navActive   = 'bg-[#B8181E] text-white px-3 py-0.5 rounded-3xl font-semibold text-base';
+    const navActive   = 'bg-[#075F26] text-white px-3 py-0.5 rounded-3xl font-semibold text-base';
     const navInactive = isGlass
-        ? 'text-[#1F0001]/85 hover:bg-white/15 hover:text-[#B8181E] px-3 py-0.5 rounded-xl font-semibold text-base transition'
-        : 'text-[#1F0001] hover:bg-[#F2F2F2] hover:text-[#B8181E] px-3 py-0.5 rounded-xl font-semibold text-base transition';
+        ? 'text-[#0B1A10]/85 hover:bg-white/15 hover:text-[#075F26] px-3 py-0.5 rounded-xl font-semibold text-base transition'
+        : 'text-[#0B1A10] hover:bg-[#F2F2F2] hover:text-[#075F26] px-3 py-0.5 rounded-xl font-semibold text-base transition';
 
     const authBtn = isGlass
         ? 'bg-white text-[#1A1528] hover:bg-[#F2F2F2]'
-        : 'bg-[#E31F25] hover:bg-[#B8181E] text-white';
+        : 'bg-[#F24F00] hover:bg-[#075F26] text-white';
 
     return (
         <div className="min-h-screen" dir="rtl">
@@ -191,7 +191,7 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                                         <Link
                                             href={route('front.blog.index', { search: query })}
                                             onClick={() => setDropOpen(false)}
-                                            className="flex items-center justify-center gap-1.5 px-4 py-2.5 border-t border-[#EEEEEE] text-xs text-[#E31F25] hover:bg-[#F2F2F2] transition font-medium"
+                                            className="flex items-center justify-center gap-1.5 px-4 py-2.5 border-t border-[#EEEEEE] text-xs text-[#F24F00] hover:bg-[#F2F2F2] transition font-medium"
                                         >
                                             مشاهده همه نتایج
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -212,7 +212,7 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                             {/* Login / Register */}
                             <Link
                                 href={route('customer.login')}
-                                className="hidden lg:inline-flex flex-shrink-0 bg-[#E31F25] hover:bg-[#B8181E] text-white text-sm font-semibold px-4 py-2.5 rounded-3xl transition-colors duration-200"
+                                className="hidden lg:inline-flex flex-shrink-0 bg-[#F24F00] hover:bg-[#075F26] text-white text-sm font-semibold px-4 py-2.5 rounded-3xl transition-colors duration-200"
                             >
                                 {auth.user ? 'پنل کاربری' : 'ورود/ثبت نام'}
                             </Link>
@@ -251,17 +251,17 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                             <div>
                                 <ul className="space-y-3">
                                     <li>
-                                        <Link href={route('front.about-us')} className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <Link href={route('front.about-us')} className="hover:text-[#075F26] text-base font-medium transition">
                                            درباره ما
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href={route('front.contact')} className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <Link href={route('front.contact')} className="hover:text-[#075F26] text-base font-medium transition">
                                             تماس با ما
                                         </Link>
                                     </li>
                                     <li>
-                                        <a href="#" className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <a href="#" className="hover:text-[#075F26] text-base font-medium transition">
                                             نظرسنجی
                                         </a>
                                     </li>
@@ -272,18 +272,18 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                             <div>
                                 <ul className="space-y-3">
                                     <li>
-                                        <Link href={route('front.blog.index')} className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <Link href={route('front.blog.index')} className="hover:text-[#075F26] text-base font-medium transition">
                                             بلاگ
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href={route('front.gallery')} className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <Link href={route('front.gallery')} className="hover:text-[#075F26] text-base font-medium transition">
                                             گالری
                                         </Link>
                                     </li>
                                     <li>
                                         <a href="/docs/gsun-catalogue.pdf" target="_blank" rel="noreferrer"
-                                           className="hover:text-[#B8181E] text-base font-medium transition">
+                                           className="hover:text-[#075F26] text-base font-medium transition">
                                             کاتالوگ محصولات
                                         </a>
                                     </li>
@@ -294,17 +294,17 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                             <div>
                                 <ul className="space-y-3">
                                     <li>
-                                        <a href="#" className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <a href="#" className="hover:text-[#075F26] text-base font-medium transition">
                                             رویه ارسال سفارش
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#" className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <a href="#" className="hover:text-[#075F26] text-base font-medium transition">
                                             شیوه‌های پرداخت
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#" className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <a href="#" className="hover:text-[#075F26] text-base font-medium transition">
                                             شرایط مرجوعی کالا
                                         </a>
                                     </li>
@@ -315,12 +315,12 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                             <div>
                                 <ul className="space-y-3">
                                     <li>
-                                        <a href="#" className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <a href="#" className="hover:text-[#075F26] text-base font-medium transition">
                                             رسیدگی به شکایات
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#" className="hover:text-[#B8181E] text-base font-medium transition">
+                                        <a href="#" className="hover:text-[#075F26] text-base font-medium transition">
                                             خدمات پس از فروش
                                         </a>
                                     </li>
@@ -350,7 +350,7 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                             </p>
                             <a
                                 href="#"
-                                className="inline-block bg-[#E31F25] hover:bg-[#B8181E] text-white font-bold px-8 py-3 rounded-3xl transition shadow-lg"
+                                className="inline-block bg-[#F24F00] hover:bg-[#075F26] text-white font-bold px-8 py-3 rounded-3xl transition shadow-lg"
                             >
                                 درخواست نمایندگی
                             </a>
@@ -410,7 +410,7 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                     </div>
                 </div>
                 {/* ── Copyright bar ── */}
-                <div className="max-w-shop mx-auto bg-[#F2F2F2] rounded-2xl py-3 text-center text-[#1F0001] text-sm font-medium mt-4 lg:mb-8 mb-24">
+                <div className="max-w-shop mx-auto bg-[#F2F2F2] rounded-2xl py-3 text-center text-[#0B1A10] text-sm font-medium mt-4 lg:mb-8 mb-24">
                     © {new Date().getFullYear()} فروشگاه جی‌سان — تمامی حقوق محفوظ است
                 </div>
             </footer>
@@ -452,9 +452,9 @@ function BottomNav({ cartCount, auth, pathname }: { cartCount: number; auth: Pag
 
     const navItemClass = (active: boolean) =>
         `relative flex flex-col items-center gap-1 py-2 flex-1 rounded-full ${active ? 'bg-[#F2F2F2]' : 'bg-white'}`;
-    const iconClass    = (active: boolean) => active ? 'text-[#E31F25]' : 'text-[#898A89]';
+    const iconClass    = (active: boolean) => active ? 'text-[#F24F00]' : 'text-[#898A89]';
     const labelClass   = (active: boolean) =>
-        `text-[10px] font-bold leading-none ${active ? 'text-[#E31F25]' : 'text-[#898A89]'}`;
+        `text-[10px] font-bold leading-none ${active ? 'text-[#F24F00]' : 'text-[#898A89]'}`;
 
     return (
         <>
@@ -472,7 +472,7 @@ function BottomNav({ cartCount, auth, pathname }: { cartCount: number; auth: Pag
                             <Link
                                 href="/shop"
                                 onClick={() => setMenuOpen(false)}
-                                className="flex items-center px-3 py-2.5 text-xs font-bold text-[#E31F25]"
+                                className="flex items-center px-3 py-2.5 text-xs font-bold text-[#F24F00]"
                             >
                                 همه محصولات
                             </Link>
@@ -485,7 +485,7 @@ function BottomNav({ cartCount, auth, pathname }: { cartCount: number; auth: Pag
                                     onMouseEnter={() => setActiveCat(cat.id)}
                                     onTouchStart={() => setActiveCat(cat.id)}
                                     className={`flex items-center justify-between px-3 py-2.5 text-xs transition
-                                        ${activeCat === cat.id ? 'bg-white text-[#B8181E] font-bold' : 'text-[#1F0001]'}`}
+                                        ${activeCat === cat.id ? 'bg-white text-[#075F26] font-bold' : 'text-[#0B1A10]'}`}
                                 >
                                     <span className="leading-snug">{cat.label}</span>
                                     {cat.subs && cat.subs.length > 0 && (
@@ -504,7 +504,7 @@ function BottomNav({ cartCount, auth, pathname }: { cartCount: number; auth: Pag
                                     <Link
                                         href={activeMenuCat.href}
                                         onClick={() => setMenuOpen(false)}
-                                        className="flex items-center gap-1 px-3 py-2.5 text-xs font-bold text-[#404040] hover:text-[#E31F25]"
+                                        className="flex items-center gap-1 px-3 py-2.5 text-xs font-bold text-[#404040] hover:text-[#F24F00]"
                                     >
                                         همه {activeMenuCat.label}
                                     </Link>
@@ -514,7 +514,7 @@ function BottomNav({ cartCount, auth, pathname }: { cartCount: number; auth: Pag
                                             key={sub.href}
                                             href={sub.href}
                                             onClick={() => setMenuOpen(false)}
-                                            className="flex items-center px-3 py-2.5 text-sm text-[#555] hover:text-[#E31F25] hover:bg-[#F7F7F7] rounded-lg transition"
+                                            className="flex items-center px-3 py-2.5 text-sm text-[#555] hover:text-[#F24F00] hover:bg-[#F7F7F7] rounded-lg transition"
                                         >
                                             {sub.label}
                                         </Link>
@@ -622,7 +622,7 @@ function SupportFab() {
                         rel="noreferrer"
                         className="flex items-center gap-3 bg-white rounded-2xl shadow-lg shadow-black/10 px-4 py-3 min-w-[200px] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-150 border border-gray-100"
                     >
-                        <div className="w-9 h-9 rounded-xl bg-[#E31F25]/10 text-[#E31F25] flex items-center justify-center flex-shrink-0">
+                        <div className="w-9 h-9 rounded-xl bg-[#F24F00]/10 text-[#F24F00] flex items-center justify-center flex-shrink-0">
                             {item.icon}
                         </div>
                         <div className="text-right">
@@ -636,7 +636,7 @@ function SupportFab() {
             {/* Main FAB */}
             <button
                 onClick={() => setOpen(o => !o)}
-                className={`pointer-events-auto w-14 h-14 rounded-full bg-[#E31F25] text-white shadow-lg shadow-[#E31F25]/40 flex items-center justify-center transition-all duration-300 hover:bg-[#B8181E] hover:scale-105 ${open ? 'rotate-45' : ''}`}
+                className={`pointer-events-auto w-14 h-14 rounded-full bg-[#F24F00] text-white shadow-lg shadow-[#F24F00]/40 flex items-center justify-center transition-all duration-300 hover:bg-[#075F26] hover:scale-105 ${open ? 'rotate-45' : ''}`}
                 aria-label="پشتیبانی"
             >
                 {open ? (

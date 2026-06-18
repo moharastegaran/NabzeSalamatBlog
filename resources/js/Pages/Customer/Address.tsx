@@ -1,4 +1,4 @@
-import CustomerLayout from '@/Layouts/CustomerLayout';
+﻿import CustomerLayout from '@/Layouts/CustomerLayout';
 import SelectInput from '@/Components/SelectInput';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
@@ -16,7 +16,7 @@ interface Props {
 }
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
-    return <label className="block text-sm font-medium text-[#1F0001] mb-1.5">{children}</label>;
+    return <label className="block text-sm font-medium text-[#0B1A10] mb-1.5">{children}</label>;
 }
 
 function FieldError({ msg }: { msg?: string }) {
@@ -86,14 +86,14 @@ export default function Address({ user, provinces }: Props) {
                     <div className="mt-4 flex justify-end gap-3">
                         <Link
                             href={route('customer.activities')}
-                            className="rounded-xl border border-[#B8181E] px-8 py-2.5 text-sm font-semibold text-[#B8181E] hover:bg-gray-50 transition-colors"
+                            className="rounded-xl border border-[#075F26] px-8 py-2.5 text-sm font-semibold text-[#075F26] hover:bg-gray-50 transition-colors"
                         >
                             انصراف
                         </Link>
                         <button
                             type="submit"
                             disabled={processing}
-                            className="rounded-xl bg-[#B8181E] px-8 py-2.5 text-sm font-semibold text-white hover:bg-[#9a1419] disabled:opacity-50 transition-colors"
+                            className="rounded-xl bg-[#075F26] px-8 py-2.5 text-sm font-semibold text-white hover:bg-[#054E1F] disabled:opacity-50 transition-colors"
                         >
                             {processing ? 'در حال ذخیره...' : 'ذخیره'}
                         </button>

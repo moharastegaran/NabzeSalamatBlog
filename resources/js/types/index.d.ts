@@ -2,6 +2,8 @@ export interface NavCategory {
     id: number;
     name: string;
     slug: string;
+    icon?: string | null;
+    thumbnail?: string | null;
     children: Array<{ id: number; name: string; slug: string; parent_id: number }>;
 }
 

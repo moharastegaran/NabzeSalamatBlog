@@ -46,7 +46,7 @@ class HandleInertiaRequests extends Middleware
                 : 0,
             'navCategories'   => fn () => BlogCategory::whereNull('parent_id')
                 ->with(['children' => fn ($q) => $q->select('id', 'name', 'slug', 'parent_id')->orderBy('name')])
-                ->select('id', 'name', 'slug')
+                ->select('id', 'name', 'slug', 'icon', 'thumbnail')
                 ->orderBy('name')
                 ->get(),
         ];

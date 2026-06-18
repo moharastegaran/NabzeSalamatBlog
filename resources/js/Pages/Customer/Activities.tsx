@@ -1,4 +1,4 @@
-import CustomerLayout from '@/Layouts/CustomerLayout';
+﻿import CustomerLayout from '@/Layouts/CustomerLayout';
 
 import { Head, Link } from '@inertiajs/react';
 import { useRef } from 'react';
@@ -90,7 +90,7 @@ function StatCard({ label, value, icon, color }: { label: string; value: number;
         <div className="flex flex-col justify-center items-center gap-4 p-3">
             <img src={icon} alt={label} className="w-16" />
             <div>
-                <p className="text-sm font-medium text-[#1F0001]">
+                <p className="text-sm font-medium text-[#0B1A10]">
                     {`${value.toLocaleString('fa-IR')} سفارش ${label}`}
                 </p>
             </div>
@@ -103,8 +103,8 @@ function StatCard({ label, value, icon, color }: { label: string; value: number;
 function ContactRow({ icon, label, href }: { icon: React.ReactNode; label: string; href: string}) {
     return (
         <a href={href} target="_blank" rel="noreferrer" className="flex items-center gap-3 py-2 hover:opacity-80 transition-opacity">
-            <div className="h-5 w-5 text-[#B8181E]">{icon}</div>
-            <p className="text-sm text-[#1F0001] font-medium">{label}</p>
+            <div className="h-5 w-5 text-[#075F26]">{icon}</div>
+            <p className="text-sm text-[#0B1A10] font-medium">{label}</p>
         </a>
     );
 }
@@ -148,7 +148,7 @@ export default function Activities({ stats, products }: Props) {
                             <ContactRow icon={<IconPhone />}     label="تماس تلفنی با کارشناسان فروش" href="tel:002122004818" />
                             <ContactRow icon={<IconWhatsapp />}  label="مشاوره و ثبت نام از طریق بله"         href="https://ble.ir/@gsun_support" />
                         </div>
-                        <p className="text-xs text-[#1F0001] leading-tight">
+                        <p className="text-xs text-[#0B1A10] leading-tight">
                             همه روزه از ساعت ۱۰ تا ۲۰ پاسخگوی شما هستیم
                         </p>
                     </div>
@@ -163,7 +163,7 @@ export default function Activities({ stats, products }: Props) {
                             <h3 className="text-lg font-bold text-right">جدیدترین محصولات</h3>
                             <Link
                                 href={route('front.index')}
-                                className="text-sm font-medium text-[#B8181E] hover:underline"
+                                className="text-sm font-medium text-[#075F26] hover:underline"
                             >
                                 مشاهده همه
                             </Link>
@@ -175,7 +175,7 @@ export default function Activities({ stats, products }: Props) {
                             <button
                                 onClick={() => scrollCarousel('prev')}
                                 aria-label="قبلی"
-                                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 hover:text-[#B8181E] transition-colors"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 hover:text-[#075F26] transition-colors"
                             >
                                 <IconChevronRight />
                             </button>
@@ -184,7 +184,7 @@ export default function Activities({ stats, products }: Props) {
                             <button
                                 onClick={() => scrollCarousel('next')}
                                 aria-label="بعدی"
-                                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 hover:text-[#B8181E] transition-colors"
+                                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 hover:text-[#075F26] transition-colors"
                             >
                                 <IconChevronLeft />
                             </button>

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+﻿import { useState, useRef, useEffect } from 'react';
 import { Link } from '@inertiajs/react';
 
 export type Sub = { label: string; href: string };
@@ -138,7 +138,7 @@ export default function CatMegaMenu({ triggerClass, activeClass, isShopActive }:
                     <div className="w-[155px] flex-shrink-0 border-l border-gray-100 py-1.5">
                         <Link
                             href="/shop"
-                            className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-[#E31F25] hover:bg-[#FFF0F0] transition mx-1.5 rounded-lg"
+                            className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-[#F24F00] hover:bg-[#FFF0F0] transition mx-1.5 rounded-lg"
                         >
                             همه محصولات
                         </Link>
@@ -150,8 +150,8 @@ export default function CatMegaMenu({ triggerClass, activeClass, isShopActive }:
                                 onMouseEnter={() => setActive(cat.id)}
                                 className={`flex items-center justify-between px-3 py-3 text-sm transition mx-0 rounded-xl
                                     ${active === cat.id
-                                        ? 'bg-white text-[#E31F25] font-bold'
-                                        : 'text-[#1F0001] hover:bg-[#F7F7F7]'
+                                        ? 'bg-white text-[#F24F00] font-bold'
+                                        : 'text-[#0B1A10] hover:bg-[#F7F7F7]'
                                     }`}
                             >
                                 <span>{cat.label}</span>
@@ -170,7 +170,7 @@ export default function CatMegaMenu({ triggerClass, activeClass, isShopActive }:
                             <>
                                 <Link
                                     href={activeCat.href}
-                                    className="flex items-center gap-1.5 px-3 py-3 text-xs font-bold text-[#404040] hover:text-[#E31F25] transition rounded-lg hover:bg-[#F7F7F7] mx-0.5"
+                                    className="flex items-center gap-1.5 px-3 py-3 text-xs font-bold text-[#404040] hover:text-[#F24F00] transition rounded-lg hover:bg-[#F7F7F7] mx-0.5"
                                 >
                                     همه {activeCat.label}
                                     <svg className="w-3 h-3 opacity-50 -scale-x-100 mr-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -182,7 +182,7 @@ export default function CatMegaMenu({ triggerClass, activeClass, isShopActive }:
                                     <Link
                                         key={i}
                                         href={sub.href}
-                                        className="flex items-center px-3 py-2 text-sm text-[#555] hover:text-[#E31F25] hover:bg-[#F7F7F7] rounded-lg transition"
+                                        className="flex items-center px-3 py-2 text-sm text-[#555] hover:text-[#F24F00] hover:bg-[#F7F7F7] rounded-lg transition"
                                     >
                                         {sub.label}
                                     </Link>

@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+﻿import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, useForm } from '@inertiajs/react';
 import { GalleryItem, PaginatedData, Province } from '@/types/models';
 import { FormEventHandler, useEffect, useState } from 'react';
@@ -27,8 +27,8 @@ function IconPlus() {
     );
 }
 
-const selectCls = 'w-full rounded-xl bg-gray-50 border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E31F25] appearance-none';
-const inputCls  = 'w-full rounded-xl bg-gray-50 border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E31F25]';
+const selectCls = 'w-full rounded-xl bg-gray-50 border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F24F00] appearance-none';
+const inputCls  = 'w-full rounded-xl bg-gray-50 border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F24F00]';
 const labelCls  = 'block text-sm font-medium text-gray-700 mb-1';
 
 export default function GalleryIndex({ items, provinces }: Props) {
@@ -85,7 +85,7 @@ export default function GalleryIndex({ items, provinces }: Props) {
                 {/* Header */}
                 <div className="flex items-center justify-between mx-auto">
                     <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-[#E31F25]">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-[#F24F00]">
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
@@ -97,7 +97,7 @@ export default function GalleryIndex({ items, provinces }: Props) {
                     </div>
                     <button
                         onClick={() => setModalOpen(true)}
-                        className="inline-flex items-center gap-2 rounded-xl bg-[#E31F25] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#c41920] transition-colors"
+                        className="inline-flex items-center gap-2 rounded-xl bg-[#F24F00] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#C24000] transition-colors"
                     >
                         <IconPlus />
                         افزودن تصویر
@@ -174,7 +174,7 @@ export default function GalleryIndex({ items, provinces }: Props) {
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                         className={`px-3 py-1 rounded-lg text-xs border transition-colors ${
                                             link.active
-                                                ? 'bg-[#E31F25] text-white border-[#E31F25]'
+                                                ? 'bg-[#F24F00] text-white border-[#F24F00]'
                                                 : link.url
                                                 ? 'border-gray-200 hover:bg-gray-50'
                                                 : 'border-gray-100 text-gray-300 cursor-default'
@@ -313,7 +313,7 @@ export default function GalleryIndex({ items, provinces }: Props) {
                             {/* Image upload */}
                             <div>
                                 <label className={labelCls}>تصویر</label>
-                                <label className="flex flex-col items-center justify-center gap-2 cursor-pointer w-full rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 py-6 hover:border-[#E31F25] hover:bg-red-50 transition-colors">
+                                <label className="flex flex-col items-center justify-center gap-2 cursor-pointer w-full rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 py-6 hover:border-[#F24F00] hover:bg-red-50 transition-colors">
                                     {previewUrl ? (
                                         <img src={previewUrl} className="h-28 w-full object-contain rounded-lg" alt="preview" />
                                     ) : (
@@ -352,7 +352,7 @@ export default function GalleryIndex({ items, provinces }: Props) {
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="inline-flex items-center gap-2 rounded-xl bg-[#E31F25] px-5 py-2 text-sm font-semibold text-white hover:bg-[#c41920] disabled:opacity-60 transition-colors"
+                                    className="inline-flex items-center gap-2 rounded-xl bg-[#F24F00] px-5 py-2 text-sm font-semibold text-white hover:bg-[#C24000] disabled:opacity-60 transition-colors"
                                 >
                                     {processing && (
                                         <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">

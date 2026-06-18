@@ -1,4 +1,4 @@
-import CustomerLayout from '@/Layouts/CustomerLayout';
+﻿import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatPrice } from '@/utils/currency';
 import { Head, Link } from '@inertiajs/react';
 import { toJalali } from '@/utils/date';
@@ -85,13 +85,13 @@ export default function Panel({ orders, stats, tab }: Props) {
                                 href={route('customer.panel', { tab: t.key })}
                                 className={`flex items-center gap-2 px-5 py-2 text-base font-semibold transition-colors ${
                                     active
-                                        ? 'text-[#B8181E] border-b-[3px] border-[#B8181E]'
+                                        ? 'text-[#075F26] border-b-[3px] border-[#075F26]'
                                         : 'text-[#404040] border-b border-[#404040] hover:bg-gray-100'
                                 }`}
                             >
                                 {t.label}
                                 <span className={`inline-flex items-center justify-center min-w-[1.25rem] w-6 h-6 rounded-md text-sm font-bold text-white ${
-                                    active ? 'bg-[#B8181E]' : 'bg-[#404040]'
+                                    active ? 'bg-[#075F26]' : 'bg-[#404040]'
                                 }`}>
                                     {stats[t.key].toLocaleString('fa-IR')}
                                 </span>
@@ -108,7 +108,7 @@ export default function Panel({ orders, stats, tab }: Props) {
                         <p className="text-sm">هنوز سفارشی ثبت نشده است.</p>
                         <Link
                             href={route('front.index')}
-                            className="mt-1 rounded-lg bg-[#E31F25] px-4 py-2 text-sm font-medium text-white hover:bg-[#B8181E] transition-colors"
+                            className="mt-1 rounded-lg bg-[#F24F00] px-4 py-2 text-sm font-medium text-white hover:bg-[#075F26] transition-colors"
                         >
                             رفتن به فروشگاه
                         </Link>
@@ -121,7 +121,7 @@ export default function Panel({ orders, stats, tab }: Props) {
                                 <thead>
                                     <tr className="bg-[#D5D5D5]">
                                         {['شماره سفارش', 'تاریخ', 'وضعیت', 'مبلغ کل', 'عملیات'].map((h, i, arr) => (
-                                            <th key={h} className={`px-5 py-4 text-right text-sm font-medium text-[#1F0001] uppercase tracking-wide ${i === 0 ? 'rounded-r-xl' : ''} ${i === arr.length - 1 ? 'rounded-l-xl' : ''}`}>
+                                            <th key={h} className={`px-5 py-4 text-right text-sm font-medium text-[#0B1A10] uppercase tracking-wide ${i === 0 ? 'rounded-r-xl' : ''} ${i === arr.length - 1 ? 'rounded-l-xl' : ''}`}>
                                                 {h}
                                             </th>
                                         ))}
@@ -130,14 +130,14 @@ export default function Panel({ orders, stats, tab }: Props) {
                                 <tbody>
                                     {orders.data.map(order => (
                                         <tr key={order.id} className="bg-[#F2F2F2] hover:bg-[#EFEFEF] transition-colors">
-                                            <td className="px-5 py-4 text-sm text-[#1F0001] font-medium rounded-r-xl">#{order.id}</td>
-                                            <td className="px-5 py-4 text-sm text-[#1F0001] font-medium">{toJalali(order.created_at)}</td>
+                                            <td className="px-5 py-4 text-sm text-[#0B1A10] font-medium rounded-r-xl">#{order.id}</td>
+                                            <td className="px-5 py-4 text-sm text-[#0B1A10] font-medium">{toJalali(order.created_at)}</td>
                                             <td className="px-5 py-4">
-                                                <span className="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium text-[#1F0001]">
+                                                <span className="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium text-[#0B1A10]">
                                                     {STATUS_LABEL[order.status] ?? order.status}
                                                 </span>
                                             </td>
-                                            <td className="px-5 py-4 text-sm text-[#1F0001] font-medium">
+                                            <td className="px-5 py-4 text-sm text-[#0B1A10] font-medium">
                                                 {formatPrice(orderTotal(order))}
                                             </td>
                                             <td className="px-5 py-4 rounded-l-xl">

@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+﻿import { Head, Link } from '@inertiajs/react';
 
 interface Props {
     status: 403 | 404 | 500 | 503;
@@ -49,7 +49,7 @@ export default function Error({ status }: Props) {
     const accentColor = status === 403
         ? 'from-amber-500 to-orange-500'
         : status === 404
-            ? 'from-[#E31F25] to-rose-400'
+            ? 'from-[#F24F00] to-rose-400'
             : status === 503
                 ? 'from-blue-500 to-indigo-500'
                 : 'from-gray-600 to-gray-800';
@@ -57,7 +57,7 @@ export default function Error({ status }: Props) {
     const iconBg = status === 403
         ? 'bg-amber-50 text-amber-500'
         : status === 404
-            ? 'bg-rose-50 text-[#E31F25]'
+            ? 'bg-rose-50 text-[#F24F00]'
             : status === 503
                 ? 'bg-blue-50 text-blue-500'
                 : 'bg-gray-100 text-gray-500';
@@ -94,7 +94,7 @@ export default function Error({ status }: Props) {
                     <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
                         <Link
                             href={route('front.landing')}
-                            className="inline-flex items-center gap-2 rounded-xl bg-[#E31F25] px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#c41920] transition-colors"
+                            className="inline-flex items-center gap-2 rounded-xl bg-[#F24F00] px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#C24000] transition-colors"
                         >
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />

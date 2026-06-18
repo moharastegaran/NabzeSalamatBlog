@@ -48,9 +48,9 @@ function IconUserInfo() {
 function IconLogout() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none">
-            <path d="M16 17L21 12L16 7" stroke="#B8181E" stroke-width="2" stroke-linejoin="round"/>
-            <path d="M21 12H9" stroke="#B8181E" stroke-width="2" stroke-linejoin="round"/>
-            <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="#B8181E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 17L21 12L16 7" stroke="#075F26" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M21 12H9" stroke="#075F26" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="#075F26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     );
 }
@@ -80,9 +80,9 @@ function NavItem({
                 href={href}
                 method="post"
                 as="button"
-                className={`${base} text-[#1f0001] hover:bg-red-50 hover:text-red-600`}
+                className={`${base} text-[#0b1a10] hover:bg-red-50 hover:text-red-600`}
             >
-                <span className="text-[#B8181E] shrink-0 text-base font-normal">{icon}</span>
+                <span className="text-[#075F26] shrink-0 text-base font-normal">{icon}</span>
                 {children}
             </Link>
         );
@@ -91,9 +91,9 @@ function NavItem({
     return (
         <Link
             href={href}
-            className={`${base} relative ${active ? 'bg-[#B8181E] text-white font-semibold' : 'text-[#1f0001] hover:bg-gray-50'}`}
+            className={`${base} relative ${active ? 'bg-[#075F26] text-white font-semibold' : 'text-[#0b1a10] hover:bg-gray-50'}`}
         >
-            <span className={`shrink-0 ${active ? 'text-white' : 'text-[#B8181E]'}`}>{icon}</span>
+            <span className={`shrink-0 ${active ? 'text-white' : 'text-[#075F26]'}`}>{icon}</span>
             {children}
         </Link>
     );
@@ -113,8 +113,8 @@ export default function CustomerLayout({ children }: PropsWithChildren) {
                     <div className="flex flex-row items-center gap-0 lg:mr-20 mr-0" dir="ltr">
                         <img src={fadedLogo} alt="جی سان" className="h-16 w-16 rounded-full shrink-0 object-contain" />
                         <div className="flex flex-col justify-end gap-1" dir="rtl">
-                            <p className="text-base font-medium text-[#1F0001] text-right">خوش آمدید</p>
-                            <p className="text-xl font-bold text-[#1F0001] text-right" dir="ltr">
+                            <p className="text-base font-medium text-[#0B1A10] text-right">خوش آمدید</p>
+                            <p className="text-xl font-bold text-[#0B1A10] text-right" dir="ltr">
                                 حساب کاربری
                             </p>
                         </div>
@@ -130,9 +130,9 @@ export default function CustomerLayout({ children }: PropsWithChildren) {
                         <div className="bg-white rounded-t-2xl border-b-2 border-[#D5D5D5] mb-5 px-5 py-3">
                             <div className="flex flex-row justify-end items-center gap-3" dir="ltr">
                                 <div className="flex flex-col gap-1" dir="rtl">
-                                    <p className="text-right text-base font-bold text-[#1F0001]">{user.name}</p>
+                                    <p className="text-right text-base font-bold text-[#0B1A10]">{user.name}</p>
                                     {user.mobile && (
-                                        <p className="text-right text-sm font-normal text-[#1F0001]" dir="ltr">
+                                        <p className="text-right text-sm font-normal text-[#0B1A10]" dir="ltr">
                                             {user.mobile}
                                         </p>
                                     )}

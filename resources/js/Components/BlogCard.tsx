@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+﻿import { Link } from '@inertiajs/react';
 import { BlogPost, BlogTag } from '@/types/models';
 
 interface Props {
@@ -33,7 +33,7 @@ export default function BlogCard({ post, className = '' }: Props) {
             {/*)}*/}
             <div className="flex flex-1 flex-col justify-end p-3 lg:p-6 max-h-[120px] lg:max-h-[160px]">
                 {/*{post.category && (*/}
-                {/*    <span className="inline-block text-[10px] w-fit p-1 rounded-full font-normal text-white bg-[#B8181E] hover:bg-[#E31F25] opacity-75">{post.category.name}</span>*/}
+                {/*    <span className="inline-block text-[10px] w-fit p-1 rounded-full font-normal text-white bg-[#075F26] hover:bg-[#F24F00] opacity-75">{post.category.name}</span>*/}
                 {/*)}*/}
                 <h2 className="flex-1 text-sm sm:text-base lg:text-xl font-bold text-[#1A1528] group-hover:text-[#000000] transition-colors line-clamp-2">
                     {post.title}

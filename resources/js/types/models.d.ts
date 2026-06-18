@@ -60,6 +60,7 @@ export interface BlogTag {
     id: number;
     name: string;
     slug: string;
+    posts_count?: number;
 }
 
 export interface BlogComment {
@@ -82,6 +83,7 @@ export interface BlogPost {
     excerpt?: string;
     body: string;
     featured_image?: string;
+    video_url?: string | null;
     status: 'draft' | 'published';
     published_at?: string;
     views: number;

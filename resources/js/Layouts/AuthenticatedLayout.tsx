@@ -551,10 +551,10 @@ function ShopDropdown() {
 
     return (
         <div ref={btnRef} className="relative ml-auto">
-            <div className="inline-flex rounded-md border border-[#E31F25] overflow-hidden shadow-sm">
+            <div className="inline-flex rounded-md border border-[#F24F00] overflow-hidden shadow-sm">
                 <Link
                     href={route('front.index')}
-                    className="inline-flex items-center gap-1.5 bg-[#E31F25]/10 px-3 py-1.5 text-sm font-medium text-[#E31F25] hover:bg-[#E31F25]/20 transition-colors"
+                    className="inline-flex items-center gap-1.5 bg-[#F24F00]/10 px-3 py-1.5 text-sm font-medium text-[#F24F00] hover:bg-[#F24F00]/20 transition-colors"
                 >
                     <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
@@ -564,7 +564,7 @@ function ShopDropdown() {
                 <button
                     type="button"
                     onClick={openMenu}
-                    className="border-r border-[#E31F25] bg-[#E31F25]/10 px-2 py-1.5 text-[#E31F25] hover:bg-[#E31F25]/20 transition-colors"
+                    className="border-r border-[#F24F00] bg-[#F24F00]/10 px-2 py-1.5 text-[#F24F00] hover:bg-[#F24F00]/20 transition-colors"
                 >
                     <svg className={`h-3.5 w-3.5 transition-transform duration-150 ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
