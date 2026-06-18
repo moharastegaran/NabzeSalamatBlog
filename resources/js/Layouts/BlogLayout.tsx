@@ -1,58 +1,12 @@
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, useState, useEffect, useRef } from 'react';
-import { PageProps } from '@/types';
+import { PageProps, NavCategory } from '@/types';
 import { BlogPost } from '@/types/models';
 import axios from 'axios';
 import logoSrc from '../../images/logo.png';
 
-// ── Static category menu (matches seeded data) ────────────────────────────────
-const BLOG_MENU = [
-    {
-        id: 'salamat-omumi',
-        label: 'سلامت عمومی',
-        slug: 'salamat-omumi',
-        subs: [
-            { label: 'بهداشت فردی',      slug: 'behdasht-fardi' },
-            { label: 'پیشگیری از بیماری', slug: 'pishgiri' },
-        ],
-    },
-    {
-        id: 'taghzie-salem',
-        label: 'تغذیه سالم',
-        slug: 'taghzie-salem',
-        subs: [
-            { label: 'رژیم غذایی',       slug: 'rezim-ghazayi' },
-            { label: 'مکمل‌های غذایی',   slug: 'mokamelha-ghazayi' },
-        ],
-    },
-    {
-        id: 'varzesh-va-tanasob',
-        label: 'ورزش و تناسب اندام',
-        slug: 'varzesh-va-tanasob',
-        subs: [
-            { label: 'یوگا و مدیتیشن', slug: 'yoga-va-mediteyshan' },
-        ],
-    },
-    {
-        id: 'salamat-ravan',
-        label: 'سلامت روان',
-        slug: 'salamat-ravan',
-        subs: [
-            { label: 'مدیریت استرس', slug: 'modiriyat-stress' },
-        ],
-    },
-    {
-        id: 'bimariyha-va-pishgiri',
-        label: 'بیماری‌ها و پیشگیری',
-        slug: 'bimariyha-va-pishgiri',
-        subs: [
-            { label: 'پیشگیری از بیماری', slug: 'pishgiri' },
-        ],
-    },
-];
-
 export default function BlogLayout({ children }: PropsWithChildren) {
-    const { auth } = usePage<PageProps>().props;
+    const { auth, navCategories } = usePage<PageProps>().props;
     const { url }  = usePage();
     const pathname = url.split('?')[0];
     const isActive = (path: string) =>
@@ -279,26 +233,12 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                                             : 'text-gray-600 border-transparent hover:text-[#B8181E] hover:border-[#B8181E]/30'
                                     }`}
                                 >
-                                    خانه
-                                </Link>
-                            </li>
-
-                            {/* All articles */}
-                            <li>
-                                <Link
-                                    href={route('front.blog.index')}
-                                    className={`flex items-center px-4 py-3 text-sm font-semibold border-b-2 transition-colors ${
-                                        pathname === '/blog'
-                                            ? 'text-[#B8181E] border-[#B8181E]'
-                                            : 'text-gray-600 border-transparent hover:text-[#B8181E] hover:border-[#B8181E]/30'
-                                    }`}
-                                >
-                                    همه مقالات
+                                    صفحه اصلی
                                 </Link>
                             </li>
 
                             {/* Category items with dropdown */}
-                            {BLOG_MENU.map(cat => (
+                            {navCategories.map(cat => (
                                 <li key={cat.id} className="relative group">
                                     <Link
                                         href={route('front.blog.category', cat.slug)}
@@ -308,29 +248,33 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                                                 : 'text-gray-600 border-transparent group-hover:text-[#B8181E] group-hover:border-[#B8181E]/30'
                                         }`}
                                     >
-                                        {cat.label}
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mt-px opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                                        </svg>
+                                        {cat.name}
+                                        {cat.children.length > 0 && (
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mt-px opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        )}
                                     </Link>
 
                                     {/* Dropdown panel */}
-                                    <div className="absolute top-full right-0 w-48 bg-white border border-gray-100 rounded-b-xl rounded-tl-xl shadow-lg z-40 opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-1 group-hover:translate-y-0 transition-all duration-150 py-1.5">
-                                        {cat.subs.map(sub => (
-                                            <Link
-                                                key={sub.slug}
-                                                href={route('front.blog.category', sub.slug)}
-                                                className={`flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${
-                                                    isActive(`/blog/category/${sub.slug}`)
-                                                        ? 'text-[#B8181E] bg-red-50 font-medium'
-                                                        : 'text-gray-600 hover:text-[#B8181E] hover:bg-gray-50'
-                                                }`}
-                                            >
-                                                <span className="w-1.5 h-1.5 rounded-full bg-[#E31F25]/60 flex-shrink-0" />
-                                                {sub.label}
-                                            </Link>
-                                        ))}
-                                    </div>
+                                    {cat.children.length > 0 && (
+                                        <div className="absolute top-full right-0 w-48 bg-white border border-gray-100 rounded-b-xl rounded-tl-xl shadow-lg z-40 opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-1 group-hover:translate-y-0 transition-all duration-150 py-1.5">
+                                            {cat.children.map(sub => (
+                                                <Link
+                                                    key={sub.slug}
+                                                    href={route('front.blog.category', sub.slug)}
+                                                    className={`flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${
+                                                        isActive(`/blog/category/${sub.slug}`)
+                                                            ? 'text-[#B8181E] bg-red-50 font-medium'
+                                                            : 'text-gray-600 hover:text-[#B8181E] hover:bg-gray-50'
+                                                    }`}
+                                                >
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-[#E31F25]/60 flex-shrink-0" />
+                                                    {sub.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
                                 </li>
                             ))}
 
@@ -376,11 +320,11 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                         <div>
                             <h4 className="text-sm font-bold text-gray-800 mb-4">دسته‌بندی‌ها</h4>
                             <ul className="space-y-2.5">
-                                {BLOG_MENU.map(cat => (
+                                {navCategories.map(cat => (
                                     <li key={cat.id}>
                                         <Link href={route('front.blog.category', cat.slug)}
                                               className="text-sm text-gray-500 hover:text-[#B8181E] transition-colors">
-                                            {cat.label}
+                                            {cat.name}
                                         </Link>
                                     </li>
                                 ))}
@@ -430,7 +374,7 @@ export default function BlogLayout({ children }: PropsWithChildren) {
             </footer>
 
             {/* ── Mobile bottom nav ── */}
-            <MobileBottomNav auth={auth} pathname={pathname} />
+            <MobileBottomNav auth={auth} pathname={pathname} navCategories={navCategories} />
 
         </div>
     );
@@ -440,15 +384,17 @@ export default function BlogLayout({ children }: PropsWithChildren) {
 function MobileBottomNav({
     auth,
     pathname,
+    navCategories,
 }: {
     auth: PageProps['auth'];
     pathname: string;
+    navCategories: NavCategory[];
 }) {
     const isActive = (path: string) =>
         pathname === path || (path !== '/' && pathname.startsWith(path));
 
     const [catOpen, setCatOpen] = useState(false);
-    const [activeCat, setActiveCat] = useState(BLOG_MENU[0].id);
+    const [activeCat, setActiveCat] = useState<number | undefined>(() => navCategories[0]?.id);
     const panelRef  = useRef<HTMLDivElement>(null);
     const catBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -463,9 +409,9 @@ function MobileBottomNav({
         return () => document.removeEventListener('mousedown', handler);
     }, [catOpen]);
 
-    useEffect(() => { if (!catOpen) setActiveCat(BLOG_MENU[0].id); }, [catOpen]);
+    useEffect(() => { if (!catOpen) setActiveCat(navCategories[0]?.id); }, [catOpen, navCategories]);
 
-    const activeItem = BLOG_MENU.find(c => c.id === activeCat);
+    const activeItem = navCategories.find(c => c.id === activeCat);
 
     const itemCls  = (active: boolean) =>
         `relative flex flex-col items-center gap-1 py-2 flex-1 rounded-full ${active ? 'bg-gray-100' : ''}`;
@@ -486,15 +432,8 @@ function MobileBottomNav({
                     <div className="flex max-h-[60vh]">
                         {/* Parent categories */}
                         <div className="w-2/5 flex-shrink-0 py-1.5 overflow-y-auto">
-                            <Link
-                                href={route('front.blog.index')}
-                                onClick={() => setCatOpen(false)}
-                                className="flex items-center px-3 py-2.5 text-xs font-bold text-[#E31F25]"
-                            >
-                                همه مقالات
-                            </Link>
                             <div className="border-t border-gray-200 mx-2 my-1" />
-                            {BLOG_MENU.map(cat => (
+                            {navCategories.map(cat => (
                                 <button
                                     key={cat.id}
                                     onMouseEnter={() => setActiveCat(cat.id)}
@@ -503,7 +442,7 @@ function MobileBottomNav({
                                         activeCat === cat.id ? 'bg-white text-[#B8181E] font-bold' : 'text-gray-700'
                                     }`}
                                 >
-                                    <span className="leading-snug">{cat.label}</span>
+                                    <span className="leading-snug">{cat.name}</span>
                                     <svg className="w-3 h-3 flex-shrink-0 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                                     </svg>
@@ -520,17 +459,17 @@ function MobileBottomNav({
                                         onClick={() => setCatOpen(false)}
                                         className="flex items-center gap-1 px-3 py-2.5 text-xs font-bold text-gray-700 hover:text-[#E31F25]"
                                     >
-                                        همه {activeItem.label}
+                                        همه {activeItem.name}
                                     </Link>
                                     <div className="border-t border-gray-100 mx-2 my-1" />
-                                    {activeItem.subs.map(sub => (
+                                    {activeItem.children.map(sub => (
                                         <Link
                                             key={sub.slug}
                                             href={route('front.blog.category', sub.slug)}
                                             onClick={() => setCatOpen(false)}
                                             className="flex items-center px-3 py-2.5 text-sm text-gray-600 hover:text-[#E31F25] hover:bg-gray-50 rounded-lg transition"
                                         >
-                                            {sub.label}
+                                            {sub.name}
                                         </Link>
                                     ))}
                                 </>

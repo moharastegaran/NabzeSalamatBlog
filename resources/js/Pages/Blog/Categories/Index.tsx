@@ -15,7 +15,11 @@ function buildFlatList(cats: BlogCategory[]): FlatRow[] {
     }
     const result: FlatRow[] = [];
     function walk(parentId: number | null, depth: number) {
-        const children = (childrenOf.get(parentId) ?? []).sort((a, b) => a.name.localeCompare(b.name, 'fa'));
+        const children = (childrenOf.get(parentId) ?? []).sort((a, b) =>
+            depth === 0
+                ? (b.posts_count ?? 0) - (a.posts_count ?? 0)
+                : a.name.localeCompare(b.name, 'fa')
+        );
         for (const cat of children) {
             result.push({ cat, depth });
             walk(cat.id, depth + 1);

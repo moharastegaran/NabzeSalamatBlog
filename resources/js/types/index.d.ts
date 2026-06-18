@@ -1,3 +1,10 @@
+export interface NavCategory {
+    id: number;
+    name: string;
+    slug: string;
+    children: Array<{ id: number; name: string; slug: string; parent_id: number }>;
+}
+
 export interface AuthUser {
     id: number;
     name: string;
@@ -20,4 +27,5 @@ export type PageProps<
     };
     shopMaintenance: boolean;
     openTickets: number;
+    navCategories: NavCategory[];
 };

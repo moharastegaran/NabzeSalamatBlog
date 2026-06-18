@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\BlogCategory;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -43,6 +44,11 @@ class HandleInertiaRequests extends Middleware
                     ->where('status', 'open')
                     ->count()
                 : 0,
+            'navCategories'   => fn () => BlogCategory::whereNull('parent_id')
+                ->with(['children' => fn ($q) => $q->select('id', 'name', 'slug', 'parent_id')->orderBy('name')])
+                ->select('id', 'name', 'slug')
+                ->orderBy('name')
+                ->get(),
         ];
     }
 }
