@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
 
 class BlogPost extends Model
@@ -69,5 +70,43 @@ class BlogPost extends Model
     {
         return $query->where('status', 'published')
                      ->where(fn ($q) => $q->whereNull('published_at')->orWhere('published_at', '<=', now()));
+    }
+
+    /**
+     * Fixed media collections supported by every BlogPost.
+     * Keys are collection_name values; values are the default allowed MIME types
+     * (null means unrestricted). Category requirements may narrow these further.
+     */
+    public const MEDIA_COLLECTIONS = [
+        'audio'      => ['audio/mpeg', 'audio/mp4', 'audio/ogg', 'audio/wav', 'audio/aac', 'audio/flac', 'audio/x-flac'],
+        'video'      => ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm', 'video/x-matroska'],
+        'transcript' => ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'],
+        'attachment' => null,
+    ];
+
+    public function media(): MorphMany
+    {
+        return $this->morphMany(PostMedia::class, 'model')->orderBy('order_column');
+    }
+
+    public function getMedia(string $collection): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->media()->where('collection_name', $collection)->get();
+    }
+
+    public function getFirstMedia(string $collection): ?PostMedia
+    {
+        return $this->media()->where('collection_name', $collection)->first();
+    }
+
+    /**
+     * Returns requirements from the post's primary category that have no
+     * corresponding media item attached yet.
+     */
+    public function getMissingRequiredMedia(): \Illuminate\Support\Collection
+    {
+        return ($this->category?->mediaRequirements ?? collect())
+            ->where('is_required', true)
+            ->filter(fn ($req) => $this->getFirstMedia($req->collection_name) === null);
     }
 }

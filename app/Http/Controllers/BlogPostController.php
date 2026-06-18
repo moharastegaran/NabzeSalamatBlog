@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogTag;
+use App\Models\PostMedia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -62,10 +63,18 @@ class BlogPostController extends Controller
 
     public function edit(BlogPost $blog): Response
     {
-        $blog->load(['tags', 'categories']);
+        $blog->load(['tags', 'categories', 'category.mediaRequirements', 'media']);
+
+        $mediaByCollection = $blog->media
+            ->groupBy('collection_name')
+            ->map(fn ($items) => $items->values())
+            ->toArray();
 
         return Inertia::render('Blog/Edit', [
-            'post' => $blog,
+            'post'             => $blog,
+            'postMedia'        => $mediaByCollection,
+            'requirements'     => $blog->category?->mediaRequirements ?? [],
+            'knownCollections' => array_keys(\App\Models\BlogPost::MEDIA_COLLECTIONS),
             ...$this->formData(),
         ]);
     }

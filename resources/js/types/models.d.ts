@@ -93,6 +93,7 @@ export interface BlogPost {
     category?: Pick<BlogCategory, 'id' | 'name' | 'slug'>;
     categories?: Pick<BlogCategory, 'id' | 'name'>[];
     tags?: BlogTag[];
+    media?: PostMedia[];
     approved_comments?: BlogComment[];
     comments_count?: number;
     approved_comments_count?: number;
@@ -162,6 +163,37 @@ export interface BreakingNews {
     active_from: string | null; // 'YYYY-MM-DD HH:mm' or null
     active_until: string | null; // 'YYYY-MM-DD HH:mm' or null
     created_at: string;
+}
+
+export interface PostMedia {
+    id: number;
+    model_type: string;
+    model_id: number;
+    collection_name: string;
+    name: string;
+    file_name: string;
+    path: string;
+    disk: string;
+    mime_type: string;
+    size: number;
+    custom_properties: Record<string, unknown> | null;
+    order_column: number;
+    url: string;
+    human_readable_size: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface CategoryMediaRequirement {
+    id: number;
+    blog_category_id: number;
+    collection_name: string;
+    label: string;
+    is_required: boolean;
+    allowed_mime_types: string[] | null;
+    sort_order: number;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface PaginatedData<T> {

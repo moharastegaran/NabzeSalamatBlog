@@ -41,10 +41,10 @@ export default function Login({
 
     return (
         <LoginLayout
-            title="ورود به پنل نمایندگی"
+            title="ورود به پنل مدیریت سایت"
             subtitle="برای دسترسی به پنل مدیریت، کد ملی و رمز عبور خود را وارد کنید."
         >
-            <Head title="ورود به پنل نمایندگی" />
+            <Head title="ورود به پنل مدیریت سایت" />
 
             {status && (
                 <div className="mb-4 rounded-lg bg-green-50 px-4 py-3 text-sm font-medium text-green-700">

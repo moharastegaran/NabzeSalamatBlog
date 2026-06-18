@@ -158,6 +158,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/blog-comments',                         [BlogCommentController::class, 'index'])  ->name('blog.comments.index');
         Route::patch('/blog-comments/{blogComment}/approve', [BlogCommentController::class, 'approve'])->name('blog.comments.approve');
         Route::delete('/blog-comments/{blogComment}',        [BlogCommentController::class, 'destroy'])->name('blog.comments.destroy');
+
+        // Category media requirements
+        Route::post  ('/blog-categories/{blogCategory}/requirements',               [\App\Http\Controllers\CategoryMediaRequirementController::class, 'store'])  ->name('blog.categories.requirements.store');
+        Route::put   ('/blog-categories/{blogCategory}/requirements/{requirement}', [\App\Http\Controllers\CategoryMediaRequirementController::class, 'update']) ->name('blog.categories.requirements.update');
+        Route::delete('/blog-categories/{blogCategory}/requirements/{requirement}', [\App\Http\Controllers\CategoryMediaRequirementController::class, 'destroy'])->name('blog.categories.requirements.destroy');
+
+        // Post media uploads
+        Route::post  ('/blog-posts/{blog}/media',         [\App\Http\Controllers\PostMediaController::class, 'store'])  ->name('blog.media.store');
+        Route::delete('/blog-posts/{blog}/media/{media}', [\App\Http\Controllers\PostMediaController::class, 'destroy'])->name('blog.media.destroy');
     });
 
     // Reports (admin & cfo only)

@@ -5,7 +5,7 @@ import { PageProps } from '@/types';
 import { useState } from 'react';
 import AssetPicker from '@/Components/AssetPicker';
 import MultiSelect from '@/Components/MultiSelect';
-import type { Asset } from '@/types/models';
+import type { Asset, CategoryMediaRequirement } from '@/types/models';
 
 interface ParentOption {
     id: number;
@@ -16,6 +16,8 @@ interface ParentOption {
 interface Props {
     category: BlogCategory;
     parents: ParentOption[];
+    requirements: CategoryMediaRequirement[];
+    knownCollections: string[];
 }
 
 
@@ -40,7 +42,230 @@ function ImagePreview({ path, onClear, label }: { path: string; onClear: () => v
     );
 }
 
-export default function BlogCategoryEdit({ category, parents }: Props) {
+const COLLECTION_LABELS: Record<string, string> = {
+    audio:      'صوتی',
+    video:      'ویدیو',
+    transcript: 'متنی / PDF',
+    attachment: 'پیوست',
+};
+
+function RequirementRow({
+    req,
+    categoryId,
+    knownCollections,
+}: {
+    req: CategoryMediaRequirement;
+    categoryId: number;
+    knownCollections: string[];
+}) {
+    const [editing, setEditing] = useState(false);
+    const [form, setForm] = useState({
+        label:       req.label,
+        is_required: req.is_required,
+        sort_order:  req.sort_order,
+    });
+    const [saving, setSaving] = useState(false);
+
+    const save = () => {
+        setSaving(true);
+        router.put(route('blog.categories.requirements.update', [categoryId, req.id]), form, {
+            preserveScroll: true,
+            onSuccess: () => { setSaving(false); setEditing(false); },
+            onError:   () => setSaving(false),
+        });
+    };
+
+    const remove = () => {
+        if (!confirm('این نیازمندی حذف شود؟')) return;
+        router.delete(route('blog.categories.requirements.destroy', [categoryId, req.id]), { preserveScroll: true });
+    };
+
+    return (
+        <div className="px-6 py-3">
+            {editing ? (
+                <div className="flex flex-wrap items-end gap-3">
+                    <div className="flex-1 min-w-[160px]">
+                        <label className="block text-xs font-medium text-gray-600 mb-1">برچسب</label>
+                        <input
+                            value={form.label}
+                            onChange={e => setForm(p => ({ ...p, label: e.target.value }))}
+                            className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2 pb-1">
+                        <input
+                            type="checkbox"
+                            id={`req-required-${req.id}`}
+                            checked={form.is_required}
+                            onChange={e => setForm(p => ({ ...p, is_required: e.target.checked }))}
+                            className="rounded border-gray-300 text-indigo-600"
+                        />
+                        <label htmlFor={`req-required-${req.id}`} className="text-sm text-gray-700">الزامی</label>
+                    </div>
+                    <div className="flex gap-2 pb-1">
+                        <button
+                            type="button"
+                            onClick={save}
+                            disabled={saving}
+                            className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
+                        >
+                            ذخیره
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setEditing(false)}
+                            className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
+                        >
+                            انصراف
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
+                            {COLLECTION_LABELS[req.collection_name] ?? req.collection_name}
+                        </span>
+                        <span className="text-sm text-gray-700">{req.label}</span>
+                        {req.is_required && (
+                            <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">الزامی</span>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <button
+                            type="button"
+                            onClick={() => setEditing(true)}
+                            className="rounded p-1.5 text-gray-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                            title="ویرایش"
+                        >
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={remove}
+                            className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                            title="حذف"
+                        >
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function AddRequirementForm({
+    categoryId,
+    knownCollections,
+    usedCollections,
+}: {
+    categoryId: number;
+    knownCollections: string[];
+    usedCollections: string[];
+}) {
+    const [open, setOpen]         = useState(false);
+    const [saving, setSaving]     = useState(false);
+    const available = knownCollections.filter(c => !usedCollections.includes(c));
+
+    const [form, setForm] = useState({
+        collection_name: available[0] ?? '',
+        label:           '',
+        is_required:     false,
+        sort_order:      0,
+    });
+
+    if (!open) {
+        return (
+            <div className="px-6 py-4 border-t border-gray-100">
+                <button
+                    type="button"
+                    onClick={() => { setForm(p => ({ ...p, collection_name: available[0] ?? '' })); setOpen(true); }}
+                    disabled={available.length === 0}
+                    className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    {available.length === 0 ? 'همه مجموعه‌ها تعریف شده‌اند' : 'افزودن نیازمندی'}
+                </button>
+            </div>
+        );
+    }
+
+    const submit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setSaving(true);
+        router.post(route('blog.categories.requirements.store', categoryId), form, {
+            preserveScroll: true,
+            onSuccess: () => { setSaving(false); setOpen(false); setForm({ collection_name: available[0] ?? '', label: '', is_required: false, sort_order: 0 }); },
+            onError:   () => setSaving(false),
+        });
+    };
+
+    return (
+        <form onSubmit={submit} className="px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-xl">
+            <p className="text-xs font-semibold text-gray-600 mb-3">نیازمندی جدید</p>
+            <div className="flex flex-wrap gap-3 items-end">
+                <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">مجموعه</label>
+                    <select
+                        value={form.collection_name}
+                        onChange={e => setForm(p => ({ ...p, collection_name: e.target.value }))}
+                        className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        style={{ background: 'none' }}
+                    >
+                        {available.map(c => (
+                            <option key={c} value={c}>{COLLECTION_LABELS[c] ?? c}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex-1 min-w-[180px]">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">برچسب <span className="text-red-500">*</span></label>
+                    <input
+                        value={form.label}
+                        onChange={e => setForm(p => ({ ...p, label: e.target.value }))}
+                        placeholder="مثال: فایل صوتی پادکست"
+                        required
+                        className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    />
+                </div>
+                <div className="flex items-center gap-2 pb-1.5">
+                    <input
+                        type="checkbox"
+                        id="new-req-required"
+                        checked={form.is_required}
+                        onChange={e => setForm(p => ({ ...p, is_required: e.target.checked }))}
+                        className="rounded border-gray-300 text-indigo-600"
+                    />
+                    <label htmlFor="new-req-required" className="text-sm text-gray-700">الزامی</label>
+                </div>
+                <div className="flex gap-2 pb-1">
+                    <button
+                        type="submit"
+                        disabled={saving || !form.label.trim()}
+                        className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
+                    >
+                        {saving ? '...' : 'افزودن'}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setOpen(false)}
+                        className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
+                    >
+                        انصراف
+                    </button>
+                </div>
+            </div>
+        </form>
+    );
+}
+
+export default function BlogCategoryEdit({ category, parents, requirements, knownCollections }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canUpload = auth.user?.roles?.includes('admin') ?? false;
 
@@ -197,6 +422,33 @@ export default function BlogCategoryEdit({ category, parents }: Props) {
                         </div>
 
                     </form>
+
+                    {/* ── Media Requirements ─────────────────────────────────── */}
+                    <div className="mt-6 bg-white rounded-xl shadow-sm">
+                        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                            <div>
+                                <h3 className="text-sm font-semibold text-gray-800">نیازمندی‌های رسانه</h3>
+                                <p className="text-xs text-gray-400 mt-0.5">تعریف کنید این دسته‌بندی چه فایل‌هایی نیاز دارد.</p>
+                            </div>
+                        </div>
+
+                        {/* Existing requirements */}
+                        {requirements.length > 0 && (
+                            <div className="divide-y divide-gray-100">
+                                {requirements.map(req => (
+                                    <RequirementRow
+                                        key={req.id}
+                                        req={req}
+                                        categoryId={category.id}
+                                        knownCollections={knownCollections}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Add new */}
+                        <AddRequirementForm categoryId={category.id} knownCollections={knownCollections} usedCollections={requirements.map(r => r.collection_name)} />
+                    </div>
                 </div>
             </div>
 

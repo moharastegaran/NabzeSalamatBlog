@@ -31,4 +31,9 @@ class BlogCategory extends Model
     {
         return $this->belongsToMany(BlogPost::class, 'blog_post_categories');
     }
+
+    public function mediaRequirements(): HasMany
+    {
+        return $this->hasMany(CategoryMediaRequirement::class)->orderBy('sort_order');
+    }
 }

@@ -51,6 +51,16 @@ class ShopController extends Controller
                 ->latest('published_at')
                 ->take(8)
                 ->get(),
+            'audioPosts'      => BlogPost::published()
+                ->whereHas('categories', fn ($q) => $q->whereIn('blog_categories.slug', ['nbd-sda', 'padkst', 'fayl-soty']))
+                ->with([
+                    'categories:id,name,slug',
+                    'media' => fn ($q) => $q->where('collection_name', 'audio')->orderBy('order_column'),
+                ])
+                ->select('id', 'title', 'slug', 'excerpt', 'featured_image', 'blog_category_id', 'published_at', 'views')
+                ->latest('published_at')
+                ->take(2)
+                ->get(),
         ]);
     }
 

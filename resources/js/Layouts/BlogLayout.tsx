@@ -220,7 +220,7 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                 </div>
 
                 {/* ── 3 · Red navigation bar ───────────────────────────────── */}
-                <nav className="hidden md:block bg-[#F24F00]">
+                <nav className="hidden md:block bg-[#F2F2F2]">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <ul className="flex items-stretch">
 
@@ -231,7 +231,7 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                                     className={`flex items-center px-4 py-3 text-sm font-bold border-l border-[#075F26] transition-colors ${
                                         isActive('/') && !isActive('/blog')
                                             ? 'bg-[#075F26] text-white'
-                                            : 'text-white/90 hover:bg-[#075F26] hover:text-white'
+                                            : 'text-[#F24F00] hover:bg-[#075F26] hover:text-white'
                                     }`}
                                 >
                                     صفحه اصلی
@@ -243,10 +243,10 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                                 <li key={cat.id} className="relative group">
                                     <Link
                                         href={route('front.blog.category', cat.slug)}
-                                        className={`flex items-center gap-1 px-4 py-3 text-sm font-bold border-l border-[#075F26] transition-colors ${
+                                        className={`flex items-center gap-1 px-4 py-3 text-sm font-bold border-l border-[#F24F00]/20 transition-colors ${
                                             isActive(`/blog/category/${cat.slug}`)
                                                 ? 'bg-[#075F26] text-white'
-                                                : 'text-white/90 hover:bg-[#075F26] hover:text-white'
+                                                : 'text-[#F24F00] hover:bg-[#075F26] hover:text-white'
                                         }`}
                                     >
                                         {cat.name}
@@ -286,8 +286,8 @@ export default function BlogLayout({ children }: PropsWithChildren) {
 
             {/* ── Breaking news ── */}
             {breakingNews.length > 0 && (
-                <div className="max-w-7xl mx-auto" dir="rtl">
-                    <div className="max-w-7xl mx-auto bg-gray-900 px-0 sm:px-0 lg:px-0 mx-8">
+                <div className="max-w-7xl mx-auto mt-4" dir="rtl">
+                    <div className="bg-gray-900 mx-4 sm:mx-6 lg:mx-8">
                         <div className="flex items-stretch">
 
                             {/* Label */}

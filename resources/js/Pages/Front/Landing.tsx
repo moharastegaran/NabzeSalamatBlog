@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
 import { BlogPost, BlogTag } from '@/types/models';
@@ -12,6 +12,7 @@ interface Props {
     analyzePosts: BlogPost[];
     tags: BlogTag[];
     videoPosts: BlogPost[];
+    audioPosts: BlogPost[];
 }
 
 // ── Shared ────────────────────────────────────────────────────────────────────
@@ -187,36 +188,71 @@ function ArticleCard({ post }: { post: BlogPost }) {
     );
 }
 
-// ── Category strip ────────────────────────────────────────────────────────────
-const PALETTE = [
-    ['#C0392B', '#922B21'],
-    ['#1A5276', '#1F618D'],
-    ['#1E8449', '#196F3D'],
-    ['#784212', '#6E2F1A'],
-    ['#6C3483', '#5B2C6F'],
-    ['#117A65', '#0E6655'],
-    ['#1A252F', '#2C3E50'],
-    ['#B7770D', '#9A7D0A'],
+// ── Category cards ────────────────────────────────────────────────────────────
+const BRAND_GRADIENTS: [string, string][] = [
+    ['#F24F00', '#7A2700'],
+    ['#075F26', '#023B18'],
+    ['#1A5276', '#0D2D45'],
+    ['#6C3483', '#4A235A'],
+    ['#117A65', '#0B5345'],
+    ['#B7770D', '#7D5109'],
+    ['#922B21', '#641E16'],
+    ['#1E8449', '#145A32'],
 ];
 
 function CategoryStrip({ categories }: { categories: NavCategory[] }) {
     if (!categories.length) return null;
 
     return (
-        <div className="flex">
+        <div className="flex gap-3">
             {categories.map((cat, i) => {
-                const [from, to] = PALETTE[i % PALETTE.length];
+                const [c1, c2] = BRAND_GRADIENTS[i % BRAND_GRADIENTS.length];
                 return (
                     <Link
                         key={cat.id}
                         href={route('front.blog.category', cat.slug)}
-                        className="flex-1 flex flex-col items-center justify-center gap-2 px-3 py-5 text-white font-bold text-sm hover:opacity-90 transition-opacity"
-                        style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}
+                        className="group relative flex-1 h-44 overflow-hidden rounded-sm shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 focus:outline-none"
                     >
-                        {cat.icon && (
-                            <img src={`/storage/${cat.icon}`} alt="" className="w-10 h-10 object-contain brightness-0 invert" />
+                        {/* Background: thumbnail or brand gradient */}
+                        {cat.thumbnail ? (
+                            <img
+                                src={`/storage/${cat.thumbnail}`}
+                                alt=""
+                                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                        ) : (
+                            <div
+                                className="absolute inset-0"
+                                style={{ background: `linear-gradient(145deg, ${c1}, ${c2})` }}
+                            />
                         )}
-                        {cat.name}
+
+                        {/* Brand color overlay — tints image with brand palette */}
+                        <div
+                            className="absolute inset-0 transition-opacity duration-300 group-hover:opacity-75"
+                            style={{ background: `linear-gradient(to bottom, ${c1}55, ${c2}dd)` }}
+                        />
+
+                        {/* Content */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-between p-3">
+
+                            {/* Icon — frosted glass circle */}
+                            <div className="mt-2 w-12 h-12 rounded-full bg-white/20 ring-2 ring-white/35 flex items-center justify-center backdrop-blur-sm group-hover:bg-white/30 transition-colors duration-300">
+                                {cat.icon ? (
+                                    <img src={`/storage/${cat.icon}`} alt="" className="w-6 h-6 object-contain brightness-0 invert" />
+                                ) : (
+                                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    </svg>
+                                )}
+                            </div>
+
+                            {/* Name */}
+                            <span className="mb-1 text-center text-lg font-black text-white leading-snug line-clamp-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]">
+                                {cat.name}
+                            </span>
+
+                        </div>
                     </Link>
                 );
             })}
@@ -421,8 +457,156 @@ function VideoSection({ posts }: { posts: BlogPost[] }) {
     );
 }
 
+// ── Audio card ────────────────────────────────────────────────────────────────
+function BlogAudioCard({ post }: { post: BlogPost }) {
+    const audioRef = useRef<HTMLAudioElement>(null);
+    const [playing, setPlaying]   = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [current, setCurrent]   = useState(0);
+    const [duration, setDuration] = useState(0);
+
+    const toggle = () => {
+        if (!audioRef.current) return;
+        if (playing) {
+            audioRef.current.pause();
+            setPlaying(false);
+        } else {
+            audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
+        }
+    };
+
+    const onTimeUpdate = () => {
+        if (!audioRef.current) return;
+        const cur = audioRef.current.currentTime;
+        const dur = audioRef.current.duration || 0;
+        setCurrent(cur);
+        setProgress(dur ? (cur / dur) * 100 : 0);
+    };
+
+    const onSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = Number(e.target.value);
+        if (!audioRef.current || !audioRef.current.duration) return;
+        audioRef.current.currentTime = (val / 100) * audioRef.current.duration;
+        setProgress(val);
+    };
+
+    const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+
+    return (
+        <div className="bg-white shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col">
+
+            {/* Thumbnail */}
+            <div className="relative aspect-video overflow-hidden bg-gray-100 flex-shrink-0">
+                {post.featured_image
+                    ? <img src={`/storage/${post.featured_image}`} alt={post.title} className="w-full h-full object-cover" />
+                    : <div className="w-full h-full bg-gradient-to-br from-[#F24F00]/20 to-[#075F26]/30" />
+                }
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+                {/* Waveform badge */}
+                <div className="absolute bottom-3 right-3 flex items-end gap-0.5">
+                    {[4, 7, 5, 9, 6, 8, 5, 7, 4].map((h, i) => (
+                        <span
+                            key={i}
+                            className={`w-[3px] rounded-full bg-white/80 ${playing ? 'animate-pulse' : ''}`}
+                            style={{ height: `${h * 2}px`, animationDelay: `${i * 80}ms` }}
+                        />
+                    ))}
+                </div>
+
+                {/* Play overlay button */}
+                <button
+                    onClick={toggle}
+                    className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200"
+                    aria-label={playing ? 'توقف' : 'پخش'}
+                >
+                    <div className="w-12 h-12 rounded-full bg-[#F24F00]/90 flex items-center justify-center shadow-lg">
+                        {playing
+                            ? <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            : <svg className="w-5 h-5 text-white translate-x-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        }
+                    </div>
+                </button>
+            </div>
+
+            {/* Body */}
+            <div className="flex flex-col gap-2.5 p-4 flex-1">
+                {(post.category ?? post.categories?.[0]) && (
+                    <span className="inline-block bg-[#F24F00] text-white text-[10px] font-black px-2 py-0.5 w-fit uppercase tracking-wide">
+                        {(post.category ?? post.categories?.[0])!.name}
+                    </span>
+                )}
+                <Link href={route('front.blog.show', post.slug)}>
+                    <h3 className="text-sm font-black text-gray-900 line-clamp-2 leading-snug hover:text-[#F24F00] transition-colors">
+                        {post.title}
+                    </h3>
+                </Link>
+                {post.excerpt && (
+                    <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">{post.excerpt}</p>
+                )}
+
+                {/* Player */}
+                {(() => {
+                    const audioFile = post.media?.[0];
+                    return (
+                        <div className="mt-auto pt-3 border-t border-gray-100">
+                            {audioFile && (
+                                <audio
+                                    ref={audioRef}
+                                    src={audioFile.url}
+                                    onTimeUpdate={onTimeUpdate}
+                                    onLoadedMetadata={() => audioRef.current && setDuration(audioRef.current.duration)}
+                                    onEnded={() => { setPlaying(false); setProgress(0); setCurrent(0); }}
+                                />
+                            )}
+                            {audioFile && (
+                                <div className="flex justify-end items-center gap-1.5 mb-2.5">
+                                    <span className="text-[10px] text-gray-300 flex-shrink-0">{audioFile.human_readable_size}</span>
+                                    <span className="grow text-[10px] text-gray-400 truncate text-left">{audioFile.file_name}</span>
+                                    <svg className="h-3 w-3 flex-shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                    </svg>
+                                </div>
+                            )}
+                            <div className="flex items-center gap-3">
+                                {/* Scrubber + times */}
+                                <div className="flex-1 flex flex-col gap-1">
+                                    <input
+                                        type="range" min={0} max={100} value={progress}
+                                        onChange={onSeek}
+                                        disabled={!audioFile}
+                                        className="w-full h-1 border-none rounded-full cursor-pointer accent-[#F24F00] disabled:opacity-40" dir="ltr"
+                                    />
+                                    <div className="flex justify-between text-[10px] text-gray-400 tabular-nums">
+                                        <span>{duration ? fmt(duration) : '--:--'}</span>
+                                        <span>{fmt(current)}</span>
+                                    </div>
+                                </div>
+
+                                {/* Play/pause */}
+                                <button
+                                    onClick={toggle}
+                                    disabled={!audioFile}
+                                    className="flex-shrink-0 w-9 h-9 rounded-full bg-[#F24F00] hover:bg-[#075F26] disabled:bg-gray-300 text-white flex items-center justify-center transition-colors shadow-sm"
+                                    aria-label={playing ? 'توقف' : 'پخش'}
+                                >
+                                    {playing
+                                        ? <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                                        : <svg className="w-4 h-4 translate-x-px" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                    }
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })()}
+            </div>
+
+        </div>
+    );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
-export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, recentPosts, analyzePosts, tags, videoPosts }: Props) {
+export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, recentPosts, analyzePosts, tags, videoPosts, audioPosts }: Props) {
     const { navCategories } = usePage<PageProps>().props;
 
     return (
@@ -480,7 +664,7 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                     </section>
                 )}
 
-                {/* ── Section 4: Trending + Video ───────────────────────────── */}
+                {/* ── Section 4: Trending + Audio ──────────────────────────── */}
                 <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                     {/* Trending — 1 col */}
@@ -495,15 +679,27 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                         </div>
                     </div>
 
-                    {/* Video — 2 cols */}
-                    {videoPosts.length > 0 && (
+                    {/* Audio posts — 2 cols */}
+                    {audioPosts.length > 0 && (
                         <div className="lg:col-span-2 flex flex-col">
-                            <SectionHeader title="ویدیوها" />
-                            <VideoSection posts={videoPosts} />
+                            <SectionHeader title="نبض صدا" href={route('front.blog.category', 'nbd-sda')} />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+                                {audioPosts.map(post => (
+                                    <BlogAudioCard key={post.id} post={post} />
+                                ))}
+                            </div>
                         </div>
                     )}
 
                 </section>
+
+                {/* ── Section 4b: Videos (full width) ──────────────────────── */}
+                {videoPosts.length > 0 && (
+                    <section>
+                        <SectionHeader title="ویدیوها" />
+                        <VideoSection posts={videoPosts} />
+                    </section>
+                )}
 
                 {/* ── Section 5: Tags / Topics ─────────────────────────────── */}
                 {tags.length > 0 && (
