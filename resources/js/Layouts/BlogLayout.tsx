@@ -288,7 +288,7 @@ export default function BlogLayout({ children }: PropsWithChildren) {
 
             {/* ── Breaking news ── */}
             {breakingNews.length > 0 && (
-                <div className="max-w-7xl mx-auto mt-4" dir="rtl">
+                <div className="max-w-7xl mx-auto mt-4 mb-4" dir="rtl">
                     <div className="bg-gray-900 mx-4 sm:mx-6 lg:mx-8">
                         <div className="flex items-stretch">
 
