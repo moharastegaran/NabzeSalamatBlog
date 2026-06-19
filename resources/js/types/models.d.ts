@@ -228,6 +228,18 @@ export interface AdBanner {
     updated_at: string;
 }
 
+export interface ContactMessage {
+    id: number;
+    phone_number: string;
+    email: string | null;
+    subject: string;
+    message: string;
+    attachment_path: string | null;
+    read_at: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface PaginatedData<T> {
     data: T[];
     current_page: number;

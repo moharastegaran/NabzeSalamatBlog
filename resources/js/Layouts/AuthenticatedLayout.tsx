@@ -109,6 +109,14 @@ function IconTickets() {
     );
 }
 
+function IconContactMessages() {
+    return (
+        <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+        </svg>
+    );
+}
+
 function IconChevron({ open }: { open: boolean }) {
     return (
         <svg
@@ -202,6 +210,7 @@ function SidebarNav({
     shopMaintenance,
     ticketsOpen, setTicketsOpen,
     canWithdrawal,
+    contactUnread,
     collapsed, setCollapsed,
 }: {
     canViewUsers: boolean;
@@ -223,6 +232,7 @@ function SidebarNav({
     ticketsOpen: boolean;
     setTicketsOpen: (v: boolean) => void;
     canWithdrawal: boolean;
+    contactUnread: number;
     collapsed: boolean;
     setCollapsed: (v: boolean) => void;
 }) {
@@ -398,6 +408,40 @@ function SidebarNav({
                     >
                         بنرهای تبلیغاتی
                     </NavItem>
+                )}
+
+                {canAdmin && (
+                    <Link
+                        href={route('contact-messages.index')}
+                        title={collapsed ? 'پیام‌های تماس' : undefined}
+                        className={`relative flex items-center overflow-hidden rounded-lg py-2.5 text-sm font-medium transition-colors ${
+                            collapsed ? 'justify-center px-2' : 'justify-between px-3'
+                        } ${
+                            route().current('contact-messages.*')
+                                ? 'bg-rose-100 text-rose-900'
+                                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                        }`}
+                    >
+                        {route().current('contact-messages.*') && !collapsed && (
+                            <span className="absolute inset-y-0 left-0 w-0.5 rounded-r-sm bg-rose-800" />
+                        )}
+                        <span className={`flex items-center ${collapsed ? '' : 'gap-3'}`}>
+                            <span className="relative shrink-0">
+                                <IconContactMessages />
+                                {contactUnread > 0 && collapsed && (
+                                    <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white leading-none">
+                                        {contactUnread > 9 ? '9+' : contactUnread}
+                                    </span>
+                                )}
+                            </span>
+                            {!collapsed && 'پیام‌های تماس'}
+                        </span>
+                        {!collapsed && contactUnread > 0 && (
+                            <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
+                                {contactUnread > 99 ? '99+' : contactUnread}
+                            </span>
+                        )}
+                    </Link>
                 )}
 
                 {/*{canGallery && (*/}
@@ -688,7 +732,7 @@ export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
-    const { auth, shopMaintenance, openTickets } = usePage().props as any;
+    const { auth, shopMaintenance, openTickets, contactUnread } = usePage().props as any;
     const user = auth.user;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [collapsed, setCollapsed]     = useState(false);
@@ -800,6 +844,7 @@ export default function Authenticated({
                     ticketsOpen={ticketsOpen}
                     setTicketsOpen={setTicketsOpen}
                     canWithdrawal={canWithdrawal}
+                    contactUnread={contactUnread ?? 0}
                     collapsed={collapsed}
                     setCollapsed={setCollapsed}
                 />

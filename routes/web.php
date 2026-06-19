@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdBannerController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\BreakingNewsController;
 use App\Http\Controllers\AssetController;
@@ -73,6 +74,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/maintenance/toggle', [MaintenanceController::class, 'toggle'])
         ->name('maintenance.toggle')
         ->middleware('role:admin');
+
+    // Contact messages (admin only)
+    Route::middleware('role:admin')->group(function () {
+        Route::get   ('/contact-messages',                          [ContactMessageController::class, 'index'])   ->name('contact-messages.index');
+        Route::patch ('/contact-messages/{message}/mark-read',      [ContactMessageController::class, 'markRead'])->name('contact-messages.markRead');
+        Route::delete('/contact-messages/{message}',                [ContactMessageController::class, 'destroy']) ->name('contact-messages.destroy');
+        Route::get   ('/contact-messages/{message}/attachment',     [ContactMessageController::class, 'download'])->name('contact-messages.download');
+    });
 
     // Ad Banners (admin only)
     Route::middleware('role:admin')->group(function () {

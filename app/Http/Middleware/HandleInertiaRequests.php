@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\BlogCategory;
 use App\Models\BreakingNews;
+use App\Models\ContactMessage;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -50,6 +51,9 @@ class HandleInertiaRequests extends Middleware
                 ->where(fn ($q) => $q->whereNull('active_until')->orWhere('active_until', '>=', now()))
                 ->orderByDesc('created_at')
                 ->get(['id', 'title', 'url']),
+            'contactUnread'   => fn () => $user && in_array('admin', $user->getRoleNames()->toArray())
+                ? ContactMessage::whereNull('read_at')->count()
+                : 0,
             'navCategories'   => fn () => BlogCategory::whereNull('parent_id')
                 ->with(['children' => fn ($q) => $q->select('id', 'name', 'slug', 'parent_id')->orderBy('name')])
                 ->select('id', 'name', 'slug', 'icon', 'thumbnail')

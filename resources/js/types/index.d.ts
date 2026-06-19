@@ -31,6 +31,7 @@ export type PageProps<
     };
     shopMaintenance: boolean;
     openTickets: number;
+    contactUnread: number;
     navCategories: NavCategory[];
     breakingNews: BreakingNews[];
 };
