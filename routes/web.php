@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdBannerController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\BreakingNewsController;
 use App\Http\Controllers\AssetController;
@@ -33,6 +34,7 @@ Route::middleware('front.maintenance')->group(function () {
     Route::get('/',            [ShopController::class, 'landing'])->name('front.landing');
     Route::get('/about-us',    [ShopController::class, 'aboutUs'])     ->name('front.about-us');
     Route::get('/contact',     [ShopController::class, 'contact'])     ->name('front.contact');
+    Route::post('/contact',    [ContactController::class, 'store'])   ->name('front.contact.store');
     Route::get('/gallery',     [ShopController::class, 'gallery'])     ->name('front.gallery');
 
     // Public blog
