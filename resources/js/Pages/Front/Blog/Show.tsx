@@ -1,12 +1,14 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
-import type { BlogComment, BlogPost, BlogTag } from '@/types/models';
+import AdBannerSlot from '@/Components/AdBannerSlot';
+import type { AdBanner, BlogComment, BlogPost, BlogTag } from '@/types/models';
 
 interface Props {
     post: BlogPost & { approved_comments: BlogComment[] };
     related: BlogPost[];
     recentPosts: BlogPost[];
+    adBanners: AdBanner[];
 }
 
 function formatDate(iso: string) {
@@ -197,7 +199,7 @@ function CommentForm({ postId }: { postId: number }) {
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
-export default function BlogShow({ post, related, recentPosts }: Props) {
+export default function BlogShow({ post, related, recentPosts, adBanners }: Props) {
     const date = post.published_at ? formatDate(post.published_at) : null;
     const comments = post.approved_comments ?? [];
 
@@ -427,6 +429,11 @@ export default function BlogShow({ post, related, recentPosts }: Props) {
                                     </svg>
                                 </Link>
                             </div>
+                        )}
+
+                        {/* Ad banners */}
+                        {adBanners.length > 0 && (
+                            <AdBannerSlot banners={adBanners} />
                         )}
 
                         {/* Social */}

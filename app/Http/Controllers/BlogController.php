@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdBanner;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
@@ -43,13 +44,14 @@ class BlogController extends Controller
             ->get(['id', 'name', 'slug']);
 
         return Inertia::render('Front/Blog/Index', [
-            'posts'          => $posts,
-            'categories'     => $categories,
-            'filters'        => [
+            'posts'      => $posts,
+            'categories' => $categories,
+            'filters'    => [
                 'category' => $categorySlug,
                 'search'   => $search,
                 'sort'     => $sort,
             ],
+            'adBanners'  => AdBanner::activeForLocation('blog')->get(),
         ]);
     }
 
@@ -88,6 +90,7 @@ class BlogController extends Controller
             'posts'       => $posts,
             'recentPosts' => $recentPosts,
             'search'      => $search,
+            'adBanners'   => AdBanner::activeForLocation('catarchive')->get(),
         ]);
     }
 
@@ -140,6 +143,7 @@ class BlogController extends Controller
             'post'        => $post,
             'related'     => $related,
             'recentPosts' => $recentPosts,
+            'adBanners'   => AdBanner::activeForLocation('blogsingle')->get(),
         ]);
     }
 }

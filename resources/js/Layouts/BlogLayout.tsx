@@ -205,15 +205,17 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                             </div>
 
                             {/* Auth */}
-                            {/*<Link*/}
-                            {/*    href={auth.user ? route('dashboard') : route('login')}*/}
-                            {/*    className="hidden sm:inline-flex flex-shrink-0 items-center gap-2 bg-[#F24F00] hover:bg-[#075F26] text-white text-sm font-bold px-5 py-2 transition-colors"*/}
-                            {/*>*/}
-                            {/*    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">*/}
-                            {/*        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />*/}
-                            {/*    </svg>*/}
-                            {/*    {auth.user ? 'پنل کاربری' : 'ورود / ثبت‌نام'}*/}
-                            {/*</Link>*/}
+                            {auth.user && (
+                                <Link
+                                href={route('dashboard')}
+                                className="hidden sm:inline-flex flex-shrink-0 items-center gap-2 bg-[#F24F00] hover:bg-[#075F26] text-white text-sm font-bold px-5 py-2 transition-colors"
+                                >
+                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    پنل مدیریت
+                            </Link>
+                            )}
 
                         </div>
                     </div>

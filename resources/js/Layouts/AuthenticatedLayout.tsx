@@ -60,6 +60,14 @@ function IconBreakingNews() {
     );
 }
 
+function IconAdBanners() {
+    return (
+        <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+        </svg>
+    );
+}
+
 function IconAnnouncements() {
     return (
         <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -184,6 +192,7 @@ function SidebarNav({
     canViewUsers, usersOpen, setUsersOpen, canCreateUser,
     canAnnounce,
     canBreakingNews,
+    canAdBanners,
     canGallery,
     canAdmin,
     canAssets,
@@ -201,6 +210,7 @@ function SidebarNav({
     canCreateUser: boolean;
     canAnnounce: boolean;
     canBreakingNews: boolean;
+    canAdBanners: boolean;
     canGallery: boolean;
     canAdmin: boolean;
     canAssets: boolean;
@@ -233,63 +243,6 @@ function SidebarNav({
                     داشبورد
                 </NavItem>
 
-                {canViewReports && (
-                    <NavItem
-                        href={route('reports.index')}
-                        active={!!route().current('reports.*')}
-                        icon={<IconReport />}
-                        collapsed={collapsed}
-                    >
-                        گزارش گیری
-                    </NavItem>
-                )}
-
-                {/* Users group */}
-                {canViewUsers && (
-                    <div>
-                        <button
-                            type="button"
-                            aria-expanded={!collapsed && usersOpen}
-                            aria-controls="users-submenu"
-                            onClick={() => collapsed ? expandAndOpen(setUsersOpen) : setUsersOpen(!usersOpen)}
-                            title={collapsed ? 'کاربران' : undefined}
-                            className={`relative flex w-full items-center overflow-hidden rounded-lg py-2.5 text-sm font-medium transition-colors ${
-                                collapsed ? 'justify-center px-2' : 'justify-between px-3'
-                            } ${
-                                route().current('users.*')
-                                    ? 'bg-rose-100 text-rose-900'
-                                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                            }`}
-                        >
-                            {!collapsed && route().current('users.*') && (
-                                <span className="absolute inset-y-0 left-0 w-0.5 rounded-r-sm bg-rose-800" />
-                            )}
-                            <span className={`flex items-center ${collapsed ? '' : 'gap-3'}`}>
-                                <IconUsers />
-                                {!collapsed && 'کاربران'}
-                            </span>
-                            {!collapsed && <IconChevron open={usersOpen} />}
-                        </button>
-
-                        {!collapsed && (
-                            <div id="users-submenu" className={`grid transition-all duration-200 ease-in-out ${usersOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-                                <div className="overflow-hidden">
-                                    <div className="mt-1 ml-5 mr-3 space-y-0.5 border-l border-gray-200 pl-3">
-                                        <SubNavItem href={route('users.index')} active={!!route().current('users.index')}>
-                                            همه کاربران
-                                        </SubNavItem>
-                                        {canCreateUser && (
-                                            <SubNavItem href={route('users.create')} active={!!route().current('users.create')}>
-                                                افزودن کاربر
-                                            </SubNavItem>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                )}
-
                 <NavItem
                     href={route('notes.index')}
                     active={!!route().current('notes.*')}
@@ -300,60 +253,71 @@ function SidebarNav({
                 </NavItem>
 
                 {/* Tickets group */}
-                <div>
-                    <button
-                        type="button"
-                        onClick={() => collapsed ? expandAndOpen(setTicketsOpen) : setTicketsOpen(!ticketsOpen)}
-                        title={collapsed ? 'درخواست‌های پشتیبانی' : undefined}
-                        className={`relative flex w-full items-center overflow-hidden rounded-lg py-2.5 text-sm font-medium transition-colors ${
-                            collapsed ? 'justify-center px-2' : 'justify-between px-3'
-                        } ${
-                            route().current('tickets.*')
-                                ? 'bg-rose-100 text-rose-900'
-                                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                        }`}
-                    >
-                        {!collapsed && route().current('tickets.*') && (
-                            <span className="absolute inset-y-0 left-0 w-0.5 rounded-r-sm bg-rose-800" />
-                        )}
-                        <span className={`flex items-center ${collapsed ? '' : 'gap-3'}`}>
-                            <span className="relative shrink-0">
-                                <IconTickets />
-                                {openTickets > 0 && collapsed && (
-                                    <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white leading-none">
-                                        {openTickets > 9 ? '9+' : openTickets}
-                                    </span>
-                                )}
-                            </span>
-                            {!collapsed && 'همه درخواست‌ها'}
-                        </span>
-                        {!collapsed && (
-                            <span className="flex items-center gap-2">
-                                {openTickets > 0 && (
-                                    <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
-                                        {openTickets > 99 ? '99+' : openTickets}
-                                    </span>
-                                )}
-                                <IconChevron open={ticketsOpen} />
-                            </span>
-                        )}
-                    </button>
+                {/*<div>*/}
+                {/*    <button*/}
+                {/*        type="button"*/}
+                {/*        onClick={() => collapsed ? expandAndOpen(setTicketsOpen) : setTicketsOpen(!ticketsOpen)}*/}
+                {/*        title={collapsed ? 'درخواست‌های پشتیبانی' : undefined}*/}
+                {/*        className={`relative flex w-full items-center overflow-hidden rounded-lg py-2.5 text-sm font-medium transition-colors ${*/}
+                {/*            collapsed ? 'justify-center px-2' : 'justify-between px-3'*/}
+                {/*        } ${*/}
+                {/*            route().current('tickets.*')*/}
+                {/*                ? 'bg-rose-100 text-rose-900'*/}
+                {/*                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'*/}
+                {/*        }`}*/}
+                {/*    >*/}
+                {/*        {!collapsed && route().current('tickets.*') && (*/}
+                {/*            <span className="absolute inset-y-0 left-0 w-0.5 rounded-r-sm bg-rose-800" />*/}
+                {/*        )}*/}
+                {/*        <span className={`flex items-center ${collapsed ? '' : 'gap-3'}`}>*/}
+                {/*            <span className="relative shrink-0">*/}
+                {/*                <IconTickets />*/}
+                {/*                {openTickets > 0 && collapsed && (*/}
+                {/*                    <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white leading-none">*/}
+                {/*                        {openTickets > 9 ? '9+' : openTickets}*/}
+                {/*                    </span>*/}
+                {/*                )}*/}
+                {/*            </span>*/}
+                {/*            {!collapsed && 'همه درخواست‌ها'}*/}
+                {/*        </span>*/}
+                {/*        {!collapsed && (*/}
+                {/*            <span className="flex items-center gap-2">*/}
+                {/*                {openTickets > 0 && (*/}
+                {/*                    <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">*/}
+                {/*                        {openTickets > 99 ? '99+' : openTickets}*/}
+                {/*                    </span>*/}
+                {/*                )}*/}
+                {/*                <IconChevron open={ticketsOpen} />*/}
+                {/*            </span>*/}
+                {/*        )}*/}
+                {/*    </button>*/}
 
-                    {!collapsed && (
-                        <div className={`grid transition-all duration-200 ease-in-out ${ticketsOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-                            <div className="overflow-hidden">
-                                <div className="mt-1 ml-5 mr-3 space-y-0.5 border-l border-gray-200 pl-3">
-                                    <SubNavItem href={route('tickets.index')} active={!!route().current('tickets.index') || !!route().current('tickets.show')}>
-                                        همه درخواست‌ها
-                                    </SubNavItem>
-                                    <SubNavItem href={route('tickets.create')} active={!!route().current('tickets.create')}>
-                                        ثبت درخواست جدید
-                                    </SubNavItem>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                {/*    {!collapsed && (*/}
+                {/*        <div className={`grid transition-all duration-200 ease-in-out ${ticketsOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>*/}
+                {/*            <div className="overflow-hidden">*/}
+                {/*                <div className="mt-1 ml-5 mr-3 space-y-0.5 border-l border-gray-200 pl-3">*/}
+                {/*                    <SubNavItem href={route('tickets.index')} active={!!route().current('tickets.index') || !!route().current('tickets.show')}>*/}
+                {/*                        همه درخواست‌ها*/}
+                {/*                    </SubNavItem>*/}
+                {/*                    <SubNavItem href={route('tickets.create')} active={!!route().current('tickets.create')}>*/}
+                {/*                        ثبت درخواست جدید*/}
+                {/*                    </SubNavItem>*/}
+                {/*                </div>*/}
+                {/*            </div>*/}
+                {/*        </div>*/}
+                {/*    )}*/}
+                {/*</div>*/}
+
+                {canAssets && (
+                    <NavItem
+                        href={route('assets.index')}
+                        active={!!route().current('assets.*')}
+                        icon={<IconAssets />}
+                        collapsed={collapsed}
+                    >
+                        مدیریت رسانه
+                    </NavItem>
+                )}
 
                 {/* Blog group */}
                 {canBlog && (
@@ -403,16 +367,16 @@ function SidebarNav({
                     </div>
                 )}
 
-                {canAnnounce && (
-                    <NavItem
-                        href={route('announcements.index')}
-                        active={!!route().current('announcements.*')}
-                        icon={<IconAnnouncements />}
-                        collapsed={collapsed}
-                    >
-                        اطلاعیه‌ها
-                    </NavItem>
-                )}
+                {/*{canAnnounce && (*/}
+                {/*    <NavItem*/}
+                {/*        href={route('announcements.index')}*/}
+                {/*        active={!!route().current('announcements.*')}*/}
+                {/*        icon={<IconAnnouncements />}*/}
+                {/*        collapsed={collapsed}*/}
+                {/*    >*/}
+                {/*        اطلاعیه‌ها*/}
+                {/*    </NavItem>*/}
+                {/*)}*/}
 
                 {canBreakingNews && (
                     <NavItem
@@ -425,27 +389,27 @@ function SidebarNav({
                     </NavItem>
                 )}
 
-                {canGallery && (
+                {canAdBanners && (
                     <NavItem
-                        href={route('gallery.index')}
-                        active={!!route().current('gallery.*')}
-                        icon={<IconGallery />}
+                        href={route('ad-banners.index')}
+                        active={!!route().current('ad-banners.*')}
+                        icon={<IconAdBanners />}
                         collapsed={collapsed}
                     >
-                        گالری تصاویر
+                        بنرهای تبلیغاتی
                     </NavItem>
                 )}
 
-                {canAssets && (
-                    <NavItem
-                        href={route('assets.index')}
-                        active={!!route().current('assets.*')}
-                        icon={<IconAssets />}
-                        collapsed={collapsed}
-                    >
-                        رسانه‌ها
-                    </NavItem>
-                )}
+                {/*{canGallery && (*/}
+                {/*    <NavItem*/}
+                {/*        href={route('gallery.index')}*/}
+                {/*        active={!!route().current('gallery.*')}*/}
+                {/*        icon={<IconGallery />}*/}
+                {/*        collapsed={collapsed}*/}
+                {/*    >*/}
+                {/*        گالری تصاویر*/}
+                {/*    </NavItem>*/}
+                {/*)}*/}
 
                 {canAdmin && (
                     <NavItem
@@ -455,6 +419,63 @@ function SidebarNav({
                         collapsed={collapsed}
                     >
                         مدیریت نقش‌ها
+                    </NavItem>
+                )}
+
+                {/* Users group */}
+                {canViewUsers && (
+                    <div>
+                        <button
+                            type="button"
+                            aria-expanded={!collapsed && usersOpen}
+                            aria-controls="users-submenu"
+                            onClick={() => collapsed ? expandAndOpen(setUsersOpen) : setUsersOpen(!usersOpen)}
+                            title={collapsed ? 'کاربران' : undefined}
+                            className={`relative flex w-full items-center overflow-hidden rounded-lg py-2.5 text-sm font-medium transition-colors ${
+                                collapsed ? 'justify-center px-2' : 'justify-between px-3'
+                            } ${
+                                route().current('users.*')
+                                    ? 'bg-rose-100 text-rose-900'
+                                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                            }`}
+                        >
+                            {!collapsed && route().current('users.*') && (
+                                <span className="absolute inset-y-0 left-0 w-0.5 rounded-r-sm bg-rose-800" />
+                            )}
+                            <span className={`flex items-center ${collapsed ? '' : 'gap-3'}`}>
+                                <IconUsers />
+                                {!collapsed && 'کاربران'}
+                            </span>
+                            {!collapsed && <IconChevron open={usersOpen} />}
+                        </button>
+
+                        {!collapsed && (
+                            <div id="users-submenu" className={`grid transition-all duration-200 ease-in-out ${usersOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                                <div className="overflow-hidden">
+                                    <div className="mt-1 ml-5 mr-3 space-y-0.5 border-l border-gray-200 pl-3">
+                                        <SubNavItem href={route('users.index')} active={!!route().current('users.index')}>
+                                            همه کاربران
+                                        </SubNavItem>
+                                        {canCreateUser && (
+                                            <SubNavItem href={route('users.create')} active={!!route().current('users.create')}>
+                                                افزودن کاربر
+                                            </SubNavItem>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {canViewReports && (
+                    <NavItem
+                        href={route('reports.index')}
+                        active={!!route().current('reports.*')}
+                        icon={<IconReport />}
+                        collapsed={collapsed}
+                    >
+                        گزارش گیری
                     </NavItem>
                 )}
 
@@ -716,6 +737,7 @@ export default function Authenticated({
         user.roles?.includes('admin') || user.roles?.includes('cfo');
 
     const canBreakingNews = canAdmin;
+    const canAdBanners    = canAdmin;
 
     const canGallery =
         user.roles?.includes('admin') || user.roles?.includes('cfo');
@@ -765,6 +787,7 @@ export default function Authenticated({
                     canCreateUser={canCreateUser}
                     canAnnounce={canAnnounce}
                     canBreakingNews={canBreakingNews}
+                    canAdBanners={canAdBanners}
                     canGallery={canGallery}
                     canAdmin={canAdmin}
                     canAssets={canAssets}

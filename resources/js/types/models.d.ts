@@ -214,6 +214,20 @@ export interface CategoryFieldDefinition {
     updated_at: string;
 }
 
+export interface AdBanner {
+    id: number;
+    title: string;
+    image: string | null;
+    external_url: string | null;
+    locations: string[];
+    is_active: boolean;
+    active_from: string | null;
+    active_until: string | null;
+    sort_order: number;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface PaginatedData<T> {
     data: T[];
     current_page: number;

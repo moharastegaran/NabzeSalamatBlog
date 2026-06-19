@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
-import type { BlogCategory, BlogPost, PaginatedData } from '@/types/models';
+import AdBannerSlot from '@/Components/AdBannerSlot';
+import type { AdBanner, BlogCategory, BlogPost, PaginatedData } from '@/types/models';
 
 interface CategoryChild extends Pick<BlogCategory, 'id' | 'name' | 'slug'> {
     posts_count: number;
@@ -18,6 +19,7 @@ interface Props {
     posts: PaginatedData<BlogPost>;
     recentPosts: BlogPost[];
     search: string;
+    adBanners: AdBanner[];
 }
 
 // ── Post card ─────────────────────────────────────────────────────────────────
@@ -260,7 +262,7 @@ function SocialWidget() {
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
-export default function BlogCategory({ category, posts, recentPosts, search }: Props) {
+export default function BlogCategory({ category, posts, recentPosts, search, adBanners }: Props) {
     return (
         <BlogLayout>
             <Head title={`${category.name} | وبلاگ`} />
@@ -361,6 +363,10 @@ export default function BlogCategory({ category, posts, recentPosts, search }: P
                             <div className="bg-white p-4 shadow-sm">
                                 <RecentWidget posts={recentPosts} />
                             </div>
+                        )}
+
+                        {adBanners.length > 0 && (
+                            <AdBannerSlot banners={adBanners} />
                         )}
 
                         <div className="bg-white p-4 shadow-sm">

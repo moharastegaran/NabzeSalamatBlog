@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdBanner;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogTag;
@@ -68,6 +69,7 @@ class ShopController extends Controller
                 ->latest('published_at')
                 ->take(8)
                 ->get(),
+            'adBanners'       => AdBanner::activeForLocation('landing')->get(),
             'audioPosts'      => BlogPost::published()
                 ->whereHas('categories', fn ($q) => $q->whereIn('blog_categories.slug', ['nbd-sda', 'padkst', 'fayl-soty']))
                 ->with([
