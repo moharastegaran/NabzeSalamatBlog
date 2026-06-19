@@ -574,7 +574,7 @@ function ShopDropdown() {
         <div ref={btnRef} className="relative ml-auto">
             <div className="inline-flex rounded-md border border-[#F24F00] overflow-hidden shadow-sm">
                 <Link
-                    href={route('front.index')}
+                    href={route('front.blog.index')}
                     className="inline-flex items-center gap-1.5 bg-[#F24F00]/10 px-3 py-1.5 text-sm font-medium text-[#F24F00] hover:bg-[#F24F00]/20 transition-colors"
                 >
                     <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -600,7 +600,7 @@ function ShopDropdown() {
                     className="fixed w-40 rounded-xl border border-gray-100 bg-white py-1 shadow-lg z-[200]"
                 >
                     <Link
-                        href={route('front.index')}
+                        href={route('front.blog.index')}
                         onClick={() => setOpen(false)}
                         className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >

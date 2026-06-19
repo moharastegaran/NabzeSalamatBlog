@@ -27,10 +27,18 @@ function PostCard({ post }: { post: BlogPost }) {
     const date = post.published_at ? new Date(post.published_at).toLocaleDateString('fa-IR') : null;
 
     return (
-        <Link href={route('front.blog.show', post.slug)} className="group flex flex-col bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+        <Link
+            href={route('front.blog.show', post.slug)}
+            className="group flex flex-col overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+        >
+            {/* Image */}
             <div className="aspect-video w-full overflow-hidden bg-gray-100 flex-shrink-0">
                 {post.featured_image ? (
-                    <img src={`/storage/${post.featured_image}`} alt={post.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img
+                        src={`/storage/${post.featured_image}`}
+                        alt={post.title}
+                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                 ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
                         <svg className="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
@@ -40,6 +48,10 @@ function PostCard({ post }: { post: BlogPost }) {
                 )}
             </div>
 
+            {/* Top accent on hover */}
+            <div className="border-t-2 border-transparent group-hover:border-[#F24F00] transition-colors duration-200" />
+
+            {/* Body */}
             <div className="flex flex-1 flex-col gap-2 p-4">
                 {post.tags && post.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
@@ -112,8 +124,8 @@ function Pagination({ links }: { links: PaginatedData<unknown>['links'] }) {
 // ── Sidebar helpers ───────────────────────────────────────────────────────────
 function SideboxHeader({ title }: { title: string }) {
     return (
-        <div className="flex items-center gap-2 mb-3 pb-2.5 border-b-2 border-[#F24F00]">
-            <span className="inline-block w-3 h-3 bg-[#F24F00] shrink-0" />
+        <div className="flex items-center gap-2 mb-4">
+            <span className="w-1 h-5 bg-[#F24F00] flex-shrink-0" />
             <h3 className="text-sm font-black text-gray-900 tracking-tight">{title}</h3>
         </div>
     );
@@ -135,7 +147,7 @@ function SearchWidget({ slug, defaultValue }: { slug: string; defaultValue: stri
                     value={q}
                     onChange={e => setQ(e.target.value)}
                     placeholder="جستجو در مقالات..."
-                    className="w-full border border-gray-200 bg-gray-50 px-3 py-2 pr-9 text-sm focus:border-[#F24F00] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#F24F00]"
+                    className="w-full border border-gray-200 bg-gray-50 px-3 py-2 pr-9 text-sm focus:border-[#F24F00] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#F24F00] transition-colors"
                 />
                 <button type="submit" className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#F24F00] transition-colors">
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -156,7 +168,7 @@ function ChildrenWidget({ children }: { children: CategoryChild[] }) {
                     <Link
                         key={child.id}
                         href={route('front.blog.category', child.slug)}
-                        className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0 text-sm text-gray-700 hover:text-[#F24F00] transition-colors group"
+                        className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0 text-sm text-gray-700 hover:text-[#F24F00] transition-colors group bg-transparent hover:bg-[#F24F00]/5 px-1"
                     >
                         <span className="flex items-center gap-2">
                             <svg className="h-3 w-3 text-gray-300 group-hover:text-[#F24F00] transition-colors -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -164,7 +176,9 @@ function ChildrenWidget({ children }: { children: CategoryChild[] }) {
                             </svg>
                             {child.name}
                         </span>
-                        <span className="text-xs text-gray-400 tabular-nums">{child.posts_count.toLocaleString('fa-IR')}</span>
+                        <span className="text-[11px] font-bold bg-[#F24F00]/10 text-[#F24F00] px-1.5 py-0.5 tabular-nums">
+                            {child.posts_count.toLocaleString('fa-IR')}
+                        </span>
                     </Link>
                 ))}
             </div>
@@ -177,18 +191,25 @@ function RecentWidget({ posts }: { posts: BlogPost[] }) {
         <div>
             <SideboxHeader title="جدیدترین مقالات" />
             <div>
-                {posts.map(post => (
+                {posts.map((post, index) => (
                     <Link
                         key={post.id}
                         href={route('front.blog.show', post.slug)}
-                        className="flex gap-3 py-2.5 border-b border-gray-50 last:border-0 group"
+                        className="flex gap-3 py-2.5 border-b border-gray-50 last:border-0 group items-start"
                     >
+                        {/* Number badge */}
+                        <div className="w-5 h-5 bg-gray-100 text-gray-400 text-[10px] font-bold flex-shrink-0 flex items-center justify-center mt-0.5">
+                            {(index + 1).toLocaleString('fa-IR')}
+                        </div>
+
+                        {/* Thumbnail */}
                         <div className="w-16 h-12 shrink-0 overflow-hidden bg-gray-100">
                             {post.featured_image
                                 ? <img src={`/storage/${post.featured_image}`} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                                 : <div className="w-full h-full bg-gray-200" />
                             }
                         </div>
+
                         <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                             <h4 className="text-xs font-semibold text-gray-800 line-clamp-2 leading-snug group-hover:text-[#F24F00] transition-colors">
                                 {post.title}
@@ -205,57 +226,48 @@ function RecentWidget({ posts }: { posts: BlogPost[] }) {
 }
 
 function SocialWidget() {
-    const socials = [
-        {
-            label: 'تلگرام',
-            href: '#',
-            color: 'hover:bg-[#229ED9]',
-            icon: (
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-                </svg>
-            ),
-        },
-        {
-            label: 'اینستاگرام',
-            href: '#',
-            color: 'hover:bg-[#E1306C]',
-            icon: (
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-            ),
-        },
-        {
-            label: 'ایکس',
-            href: '#',
-            color: 'hover:bg-gray-900',
-            icon: (
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                </svg>
-            ),
-        },
-    ];
-
     return (
         <div>
             <SideboxHeader title="ما را دنبال کنید" />
-            <div className="flex justify-around pt-1">
-                {socials.map(s => (
-                    <a
-                        key={s.label}
-                        href={s.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`flex flex-col items-center gap-1.5 group`}
-                    >
-                        <div className={`w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:text-white transition-colors duration-200 ${s.color}`}>
-                            {s.icon}
-                        </div>
-                        <span className="text-[11px] text-gray-500 group-hover:text-[#F24F00] transition-colors">{s.label}</span>
-                    </a>
-                ))}
+            <div className="flex gap-2">
+                {/* Telegram */}
+                <a
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-1 flex-col items-center gap-1.5 py-3 bg-[#229ED9] text-white hover:opacity-90 transition-opacity"
+                >
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                    </svg>
+                    <span className="text-[11px] font-medium">تلگرام</span>
+                </a>
+
+                {/* Instagram */}
+                <a
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-1 flex-col items-center gap-1.5 py-3 bg-gradient-to-b from-[#E1306C] to-[#833AB4] text-white hover:opacity-90 transition-opacity"
+                >
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                    <span className="text-[11px] font-medium">اینستاگرام</span>
+                </a>
+
+                {/* X / Twitter */}
+                <a
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-1 flex-col items-center gap-1.5 py-3 bg-gray-800 text-white hover:opacity-90 transition-opacity"
+                >
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    <span className="text-[11px] font-medium">ایکس</span>
+                </a>
             </div>
         </div>
     );
@@ -270,39 +282,54 @@ export default function BlogCategory({ category, posts, recentPosts, search, adB
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
                 {/* Breadcrumb */}
-                <nav className="mb-5 flex items-center gap-2 text-sm text-gray-400">
+                <nav className="mb-6 flex items-center gap-1.5 text-sm text-gray-400 flex-wrap">
                     <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
-                    <span>/</span>
+                    <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
                     <Link href={route('front.blog.index')} className="hover:text-gray-600 transition-colors">وبلاگ</Link>
                     {category.parent && (
                         <>
-                            <span>/</span>
+                            <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
                             <Link href={route('front.blog.category', category.parent.slug)} className="hover:text-gray-600 transition-colors">
                                 {category.parent.name}
                             </Link>
                         </>
                     )}
-                    <span>/</span>
+                    <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
                     <span className="text-gray-700 font-medium">{category.name}</span>
                 </nav>
 
-                {/* Category header */}
-                <div className="mb-7 flex items-center gap-5 bg-white p-5 shadow-sm border-r-4 border-[#F24F00]">
-                    {(category.thumbnail || category.icon) && (
-                        <img
-                            src={`/storage/${category.thumbnail ?? category.icon}`}
-                            alt={category.name}
-                            className="h-16 w-16 flex-none object-cover ring-1 ring-gray-100"
-                        />
-                    )}
-                    <div className="flex-1 min-w-0">
-                        <h1 className="text-xl font-black text-gray-900">{category.name}</h1>
-                        {category.description && (
-                            <p className="mt-1 text-sm text-gray-500 line-clamp-2">{category.description}</p>
+                {/* Category header banner */}
+                <div className="mb-7 overflow-hidden bg-white shadow-sm border-b-4 border-[#F24F00]">
+                    {/* Top color strip */}
+                    <div className="h-1.5 w-full bg-[#F24F00]" />
+                    <div className="flex items-center gap-5 p-5">
+                        {(category.thumbnail || category.icon) && (
+                            <img
+                                src={`/storage/${category.thumbnail ?? category.icon}`}
+                                alt={category.name}
+                                className="h-20 w-20 flex-none object-cover ring-2 ring-[#F24F00]/20"
+                            />
                         )}
-                        <p className="mt-1.5 text-xs text-gray-400">
-                            {category.posts_count.toLocaleString('fa-IR')} مقاله
-                        </p>
+                        <div className="flex-1 min-w-0">
+                            <h1 className="text-2xl font-black text-gray-900">{category.name}</h1>
+                            {category.description && (
+                                <p className="mt-1 text-sm text-gray-500 line-clamp-2">{category.description}</p>
+                            )}
+                            <div className="mt-2 flex items-center gap-2">
+                                <span className="inline-flex items-center gap-1 bg-[#F24F00]/10 text-[#F24F00] text-xs font-bold px-2 py-0.5">
+                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    {category.posts_count.toLocaleString('fa-IR')} مقاله
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -336,18 +363,38 @@ export default function BlogCategory({ category, posts, recentPosts, search, adB
                             </>
                         ) : (
                             <div className="flex flex-col items-center justify-center bg-white py-20 text-center shadow-sm">
-                                <svg className="mb-4 h-12 w-12 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                <p className="text-sm text-gray-400">
-                                    {search ? `نتیجه‌ای برای «${search}» یافت نشد.` : 'هنوز مقاله‌ای در این دسته‌بندی منتشر نشده است.'}
+                                {/* Illustration */}
+                                <div className="mb-5 relative">
+                                    <div className="flex h-20 w-20 items-center justify-center bg-gray-50">
+                                        <svg className="h-10 w-10 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                    </div>
+                                    <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-[#F24F00]/20" />
+                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#075F26]/20" />
+                                </div>
+                                <p className="text-sm font-semibold text-gray-700">
+                                    {search ? `نتیجه‌ای برای «${search}» یافت نشد` : 'هنوز مقاله‌ای منتشر نشده است'}
                                 </p>
+                                <p className="mt-1 text-xs text-gray-400 max-w-xs">
+                                    {search
+                                        ? 'عبارت دیگری جستجو کنید یا فیلتر جستجو را پاک کنید.'
+                                        : 'به زودی مقالاتی در این دسته‌بندی منتشر خواهد شد.'}
+                                </p>
+                                {search && (
+                                    <Link
+                                        href={route('front.blog.category', category.slug)}
+                                        className="mt-4 inline-flex items-center gap-1.5 bg-[#F24F00] px-4 py-2 text-xs font-bold text-white hover:opacity-90 transition-opacity"
+                                    >
+                                        پاک کردن جستجو
+                                    </Link>
+                                )}
                             </div>
                         )}
                     </main>
 
                     {/* Sidebar */}
-                    <aside className="space-y-6 lg:sticky lg:top-6">
+                    <aside className="space-y-5 lg:sticky lg:top-28">
 
                         <div className="bg-white p-4 shadow-sm">
                             <SearchWidget slug={category.slug} defaultValue={search} />

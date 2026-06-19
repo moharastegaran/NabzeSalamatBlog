@@ -38,10 +38,34 @@ class BlogController extends Controller
 
         $posts = $query->paginate(8)->withQueryString();
 
-        $categories = BlogCategory::withCount(['posts' => fn ($q) => $q->published()])
-            ->having('posts_count', '>', 0)
+        $categories = BlogCategory::whereNull('parent_id')
+            ->with(['children' => fn ($q) => $q
+                ->withCount(['posts' => fn ($q) => $q->published()])
+                ->orderBy('name')
+            ])
+            ->withCount(['posts' => fn ($q) => $q->published()])
             ->orderBy('name')
-            ->get(['id', 'name', 'slug']);
+            ->get(['id', 'name', 'slug'])
+            ->filter(fn ($cat) =>
+                $cat->posts_count > 0 ||
+                $cat->children->some(fn ($c) => ($c->posts_count ?? 0) > 0)
+            )
+            ->map(fn ($cat) => [
+                'id'          => $cat->id,
+                'name'        => $cat->name,
+                'slug'        => $cat->slug,
+                'posts_count' => $cat->posts_count,
+                'children'    => $cat->children
+                    ->filter(fn ($c) => ($c->posts_count ?? 0) > 0)
+                    ->map(fn ($c) => [
+                        'id'          => $c->id,
+                        'name'        => $c->name,
+                        'slug'        => $c->slug,
+                        'posts_count' => $c->posts_count ?? 0,
+                    ])
+                    ->values(),
+            ])
+            ->values();
 
         return Inertia::render('Front/Blog/Index', [
             'posts'      => $posts,

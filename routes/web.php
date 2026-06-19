@@ -28,12 +28,9 @@ use Illuminate\Support\Facades\Route;
 // Maintenance page (exempt from maintenance middleware — avoids redirect loop)
 Route::get('/maintenance', [MaintenanceController::class, 'show'])->name('front.maintenance');
 
-// Public shop (gated by maintenance mode)
+// Public routes (gated by maintenance mode)
 Route::middleware('front.maintenance')->group(function () {
     Route::get('/',            [ShopController::class, 'landing'])->name('front.landing');
-    Route::get('/shop',        [ShopController::class, 'index'])  ->name('front.index');
-    Route::get('/shop/search', [ShopController::class, 'search']) ->name('front.search');
-    Route::get('/shop/{product}', [ShopController::class, 'show'])->name('front.show');
     Route::get('/about-us',    [ShopController::class, 'aboutUs'])     ->name('front.about-us');
     Route::get('/contact',     [ShopController::class, 'contact'])     ->name('front.contact');
     Route::get('/gallery',     [ShopController::class, 'gallery'])     ->name('front.gallery');
