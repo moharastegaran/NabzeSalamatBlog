@@ -568,7 +568,7 @@ function BlogAudioCard({ post }: { post: BlogPost }) {
                                     </svg>
                                 </div>
                             )}
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-end gap-3">
                                 {/* Scrubber + times */}
                                 <div className="flex-1 flex flex-col gap-1">
                                     <input

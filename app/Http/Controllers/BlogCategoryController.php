@@ -43,15 +43,15 @@ class BlogCategoryController extends Controller
 
     public function edit(BlogCategory $blogCategory): Response
     {
-        $blogCategory->load('mediaRequirements');
+        $blogCategory->load('fieldDefinitions');
 
         return Inertia::render('Blog/Categories/Edit', [
             'category'         => $blogCategory,
-            'requirements'     => $blogCategory->mediaRequirements,
+            'fieldDefinitions' => $blogCategory->fieldDefinitions,
             'parents'          => BlogCategory::where('id', '!=', $blogCategory->id)
                 ->orderBy('name')
                 ->get(['id', 'name', 'parent_id']),
-            'knownCollections' => array_keys(\App\Models\BlogPost::MEDIA_COLLECTIONS),
+            'mediaCollections' => array_keys(\App\Models\BlogPost::MEDIA_COLLECTIONS),
         ]);
     }
 

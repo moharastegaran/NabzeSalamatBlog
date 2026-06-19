@@ -63,7 +63,7 @@ class BlogPostController extends Controller
 
     public function edit(BlogPost $blog): Response
     {
-        $blog->load(['tags', 'categories', 'category.mediaRequirements', 'media']);
+        $blog->load(['tags', 'categories', 'category.fieldDefinitions', 'media']);
 
         $mediaByCollection = $blog->media
             ->groupBy('collection_name')
@@ -73,8 +73,8 @@ class BlogPostController extends Controller
         return Inertia::render('Blog/Edit', [
             'post'             => $blog,
             'postMedia'        => $mediaByCollection,
-            'requirements'     => $blog->category?->mediaRequirements ?? [],
-            'knownCollections' => array_keys(\App\Models\BlogPost::MEDIA_COLLECTIONS),
+            'fieldDefinitions' => $blog->category?->fieldDefinitions ?? [],
+            'mediaCollections' => array_keys(\App\Models\BlogPost::MEDIA_COLLECTIONS),
             ...$this->formData(),
         ]);
     }

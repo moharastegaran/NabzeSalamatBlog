@@ -3,7 +3,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import WysiwygEditor from '@/Components/WysiwygEditor';
 import AssetPicker from '@/Components/AssetPicker';
 import CategoryMultiSelect from '@/Components/CategoryMultiSelect';
-import type { Asset, BlogCategory, BlogPost, BlogTag, PostMedia, CategoryMediaRequirement } from '@/types/models';
+import type { Asset, BlogCategory, BlogPost, BlogTag, PostMedia, CategoryFieldDefinition } from '@/types/models';
 import type { PageProps } from '@/types';
 import { useState, useRef } from 'react';
 import React from 'react';
@@ -13,8 +13,8 @@ interface Props {
     categories: Pick<BlogCategory, 'id' | 'name' | 'parent_id'>[];
     tags: Pick<BlogTag, 'id' | 'name'>[];
     postMedia: Record<string, PostMedia[]>;
-    requirements: CategoryMediaRequirement[];
-    knownCollections: string[];
+    fieldDefinitions: CategoryFieldDefinition[];
+    mediaCollections: string[];
 }
 
 interface FormData {
@@ -190,7 +190,7 @@ function MediaCollection({
     );
 }
 
-export default function BlogEdit({ post, categories, tags, postMedia, requirements, knownCollections }: Props) {
+export default function BlogEdit({ post, categories, tags, postMedia, fieldDefinitions, mediaCollections }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canUpload = auth.user?.roles?.includes('admin') ?? false;
 
@@ -374,30 +374,32 @@ export default function BlogEdit({ post, categories, tags, postMedia, requiremen
                         )}
 
                         {/* ── Media Attachments ── */}
-                        {(requirements.length > 0 || knownCollections.length > 0) && (
+                        {(() => {
+                            const fileDefs = fieldDefinitions.filter(d => d.field_type === 'file');
+                            return (fileDefs.length > 0 || mediaCollections.length > 0) && (
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-3">فایل‌های رسانه‌ای</label>
 
-                                {/* Required collections from category */}
-                                {requirements.length > 0 && (
+                                {/* File-type field definitions from category */}
+                                {fileDefs.length > 0 && (
                                     <div className="space-y-3 mb-3">
-                                        {requirements.map(req => (
+                                        {fileDefs.map(def => (
                                             <MediaCollection
-                                                key={req.id}
+                                                key={def.id}
                                                 postId={post.id}
-                                                collection={req.collection_name}
-                                                label={req.label}
-                                                isRequired={req.is_required}
-                                                items={postMedia[req.collection_name] ?? []}
+                                                collection={def.field_key}
+                                                label={def.label}
+                                                isRequired={def.is_required}
+                                                items={postMedia[def.field_key] ?? []}
                                             />
                                         ))}
                                     </div>
                                 )}
 
-                                {/* Other known collections not in requirements */}
+                                {/* Other known collections not covered by field definitions */}
                                 {(() => {
-                                    const reqCollections = new Set(requirements.map(r => r.collection_name));
-                                    const extras = knownCollections.filter(c => !reqCollections.has(c));
+                                    const defKeys = new Set(fileDefs.map(d => d.field_key));
+                                    const extras = mediaCollections.filter(c => !defKeys.has(c));
                                     if (!extras.length) return null;
                                     return (
                                         <details className="group">
@@ -423,7 +425,8 @@ export default function BlogEdit({ post, categories, tags, postMedia, requiremen
                                     );
                                 })()}
                             </div>
-                        )}
+                        );
+                        })()}
 
                         <div className="flex justify-end gap-3 pt-2">
                             <a href={route('blog.index')} className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">

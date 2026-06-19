@@ -26,11 +26,12 @@ class PostMediaController extends Controller
         ]);
 
         $collection = $request->input('collection_name');
-        $requirement = $blog->category?->mediaRequirements()
-            ->where('collection_name', $collection)
+        $fieldDef = $blog->category?->fieldDefinitions()
+            ->where('field_type', 'file')
+            ->where('field_key', $collection)
             ->first();
 
-        $allowedMimes = $requirement?->effectiveMimeTypes()
+        $allowedMimes = $fieldDef?->effectiveMimeTypes()
             ?? BlogPost::MEDIA_COLLECTIONS[$collection]
             ?? null;
 

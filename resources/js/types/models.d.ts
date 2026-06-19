@@ -184,13 +184,22 @@ export interface PostMedia {
     updated_at: string;
 }
 
-export interface CategoryMediaRequirement {
+export type CategoryFieldType = 'file' | 'text' | 'number' | 'select' | 'date';
+
+export interface CategoryFieldDefinition {
     id: number;
     blog_category_id: number;
-    collection_name: string;
+    field_key: string;
+    field_type: CategoryFieldType;
     label: string;
     is_required: boolean;
-    allowed_mime_types: string[] | null;
+    options: {
+        allowed_mime_types?: string[];
+        choices?: { value: string; label: string }[];
+        min?: number;
+        max?: number;
+        max_length?: number;
+    } | null;
     sort_order: number;
     created_at: string;
     updated_at: string;

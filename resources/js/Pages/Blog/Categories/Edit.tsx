@@ -5,7 +5,7 @@ import { PageProps } from '@/types';
 import { useState } from 'react';
 import AssetPicker from '@/Components/AssetPicker';
 import MultiSelect from '@/Components/MultiSelect';
-import type { Asset, CategoryMediaRequirement } from '@/types/models';
+import type { Asset, CategoryFieldDefinition, CategoryFieldType } from '@/types/models';
 
 interface ParentOption {
     id: number;
@@ -16,10 +16,9 @@ interface ParentOption {
 interface Props {
     category: BlogCategory;
     parents: ParentOption[];
-    requirements: CategoryMediaRequirement[];
-    knownCollections: string[];
+    fieldDefinitions: CategoryFieldDefinition[];
+    mediaCollections: string[];
 }
-
 
 function ImagePreview({ path, onClear, label }: { path: string; onClear: () => void; label: string }) {
     return (
@@ -42,6 +41,14 @@ function ImagePreview({ path, onClear, label }: { path: string; onClear: () => v
     );
 }
 
+const FIELD_TYPE_LABELS: Record<CategoryFieldType, string> = {
+    file:   'فایل',
+    text:   'متن',
+    number: 'عدد',
+    select: 'انتخابی',
+    date:   'تاریخ',
+};
+
 const COLLECTION_LABELS: Record<string, string> = {
     audio:      'صوتی',
     video:      'ویدیو',
@@ -49,26 +56,32 @@ const COLLECTION_LABELS: Record<string, string> = {
     attachment: 'پیوست',
 };
 
-function RequirementRow({
-    req,
+const FIELD_TYPE_COLORS: Record<CategoryFieldType, string> = {
+    file:   'bg-blue-50 text-blue-700',
+    text:   'bg-gray-50 text-gray-700',
+    number: 'bg-amber-50 text-amber-700',
+    select: 'bg-purple-50 text-purple-700',
+    date:   'bg-green-50 text-green-700',
+};
+
+function FieldDefinitionRow({
+    def,
     categoryId,
-    knownCollections,
 }: {
-    req: CategoryMediaRequirement;
+    def: CategoryFieldDefinition;
     categoryId: number;
-    knownCollections: string[];
 }) {
     const [editing, setEditing] = useState(false);
     const [form, setForm] = useState({
-        label:       req.label,
-        is_required: req.is_required,
-        sort_order:  req.sort_order,
+        label:       def.label,
+        is_required: def.is_required,
+        sort_order:  def.sort_order,
     });
     const [saving, setSaving] = useState(false);
 
     const save = () => {
         setSaving(true);
-        router.put(route('blog.categories.requirements.update', [categoryId, req.id]), form, {
+        router.put(route('blog.categories.fields.update', [categoryId, def.id]), form, {
             preserveScroll: true,
             onSuccess: () => { setSaving(false); setEditing(false); },
             onError:   () => setSaving(false),
@@ -76,9 +89,13 @@ function RequirementRow({
     };
 
     const remove = () => {
-        if (!confirm('این نیازمندی حذف شود؟')) return;
-        router.delete(route('blog.categories.requirements.destroy', [categoryId, req.id]), { preserveScroll: true });
+        if (!confirm('این فیلد حذف شود؟')) return;
+        router.delete(route('blog.categories.fields.destroy', [categoryId, def.id]), { preserveScroll: true });
     };
+
+    const keyDisplay = def.field_type === 'file'
+        ? (COLLECTION_LABELS[def.field_key] ?? def.field_key)
+        : def.field_key;
 
     return (
         <div className="px-6 py-3">
@@ -95,12 +112,12 @@ function RequirementRow({
                     <div className="flex items-center gap-2 pb-1">
                         <input
                             type="checkbox"
-                            id={`req-required-${req.id}`}
+                            id={`req-required-${def.id}`}
                             checked={form.is_required}
                             onChange={e => setForm(p => ({ ...p, is_required: e.target.checked }))}
                             className="rounded border-gray-300 text-indigo-600"
                         />
-                        <label htmlFor={`req-required-${req.id}`} className="text-sm text-gray-700">الزامی</label>
+                        <label htmlFor={`req-required-${def.id}`} className="text-sm text-gray-700">الزامی</label>
                     </div>
                     <div className="flex gap-2 pb-1">
                         <button
@@ -122,16 +139,17 @@ function RequirementRow({
                 </div>
             ) : (
                 <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                        <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
-                            {COLLECTION_LABELS[req.collection_name] ?? req.collection_name}
+                    <div className="flex items-center gap-3 min-w-0">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold shrink-0 ${FIELD_TYPE_COLORS[def.field_type]}`}>
+                            {FIELD_TYPE_LABELS[def.field_type]}
                         </span>
-                        <span className="text-sm text-gray-700">{req.label}</span>
-                        {req.is_required && (
-                            <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">الزامی</span>
+                        <span className="text-xs text-gray-400 font-mono shrink-0">{keyDisplay}</span>
+                        <span className="text-sm text-gray-700 truncate">{def.label}</span>
+                        {def.is_required && (
+                            <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600 shrink-0">الزامی</span>
                         )}
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 shrink-0">
                         <button
                             type="button"
                             onClick={() => setEditing(true)}
@@ -159,39 +177,59 @@ function RequirementRow({
     );
 }
 
-function AddRequirementForm({
+function AddFieldDefinitionForm({
     categoryId,
-    knownCollections,
-    usedCollections,
+    fieldDefinitions,
+    mediaCollections,
 }: {
     categoryId: number;
-    knownCollections: string[];
-    usedCollections: string[];
+    fieldDefinitions: CategoryFieldDefinition[];
+    mediaCollections: string[];
 }) {
-    const [open, setOpen]         = useState(false);
-    const [saving, setSaving]     = useState(false);
-    const available = knownCollections.filter(c => !usedCollections.includes(c));
+    const [open, setOpen]     = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const [form, setForm] = useState({
-        collection_name: available[0] ?? '',
-        label:           '',
-        is_required:     false,
-        sort_order:      0,
+    const usedFileKeys = fieldDefinitions.filter(d => d.field_type === 'file').map(d => d.field_key);
+    const availableCollections = mediaCollections.filter(c => !usedFileKeys.includes(c));
+
+    const [form, setForm] = useState<{
+        field_type: CategoryFieldType;
+        field_key: string;
+        label: string;
+        is_required: boolean;
+        sort_order: number;
+        options: Record<string, unknown>;
+    }>({
+        field_type:  'file',
+        field_key:   availableCollections[0] ?? '',
+        label:       '',
+        is_required: false,
+        sort_order:  0,
+        options:     {},
     });
+
+    const setFieldType = (type: CategoryFieldType) => {
+        setForm(p => ({
+            ...p,
+            field_type: type,
+            field_key:  type === 'file' ? (availableCollections[0] ?? '') : '',
+            options:    {},
+        }));
+    };
 
     if (!open) {
         return (
             <div className="px-6 py-4 border-t border-gray-100">
                 <button
                     type="button"
-                    onClick={() => { setForm(p => ({ ...p, collection_name: available[0] ?? '' })); setOpen(true); }}
-                    disabled={available.length === 0}
-                    className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+                    onClick={() => setOpen(true)}
+                    className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 transition-colors"
                 >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                     </svg>
-                    {available.length === 0 ? 'همه مجموعه‌ها تعریف شده‌اند' : 'افزودن نیازمندی'}
+                    افزودن فیلد
                 </button>
             </div>
         );
@@ -199,73 +237,225 @@ function AddRequirementForm({
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
+        setErrors({});
         setSaving(true);
-        router.post(route('blog.categories.requirements.store', categoryId), form, {
+
+        const payload: Record<string, unknown> = {
+            field_type:  form.field_type,
+            field_key:   form.field_key,
+            label:       form.label,
+            is_required: form.is_required,
+            sort_order:  form.sort_order,
+            options:     Object.keys(form.options).length > 0 ? form.options : null,
+        };
+
+        router.post(route('blog.categories.fields.store', categoryId), payload, {
             preserveScroll: true,
-            onSuccess: () => { setSaving(false); setOpen(false); setForm({ collection_name: available[0] ?? '', label: '', is_required: false, sort_order: 0 }); },
-            onError:   () => setSaving(false),
+            onSuccess: () => {
+                setSaving(false);
+                setOpen(false);
+                setForm({ field_type: 'file', field_key: availableCollections[0] ?? '', label: '', is_required: false, sort_order: 0, options: {} });
+            },
+            onError: errs => { setErrors(errs); setSaving(false); },
         });
     };
 
+    const inputClass = 'rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500';
+
     return (
-        <form onSubmit={submit} className="px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-xl">
-            <p className="text-xs font-semibold text-gray-600 mb-3">نیازمندی جدید</p>
+        <form onSubmit={submit} className="px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-xl space-y-4">
+            <p className="text-xs font-semibold text-gray-600">فیلد جدید</p>
+
+            {/* Row 1: type + key + label */}
             <div className="flex flex-wrap gap-3 items-end">
+                {/* Field type */}
                 <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">مجموعه</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">نوع</label>
                     <select
-                        value={form.collection_name}
-                        onChange={e => setForm(p => ({ ...p, collection_name: e.target.value }))}
-                        className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        value={form.field_type}
+                        onChange={e => setFieldType(e.target.value as CategoryFieldType)}
+                        className={inputClass}
                         style={{ background: 'none' }}
                     >
-                        {available.map(c => (
-                            <option key={c} value={c}>{COLLECTION_LABELS[c] ?? c}</option>
+                        {(['file', 'text', 'number', 'select', 'date'] as CategoryFieldType[]).map(t => (
+                            <option key={t} value={t}>{FIELD_TYPE_LABELS[t]}</option>
                         ))}
                     </select>
                 </div>
+
+                {/* field_key — collection picker for file, text input for scalars */}
+                {form.field_type === 'file' ? (
+                    <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">مجموعه</label>
+                        <select
+                            value={form.field_key}
+                            onChange={e => setForm(p => ({ ...p, field_key: e.target.value }))}
+                            disabled={availableCollections.length === 0}
+                            className={inputClass}
+                            style={{ background: 'none' }}
+                        >
+                            {availableCollections.length === 0
+                                ? <option value="">همه مجموعه‌ها استفاده شده‌اند</option>
+                                : availableCollections.map(c => (
+                                    <option key={c} value={c}>{COLLECTION_LABELS[c] ?? c}</option>
+                                ))
+                            }
+                        </select>
+                        {errors.field_key && <p className="mt-1 text-xs text-red-600">{errors.field_key}</p>}
+                    </div>
+                ) : (
+                    <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                            کلید (slug) <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            dir="ltr"
+                            value={form.field_key}
+                            onChange={e => setForm(p => ({ ...p, field_key: e.target.value }))}
+                            placeholder="مثال: episode_number"
+                            required
+                            className={`${inputClass} font-mono w-40`}
+                        />
+                        {errors.field_key && <p className="mt-1 text-xs text-red-600">{errors.field_key}</p>}
+                    </div>
+                )}
+
+                {/* Label */}
                 <div className="flex-1 min-w-[180px]">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">برچسب <span className="text-red-500">*</span></label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                        برچسب <span className="text-red-500">*</span>
+                    </label>
                     <input
                         value={form.label}
                         onChange={e => setForm(p => ({ ...p, label: e.target.value }))}
-                        placeholder="مثال: فایل صوتی پادکست"
+                        placeholder="مثال: شماره اپیزود"
                         required
-                        className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        className={`${inputClass} w-full`}
                     />
+                    {errors.label && <p className="mt-1 text-xs text-red-600">{errors.label}</p>}
                 </div>
+
+                {/* is_required */}
                 <div className="flex items-center gap-2 pb-1.5">
                     <input
                         type="checkbox"
-                        id="new-req-required"
+                        id="new-field-required"
                         checked={form.is_required}
                         onChange={e => setForm(p => ({ ...p, is_required: e.target.checked }))}
                         className="rounded border-gray-300 text-indigo-600"
                     />
-                    <label htmlFor="new-req-required" className="text-sm text-gray-700">الزامی</label>
+                    <label htmlFor="new-field-required" className="text-sm text-gray-700">الزامی</label>
                 </div>
-                <div className="flex gap-2 pb-1">
-                    <button
-                        type="submit"
-                        disabled={saving || !form.label.trim()}
-                        className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
-                    >
-                        {saving ? '...' : 'افزودن'}
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setOpen(false)}
-                        className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
-                    >
-                        انصراف
-                    </button>
+            </div>
+
+            {/* Row 2: type-specific options */}
+            {form.field_type === 'number' && (
+                <div className="flex gap-3 items-end">
+                    <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">حداقل</label>
+                        <input
+                            type="number"
+                            dir="ltr"
+                            value={(form.options.min as number | undefined) ?? ''}
+                            onChange={e => setForm(p => ({ ...p, options: { ...p.options, min: e.target.value === '' ? undefined : Number(e.target.value) } }))}
+                            className={`${inputClass} w-24`}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">حداکثر</label>
+                        <input
+                            type="number"
+                            dir="ltr"
+                            value={(form.options.max as number | undefined) ?? ''}
+                            onChange={e => setForm(p => ({ ...p, options: { ...p.options, max: e.target.value === '' ? undefined : Number(e.target.value) } }))}
+                            className={`${inputClass} w-24`}
+                        />
+                    </div>
                 </div>
+            )}
+
+            {form.field_type === 'select' && (
+                <SelectChoicesEditor
+                    choices={(form.options.choices as { value: string; label: string }[]) ?? []}
+                    onChange={choices => setForm(p => ({ ...p, options: { ...p.options, choices } }))}
+                />
+            )}
+
+            {/* Actions */}
+            <div className="flex gap-2">
+                <button
+                    type="submit"
+                    disabled={saving || !form.label.trim() || !form.field_key.trim() || (form.field_type === 'file' && availableCollections.length === 0)}
+                    className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
+                >
+                    {saving ? '...' : 'افزودن'}
+                </button>
+                <button
+                    type="button"
+                    onClick={() => { setOpen(false); setErrors({}); }}
+                    className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
+                >
+                    انصراف
+                </button>
             </div>
         </form>
     );
 }
 
-export default function BlogCategoryEdit({ category, parents, requirements, knownCollections }: Props) {
+function SelectChoicesEditor({
+    choices,
+    onChange,
+}: {
+    choices: { value: string; label: string }[];
+    onChange: (choices: { value: string; label: string }[]) => void;
+}) {
+    const add = () => onChange([...choices, { value: '', label: '' }]);
+    const update = (i: number, field: 'value' | 'label', v: string) => {
+        const next = choices.map((c, idx) => idx === i ? { ...c, [field]: v } : c);
+        onChange(next);
+    };
+    const remove = (i: number) => onChange(choices.filter((_, idx) => idx !== i));
+
+    return (
+        <div className="space-y-2">
+            <label className="block text-xs font-medium text-gray-600">گزینه‌ها</label>
+            {choices.map((c, i) => (
+                <div key={i} className="flex gap-2 items-center">
+                    <input
+                        dir="ltr"
+                        value={c.value}
+                        onChange={e => update(i, 'value', e.target.value)}
+                        placeholder="مقدار"
+                        className="rounded-md border border-gray-300 px-2 py-1 text-xs font-mono w-28 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    />
+                    <input
+                        value={c.label}
+                        onChange={e => update(i, 'label', e.target.value)}
+                        placeholder="برچسب"
+                        className="rounded-md border border-gray-300 px-2 py-1 text-xs flex-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    />
+                    <button type="button" onClick={() => remove(i)} className="text-gray-400 hover:text-red-500 transition-colors">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            ))}
+            <button
+                type="button"
+                onClick={add}
+                className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 transition-colors"
+            >
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                افزودن گزینه
+            </button>
+        </div>
+    );
+}
+
+export default function BlogCategoryEdit({ category, parents, fieldDefinitions, mediaCollections }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canUpload = auth.user?.roles?.includes('admin') ?? false;
 
@@ -423,31 +613,30 @@ export default function BlogCategoryEdit({ category, parents, requirements, know
 
                     </form>
 
-                    {/* ── Media Requirements ─────────────────────────────────── */}
+                    {/* ── Field Definitions ─────────────────────────────────── */}
                     <div className="mt-6 bg-white rounded-xl shadow-sm">
-                        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                            <div>
-                                <h3 className="text-sm font-semibold text-gray-800">نیازمندی‌های رسانه</h3>
-                                <p className="text-xs text-gray-400 mt-0.5">تعریف کنید این دسته‌بندی چه فایل‌هایی نیاز دارد.</p>
-                            </div>
+                        <div className="px-6 py-4 border-b border-gray-100">
+                            <h3 className="text-sm font-semibold text-gray-800">فیلدهای دسته‌بندی</h3>
+                            <p className="text-xs text-gray-400 mt-0.5">فیلدهایی که پست‌های این دسته باید تکمیل کنند (فایل، عدد، متن، …).</p>
                         </div>
 
-                        {/* Existing requirements */}
-                        {requirements.length > 0 && (
+                        {fieldDefinitions.length > 0 && (
                             <div className="divide-y divide-gray-100">
-                                {requirements.map(req => (
-                                    <RequirementRow
-                                        key={req.id}
-                                        req={req}
+                                {fieldDefinitions.map(def => (
+                                    <FieldDefinitionRow
+                                        key={def.id}
+                                        def={def}
                                         categoryId={category.id}
-                                        knownCollections={knownCollections}
                                     />
                                 ))}
                             </div>
                         )}
 
-                        {/* Add new */}
-                        <AddRequirementForm categoryId={category.id} knownCollections={knownCollections} usedCollections={requirements.map(r => r.collection_name)} />
+                        <AddFieldDefinitionForm
+                            categoryId={category.id}
+                            fieldDefinitions={fieldDefinitions}
+                            mediaCollections={mediaCollections}
+                        />
                     </div>
                 </div>
             </div>

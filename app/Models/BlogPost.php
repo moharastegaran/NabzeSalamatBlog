@@ -99,14 +99,22 @@ class BlogPost extends Model
         return $this->media()->where('collection_name', $collection)->first();
     }
 
-    /**
-     * Returns requirements from the post's primary category that have no
-     * corresponding media item attached yet.
-     */
-    public function getMissingRequiredMedia(): \Illuminate\Support\Collection
+    public function fieldValues(): HasMany
     {
-        return ($this->category?->mediaRequirements ?? collect())
+        return $this->hasMany(PostFieldValue::class, 'blog_post_id');
+    }
+
+    public function getMissingRequiredFields(): \Illuminate\Support\Collection
+    {
+        return ($this->category?->fieldDefinitions ?? collect())
             ->where('is_required', true)
-            ->filter(fn ($req) => $this->getFirstMedia($req->collection_name) === null);
+            ->filter(function ($def) {
+                if ($def->field_type === 'file') {
+                    return $this->getFirstMedia($def->field_key) === null;
+                }
+                return $this->fieldValues()
+                    ->where('category_field_definition_id', $def->id)
+                    ->doesntExist();
+            });
     }
 }
