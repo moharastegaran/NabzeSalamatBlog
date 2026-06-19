@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
-import { BlogPost, BlogTag, PostFieldValue } from '@/types/models';
+import { AdBanner, BlogPost, BlogTag, PostFieldValue } from '@/types/models';
 import { NavCategory, PageProps } from '@/types';
 
 interface Props {
@@ -14,6 +14,7 @@ interface Props {
     videoPosts: BlogPost[];
     audioPosts: BlogPost[];
     eventPosts: BlogPost[];
+    adBanners: AdBanner[];
 }
 
 // ── Shared ────────────────────────────────────────────────────────────────────
@@ -681,8 +682,13 @@ function EventPostCard({ post }: { post: BlogPost }) {
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
-export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, recentPosts, analyzePosts, tags, videoPosts, audioPosts, eventPosts }: Props) {
+export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, recentPosts, analyzePosts, tags, videoPosts, audioPosts, eventPosts, adBanners }: Props) {
     const { navCategories } = usePage<PageProps>().props;
+    const [adsState, setAdsState] = useState<'visible' | 'fading' | 'hidden'>('visible');
+    const dismissAds = () => {
+        setAdsState('fading');
+        setTimeout(() => setAdsState('hidden'), 500);
+    };
 
     return (
         <BlogLayout>
@@ -735,6 +741,58 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                             {recentPosts.slice(0, 4).map(post => (
                                 <ArticleCard key={post.id} post={post} />
                             ))}
+                        </div>
+                    </section>
+                )}
+
+                {/* ── Section 3.5: Ad Banners ─────────────────────────────── */}
+                {adBanners.length > 0 && adsState !== 'hidden' && (
+                    <section
+                        className={`transition-opacity duration-500 ${adsState === 'fading' ? 'opacity-0' : 'opacity-100'}`}
+                    >
+                        {/* Dotted top border + dismiss button */}
+                        <div className="relative border-t-2 border-dashed border-gray-200 mb-4">
+                            <button
+                                type="button"
+                                onClick={dismissAds}
+                                title="بستن تبلیغات"
+                                className="absolute -top-3.5 left-0 flex h-7 w-7 items-center justify-center rounded-full border border-dashed border-gray-300 bg-white text-gray-400 hover:border-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mx-3">
+                            {adBanners.slice(0, 2).map((banner, idx) =>
+                                banner.image ? (
+                                    banner.external_url ? (
+                                        <a
+                                            key={banner.id}
+                                            href={banner.external_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer sponsored"
+                                            title={banner.title}
+                                            className="relative block overflow-hidden rounded-lg shadow-md ad-banner-enter"
+                                            style={{ animationDelay: `${idx * 0.18}s` }}
+                                        >
+                                            <img src={`/storage/${banner.image}`} alt={banner.title} className="w-full object-cover ad-banner-breathe" style={{ animationDelay: `${idx * 1.5}s` }} />
+                                            <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent ad-banner-shine-loop" style={{ animationDelay: `${idx * 2}s` }} />
+                                        </a>
+                                    ) : (
+                                        <div
+                                            key={banner.id}
+                                            title={banner.title}
+                                            className="relative overflow-hidden rounded-lg shadow-md ad-banner-enter"
+                                            style={{ animationDelay: `${idx * 0.18}s` }}
+                                        >
+                                            <img src={`/storage/${banner.image}`} alt={banner.title} className="w-full object-cover ad-banner-breathe" style={{ animationDelay: `${idx * 1.5}s` }} />
+                                            <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent ad-banner-shine-loop" style={{ animationDelay: `${idx * 2}s` }} />
+                                        </div>
+                                    )
+                                ) : null
+                            )}
                         </div>
                     </section>
                 )}

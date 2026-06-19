@@ -10,6 +10,7 @@ interface Props {
 }
 
 type FormData = {
+    _method: string;
     title: string;
     image: File | null;
     external_url: string;
@@ -45,6 +46,7 @@ export default function AdBannerForm({ banner, locations }: Props) {
     const isEdit = banner !== null;
 
     const form = useForm<FormData>({
+        _method:      isEdit ? 'put' : '',
         title:        banner?.title        ?? '',
         image:        null,
         external_url: banner?.external_url ?? '',
@@ -79,7 +81,7 @@ export default function AdBannerForm({ banner, locations }: Props) {
     const submit = (e: FormEvent) => {
         e.preventDefault();
         if (isEdit) {
-            form.put(route('ad-banners.update', banner.id));
+            form.post(route('ad-banners.update', banner.id), { forceFormData: true });
         } else {
             form.post(route('ad-banners.store'));
         }
@@ -148,7 +150,7 @@ export default function AdBannerForm({ banner, locations }: Props) {
                                             err('image') ? 'outline outline-1 outline-red-400' : ''
                                         }`}
                                     />
-                                    <p className="mt-1 text-xs text-gray-400">حداکثر ۵ مگابایت — JPG، PNG، WebP</p>
+                                    <p className="mt-1 text-xs text-gray-400">حداکثر ۵ مگابایت — JPG، PNG، WebP, GIF</p>
                                     <FieldError msg={err('image')} />
                                 </div>
 

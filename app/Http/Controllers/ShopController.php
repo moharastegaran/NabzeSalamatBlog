@@ -69,7 +69,7 @@ class ShopController extends Controller
                 ->latest('published_at')
                 ->take(8)
                 ->get(),
-            'adBanners'       => AdBanner::activeForLocation('landing')->get(),
+            'adBanners'       => AdBanner::activeForLocation('landing')->limit(2)->get(),
             'audioPosts'      => BlogPost::published()
                 ->whereHas('categories', fn ($q) => $q->whereIn('blog_categories.slug', ['nbd-sda', 'padkst', 'fayl-soty']))
                 ->with([
