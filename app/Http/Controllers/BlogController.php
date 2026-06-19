@@ -53,8 +53,10 @@ class BlogController extends Controller
         ]);
     }
 
-    public function category(string $slug): Response
+    public function category(Request $request, string $slug): Response
     {
+        $search = trim($request->query('search', ''));
+
         $category = BlogCategory::where('slug', $slug)
             ->with([
                 'parent:id,name,slug',
@@ -67,13 +69,25 @@ class BlogController extends Controller
             ->whereHas('categories', fn ($q) => $q->where('blog_categories.id', $category->id))
             ->with(['author:id,name', 'tags:id,name,slug'])
             ->withCount('approvedComments')
+            ->when($search, fn ($q) => $q->where(fn ($q) => $q
+                ->where('title',   'like', "%{$search}%")
+                ->orWhere('excerpt', 'like', "%{$search}%")
+                ->orWhere('body',    'like', "%{$search}%")
+            ))
             ->latest('published_at')
             ->paginate(9)
             ->withQueryString();
 
+        $recentPosts = BlogPost::published()
+            ->latest('published_at')
+            ->limit(6)
+            ->get(['id', 'title', 'slug', 'featured_image', 'published_at']);
+
         return Inertia::render('Front/Blog/Category', [
-            'category' => $category,
-            'posts'    => $posts,
+            'category'    => $category,
+            'posts'       => $posts,
+            'recentPosts' => $recentPosts,
+            'search'      => $search,
         ]);
     }
 
