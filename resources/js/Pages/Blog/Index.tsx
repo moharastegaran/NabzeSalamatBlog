@@ -1,3 +1,4 @@
+import { useState, useMemo, useRef } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { BlogPost, PaginatedData } from '@/types/models';
@@ -7,6 +8,8 @@ import type { PageProps } from '@/types';
 interface Props {
     posts: PaginatedData<BlogPost>;
     activeCategory?: { id: number; name: string } | null;
+    statusCounts: Record<string, number>;
+    filters: { search: string };
 }
 
 const statusLabel: Record<string, string> = { draft: 'پیش‌نویس', published: 'منتشر شده' };
@@ -15,11 +18,35 @@ const statusClass: Record<string, string> = {
     published: 'bg-green-50 text-green-700',
 };
 
-export default function BlogIndex({ posts, activeCategory }: Props) {
+export default function BlogIndex({ posts, activeCategory, statusCounts, filters }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canCreate = auth.user.permissions.includes('blog.create');
     const canEdit   = auth.user.permissions.includes('blog.edit');
     const canDelete = auth.user.permissions.includes('blog.delete');
+
+    const [searchQuery, setSearchQuery] = useState(filters.search);
+    const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+    const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const statusOptions = Object.entries(statusCounts);
+
+    const filteredPosts = useMemo(() => {
+        return posts.data.filter(post =>
+            selectedStatus === null || post.status === selectedStatus
+        );
+    }, [posts.data, selectedStatus]);
+
+    const handleSearch = (value: string) => {
+        setSearchQuery(value);
+        if (searchTimeout.current) clearTimeout(searchTimeout.current);
+        searchTimeout.current = setTimeout(() => {
+            router.get(
+                route('blog.index'),
+                { ...(activeCategory ? { category: activeCategory.id } : {}), ...(value ? { search: value } : {}) },
+                { preserveState: true, preserveScroll: true, replace: true },
+            );
+        }, 350);
+    };
 
     const destroy = (post: BlogPost) => {
         if (confirm(`آیا از حذف مقاله "${post.title}" اطمینان دارید؟`)) {
@@ -56,7 +83,47 @@ export default function BlogIndex({ posts, activeCategory }: Props) {
                         </div>
                     )}
 
-                    {posts.data.length === 0 ? (
+                    {(posts.data.length > 0 || filters.search !== '') && (
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-lg bg-white px-4 py-3 shadow-sm">
+                            <div className="relative flex-1 max-w-sm">
+                                <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={e => handleSearch(e.target.value)}
+                                    placeholder="جستجو در عنوان، خلاصه و متن..."
+                                    className="w-full rounded-md border border-gray-200 py-2 pr-9 pl-3 text-sm text-gray-700 placeholder-gray-400 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                                    dir="rtl"
+                                />
+                            </div>
+
+                            {statusOptions.length > 0 && (
+                                <div className="flex items-center text-sm">
+                                    <button
+                                        onClick={() => setSelectedStatus(null)}
+                                        className={`px-3 py-1 transition-colors ${selectedStatus === null ? 'font-semibold text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+                                    >
+                                        همه
+                                    </button>
+                                    {statusOptions.map(([status, count]) => (
+                                        <span key={status} className="flex items-center">
+                                            <span className="text-gray-300 select-none">|</span>
+                                            <button
+                                                onClick={() => setSelectedStatus(selectedStatus === status ? null : status)}
+                                                className={`px-3 py-1 transition-colors ${selectedStatus === status ? 'font-semibold text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+                                            >
+                                                {statusLabel[status] ?? status} ({count})
+                                            </button>
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {posts.data.length === 0 && filters.search === '' ? (
                         <div className="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-200 bg-white py-16 text-center">
                             <svg className="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
@@ -67,6 +134,13 @@ export default function BlogIndex({ posts, activeCategory }: Props) {
                                     + مقاله جدید
                                 </Link>
                             )}
+                        </div>
+                    ) : posts.data.length === 0 || filteredPosts.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 bg-white py-14 text-center">
+                            <svg className="h-8 w-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <p className="text-sm text-gray-500">نتیجه‌ای برای فیلتر انتخابی یافت نشد.</p>
                         </div>
                     ) : (
                         <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
@@ -80,7 +154,7 @@ export default function BlogIndex({ posts, activeCategory }: Props) {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 bg-white">
-                                        {posts.data.map(post => (
+                                        {filteredPosts.map(post => (
                                             <tr key={post.id} className="hover:bg-gray-50">
                                                 <td className="px-4 py-3 text-sm text-gray-500">{post.id}</td>
                                                 <td className="px-4 py-3">

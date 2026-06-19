@@ -18,12 +18,28 @@ class BlogPostController extends Controller
     {
         $categoryId = $request->query('category');
 
+        $search = trim((string) $request->query('search', ''));
+
+        $categoryFilter = fn ($q) => $q->whereHas('categories', fn ($q) => $q->where('blog_categories.id', $categoryId));
+        $searchFilter   = fn ($q) => $q->where(fn ($q) => $q
+            ->where('title', 'like', "%{$search}%")
+            ->orWhere('excerpt', 'like', "%{$search}%")
+            ->orWhere('body', 'like', "%{$search}%")
+        );
+
         $posts = BlogPost::with(['author', 'categories'])
             ->withCount('comments')
-            ->when($categoryId, fn ($q) => $q->whereHas('categories', fn ($q) => $q->where('blog_categories.id', $categoryId)))
+            ->when($categoryId, $categoryFilter)
+            ->when($search, $searchFilter)
             ->latest()
             ->paginate(20)
             ->withQueryString();
+
+        $statusCounts = BlogPost::when($categoryId, $categoryFilter)
+            ->when($search, $searchFilter)
+            ->selectRaw('status, count(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status');
 
         $activeCategory = $categoryId
             ? BlogCategory::find($categoryId, ['id', 'name'])
@@ -32,6 +48,8 @@ class BlogPostController extends Controller
         return Inertia::render('Blog/Index', [
             'posts'          => $posts,
             'activeCategory' => $activeCategory,
+            'statusCounts'   => $statusCounts,
+            'filters'        => ['search' => $search],
         ]);
     }
 
