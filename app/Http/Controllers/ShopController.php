@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogTag;
 use Illuminate\Http\JsonResponse;
@@ -45,6 +46,22 @@ class ShopController extends Controller
             'tags'            => BlogTag::withCount('posts')
                 ->orderByDesc('posts_count')
                 ->get(['id', 'name', 'slug']),
+            'eventPosts'      => (function () {
+                $eventCategoryIds = BlogCategory::where('id', 69)
+                    ->orWhere('parent_id', 69)
+                    ->pluck('id');
+
+                return BlogPost::published()
+                    ->whereHas('categories', fn ($q) => $q->whereIn('blog_categories.id', $eventCategoryIds))
+                    ->with([
+                        'categories:id,name,slug',
+                        'fieldValues.definition:id,field_key,field_type,label',
+                    ])
+                    ->select('id', 'title', 'slug', 'excerpt', 'featured_image', 'blog_category_id', 'published_at', 'views')
+                    ->latest('published_at')
+                    ->take(6)
+                    ->get();
+            })(),
             'videoPosts'      => BlogPost::published()
                 ->with('category:id,name,slug')
                 ->select('id', 'title', 'slug', 'excerpt', 'featured_image', 'video_url', 'blog_category_id', 'published_at', 'views')

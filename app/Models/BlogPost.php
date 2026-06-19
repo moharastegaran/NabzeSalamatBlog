@@ -106,7 +106,11 @@ class BlogPost extends Model
 
     public function getMissingRequiredFields(): \Illuminate\Support\Collection
     {
-        return ($this->category?->fieldDefinitions ?? collect())
+        $allDefs = $this->categories
+            ->flatMap(fn ($cat) => $cat->fieldDefinitions)
+            ->unique('id');
+
+        return $allDefs
             ->where('is_required', true)
             ->filter(function ($def) {
                 if ($def->field_type === 'file') {

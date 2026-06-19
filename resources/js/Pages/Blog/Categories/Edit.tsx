@@ -240,13 +240,13 @@ function AddFieldDefinitionForm({
         setErrors({});
         setSaving(true);
 
-        const payload: Record<string, unknown> = {
+        const payload = {
             field_type:  form.field_type,
             field_key:   form.field_key,
             label:       form.label,
             is_required: form.is_required,
             sort_order:  form.sort_order,
-            options:     Object.keys(form.options).length > 0 ? form.options : null,
+            options:     Object.keys(form.options).length > 0 ? form.options as Record<string, string | number | boolean | null> : null,
         };
 
         router.post(route('blog.categories.fields.store', categoryId), payload, {

@@ -5,6 +5,7 @@ import AssetPicker from '@/Components/AssetPicker';
 import CategoryMultiSelect from '@/Components/CategoryMultiSelect';
 import type { Asset, BlogCategory, BlogPost, BlogTag, PostMedia, CategoryFieldDefinition } from '@/types/models';
 import type { PageProps } from '@/types';
+import PersianDatePicker from '@/Components/PersianDatePicker';
 import { useState, useRef } from 'react';
 import React from 'react';
 
@@ -14,6 +15,7 @@ interface Props {
     tags: Pick<BlogTag, 'id' | 'name'>[];
     postMedia: Record<string, PostMedia[]>;
     fieldDefinitions: CategoryFieldDefinition[];
+    fieldValues: Record<number, string>;
     mediaCollections: string[];
 }
 
@@ -56,6 +58,69 @@ const COLLECTION_ICONS: Record<string, React.ReactNode> = {
         </svg>
     ),
 };
+
+function ScalarFieldInput({
+    def,
+    value,
+    onChange,
+    error,
+}: {
+    def: CategoryFieldDefinition;
+    value: string;
+    onChange: (val: string) => void;
+    error?: string;
+}) {
+    const inputClass = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500';
+
+    return (
+        <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                {def.label}
+                {def.is_required && <span className="text-red-500 mr-1">*</span>}
+            </label>
+            {def.field_type === 'text' && (
+                <textarea
+                    value={value}
+                    onChange={e => onChange(e.target.value)}
+                    rows={2}
+                    className={inputClass}
+                />
+            )}
+            {def.field_type === 'number' && (
+                <input
+                    type="number"
+                    dir="ltr"
+                    value={value}
+                    onChange={e => onChange(e.target.value)}
+                    min={def.options?.min}
+                    max={def.options?.max}
+                    className={`${inputClass} w-40`}
+                />
+            )}
+            {def.field_type === 'select' && (
+                <select
+                    value={value}
+                    onChange={e => onChange(e.target.value)}
+                    className={inputClass}
+                    style={{ background: 'none' }}
+                >
+                    <option value="">— انتخاب کنید —</option>
+                    {(def.options?.choices ?? []).map(c => (
+                        <option key={c.value} value={c.value}>{c.label}</option>
+                    ))}
+                </select>
+            )}
+            {def.field_type === 'date' && (
+                <PersianDatePicker
+                    value={value}
+                    onChange={onChange}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2"
+                />
+            )}
+            {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        </div>
+    );
+}
 
 function MediaCollection({
     postId,
@@ -190,9 +255,18 @@ function MediaCollection({
     );
 }
 
-export default function BlogEdit({ post, categories, tags, postMedia, fieldDefinitions, mediaCollections }: Props) {
+export default function BlogEdit({ post, categories, tags, postMedia, fieldDefinitions, fieldValues, mediaCollections }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canUpload = auth.user?.roles?.includes('admin') ?? false;
+
+    const scalarDefs = fieldDefinitions.filter(d => d.field_type !== 'file');
+    const fileDefs   = fieldDefinitions.filter(d => d.field_type === 'file' && mediaCollections.includes(d.field_key));
+    const defFileKeys = new Set(fileDefs.map(d => d.field_key));
+    const extraCollections = fileDefs.length > 0 ? mediaCollections.filter(c => !defFileKeys.has(c)) : [];
+
+    const [scalarValues, setScalarValues] = useState<Record<number, string>>(
+        () => Object.fromEntries(scalarDefs.map(d => [d.id, fieldValues[d.id] ?? '']))
+    );
 
     const [form, setForm] = useState<FormData>({
         title: post.title,
@@ -232,6 +306,7 @@ export default function BlogEdit({ post, categories, tags, postMedia, fieldDefin
         form.category_ids.forEach(id => data.append('category_ids[]', String(id)));
         form.tag_ids.forEach(id => data.append('tag_ids[]', String(id)));
         data.append('featured_image', form.featured_image ?? '');
+        Object.entries(scalarValues).forEach(([defId, val]) => data.append(`field_values[${defId}]`, val));
 
         router.post(route('blog.update', post.id), data, {
             forceFormData: true,
@@ -372,61 +447,54 @@ export default function BlogEdit({ post, categories, tags, postMedia, fieldDefin
                                 </div>
                             </div>
                         )}
+                        {/* ── Category Fields (scalar + file) ── */}
+                        {(scalarDefs.length > 0 || fileDefs.length > 0 || extraCollections.length > 0) && (
+                            <div className="space-y-4">
+                                <label className="block text-sm font-medium text-gray-700">فیلدهای دسته‌بندی</label>
 
-                        {/* ── Media Attachments ── */}
-                        {(() => {
-                            const fileDefs = fieldDefinitions.filter(d => d.field_type === 'file');
-                            return (fileDefs.length > 0 || mediaCollections.length > 0) && (
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-3">فایل‌های رسانه‌ای</label>
-
-                                {/* File-type field definitions from category */}
-                                {fileDefs.length > 0 && (
-                                    <div className="space-y-3 mb-3">
-                                        {fileDefs.map(def => (
-                                            <MediaCollection
-                                                key={def.id}
-                                                postId={post.id}
-                                                collection={def.field_key}
-                                                label={def.label}
-                                                isRequired={def.is_required}
-                                                items={postMedia[def.field_key] ?? []}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* Other known collections not covered by field definitions */}
-                                {(() => {
-                                    const defKeys = new Set(fileDefs.map(d => d.field_key));
-                                    const extras = mediaCollections.filter(c => !defKeys.has(c));
-                                    if (!extras.length) return null;
-                                    return (
-                                        <details className="group">
-                                            <summary className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition-colors mb-2 select-none list-none flex items-center gap-1">
-                                                <svg className="h-3.5 w-3.5 group-open:rotate-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                                                </svg>
-                                                سایر مجموعه‌ها
-                                            </summary>
-                                            <div className="space-y-3 mt-2">
-                                                {extras.map(col => (
-                                                    <MediaCollection
-                                                        key={col}
-                                                        postId={post.id}
-                                                        collection={col}
-                                                        label={COLLECTION_LABELS[col] ?? col}
-                                                        isRequired={false}
-                                                        items={postMedia[col] ?? []}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </details>
-                                    );
-                                })()}
+                                {scalarDefs.map(def => (
+                                    <ScalarFieldInput
+                                        key={def.id}
+                                        def={def}
+                                        value={scalarValues[def.id] ?? ''}
+                                        onChange={val => setScalarValues(p => ({ ...p, [def.id]: val }))}
+                                        error={errors[`field_values.${def.id}`]}
+                                    />
+                                ))}
+                                {fileDefs.map(def => (
+                                    <MediaCollection
+                                        key={def.id}
+                                        postId={post.id}
+                                        collection={def.field_key}
+                                        label={def.label}
+                                        isRequired={def.is_required}
+                                        items={postMedia[def.field_key] ?? []}
+                                    />
+                                ))}
+                                {/*{extraCollections.length > 0 && (*/}
+                                {/*    <details className="group">*/}
+                                {/*        <summary className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition-colors mb-2 select-none list-none flex items-center gap-1">*/}
+                                {/*            <svg className="h-3.5 w-3.5 group-open:rotate-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>*/}
+                                {/*                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />*/}
+                                {/*            </svg>*/}
+                                {/*            سایر مجموعه‌ها*/}
+                                {/*        </summary>*/}
+                                {/*        <div className="space-y-3 mt-2">*/}
+                                {/*            {extraCollections.map(col => (*/}
+                                {/*                <MediaCollection*/}
+                                {/*                    key={col}*/}
+                                {/*                    postId={post.id}*/}
+                                {/*                    collection={col}*/}
+                                {/*                    label={COLLECTION_LABELS[col] ?? col}*/}
+                                {/*                    isRequired={false}*/}
+                                {/*                    items={postMedia[col] ?? []}*/}
+                                {/*                />*/}
+                                {/*            ))}*/}
+                                {/*        </div>*/}
+                                {/*    </details>*/}
+                                {/*)}*/}
                             </div>
-                        );
-                        })()}
+                        )}
 
                         <div className="flex justify-end gap-3 pt-2">
                             <a href={route('blog.index')} className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">

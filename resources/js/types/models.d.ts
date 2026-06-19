@@ -94,9 +94,18 @@ export interface BlogPost {
     categories?: Pick<BlogCategory, 'id' | 'name'>[];
     tags?: BlogTag[];
     media?: PostMedia[];
+    field_values?: PostFieldValue[];
     approved_comments?: BlogComment[];
     comments_count?: number;
     approved_comments_count?: number;
+}
+
+export interface PostFieldValue {
+    id: number;
+    blog_post_id: number;
+    category_field_definition_id: number;
+    value: string | null;
+    definition?: Pick<CategoryFieldDefinition, 'id' | 'field_key' | 'field_type' | 'label' | 'options'>;
 }
 
 export type GalleryEvent = 'seminar' | 'exhibition';

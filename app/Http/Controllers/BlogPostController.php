@@ -63,17 +63,23 @@ class BlogPostController extends Controller
 
     public function edit(BlogPost $blog): Response
     {
-        $blog->load(['tags', 'categories', 'category.fieldDefinitions', 'media']);
+        $blog->load(['tags', 'categories.fieldDefinitions', 'media', 'fieldValues']);
 
         $mediaByCollection = $blog->media
             ->groupBy('collection_name')
             ->map(fn ($items) => $items->values())
             ->toArray();
 
+        $fieldDefinitions = $blog->categories
+            ->flatMap(fn ($cat) => $cat->fieldDefinitions)
+            ->unique('id')
+            ->values();
+
         return Inertia::render('Blog/Edit', [
             'post'             => $blog,
             'postMedia'        => $mediaByCollection,
-            'fieldDefinitions' => $blog->category?->fieldDefinitions ?? [],
+            'fieldDefinitions' => $fieldDefinitions,
+            'fieldValues'      => $blog->fieldValues->pluck('value', 'category_field_definition_id'),
             'mediaCollections' => array_keys(\App\Models\BlogPost::MEDIA_COLLECTIONS),
             ...$this->formData(),
         ]);
@@ -94,6 +100,13 @@ class BlogPostController extends Controller
         $blog->update($validated);
         $blog->tags()->sync($tagIds);
         $blog->categories()->sync($categoryIds);
+
+        foreach ($request->input('field_values', []) as $defId => $value) {
+            $blog->fieldValues()->updateOrCreate(
+                ['category_field_definition_id' => (int) $defId],
+                ['value' => $value === '' ? null : $value],
+            );
+        }
 
         return redirect()->route('blog.index')->with('success', 'مقاله به‌روزرسانی شد.');
     }
@@ -117,6 +130,8 @@ class BlogPostController extends Controller
             'tag_ids.*'        => ['exists:blog_tags,id'],
             'category_ids'     => ['nullable', 'array'],
             'category_ids.*'   => ['exists:blog_categories,id'],
+            'field_values'     => ['nullable', 'array'],
+            'field_values.*'   => ['nullable', 'string', 'max:1000'],
         ]);
     }
 

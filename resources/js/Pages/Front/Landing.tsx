@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
-import { BlogPost, BlogTag } from '@/types/models';
+import { BlogPost, BlogTag, PostFieldValue } from '@/types/models';
 import { NavCategory, PageProps } from '@/types';
 
 interface Props {
@@ -13,6 +13,7 @@ interface Props {
     tags: BlogTag[];
     videoPosts: BlogPost[];
     audioPosts: BlogPost[];
+    eventPosts: BlogPost[];
 }
 
 // ── Shared ────────────────────────────────────────────────────────────────────
@@ -531,11 +532,14 @@ function BlogAudioCard({ post }: { post: BlogPost }) {
 
             {/* Body */}
             <div className="flex flex-col gap-2.5 p-4 flex-1">
-                {(post.category ?? post.categories?.[0]) && (
-                    <span className="inline-block bg-[#F24F00] text-white text-[10px] font-black px-2 py-0.5 w-fit uppercase tracking-wide">
-                        {(post.category ?? post.categories?.[0])!.name}
-                    </span>
-                )}
+                {(() => {
+                    const cat = post.categories?.at(-1) ?? post.category;
+                    return cat && (
+                        <span className="inline-block bg-[#F24F00] text-white text-[10px] font-black px-2 py-0.5 w-fit uppercase tracking-wide">
+                            {cat.name}
+                        </span>
+                    );
+                })()}
                 <Link href={route('front.blog.show', post.slug)}>
                     <h3 className="text-sm font-black text-gray-900 line-clamp-2 leading-snug hover:text-[#F24F00] transition-colors">
                         {post.title}
@@ -605,8 +609,79 @@ function BlogAudioCard({ post }: { post: BlogPost }) {
     );
 }
 
+// ── Event post card ───────────────────────────────────────────────────────────
+function EventPostCard({ post }: { post: BlogPost }) {
+    const fieldValues = post.field_values ?? [];
+    const dateFVs  = fieldValues.filter((fv): fv is PostFieldValue & { value: string } =>
+        fv.definition?.field_type === 'date' && !!fv.value
+    );
+    const otherFVs = fieldValues.filter((fv): fv is PostFieldValue & { value: string } =>
+        fv.definition?.field_type !== 'date' && !!fv.value
+    );
+
+    return (
+        <Link href={route('front.blog.show', post.slug)} className="group flex flex-col bg-white hover:shadow-md transition-shadow duration-200">
+            {/* Image */}
+            <div className="overflow-hidden aspect-video bg-gray-100 flex-shrink-0">
+                {post.featured_image
+                    ? <img src={`/storage/${post.featured_image}`} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    : <div className="w-full h-full bg-gradient-to-br from-[#075F26]/20 to-[#F24F00]/10" />
+                }
+            </div>
+
+            <div className="flex flex-col gap-2 p-3 flex-1">
+                {/* Category badge */}
+                {(() => {
+                    const cat = post.categories?.at(-1) ?? post.category;
+                    return cat && (
+                        <span className="inline-block w-fit bg-[#075F26] text-white text-[10px] font-black px-2 py-0.5 uppercase tracking-wide">
+                            {cat.name}
+                        </span>
+                    );
+                })()}
+
+                {/* Date range badge */}
+                {dateFVs.length > 0 && (
+                    <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#075F26]">
+                        <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {dateFVs.map((fv, i) => (
+                            <React.Fragment key={fv.id}>
+                                {i > 0 && <span className="text-gray-300">—</span>}
+                                <span>{fmtDate(fv.value)}</span>
+                            </React.Fragment>
+                        ))}
+                    </div>
+                )}
+
+                {/* Title */}
+                <h3 className="text-sm font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-[#F24F00] transition-colors flex-1">
+                    {post.title}
+                </h3>
+
+                {/* Other field values (venue, etc.) */}
+                {otherFVs.length > 0 && (
+                    <div className="space-y-1 mt-auto pt-2 border-t border-gray-100">
+                        {otherFVs.map(fv => (
+                            <div key={fv.id} className="flex items-start gap-1.5 text-xs text-gray-500">
+                                <svg className="w-3 h-3 shrink-0 mt-0.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span className="font-medium text-gray-600 shrink-0">{fv.definition!.label}:</span>
+                                <span className="line-clamp-1">{fv.value}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </Link>
+    );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
-export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, recentPosts, analyzePosts, tags, videoPosts, audioPosts }: Props) {
+export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, recentPosts, analyzePosts, tags, videoPosts, audioPosts, eventPosts }: Props) {
     const { navCategories } = usePage<PageProps>().props;
 
     return (
@@ -698,6 +773,18 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                     <section>
                         <SectionHeader title="ویدیوها" />
                         <VideoSection posts={videoPosts} />
+                    </section>
+                )}
+
+                {/* ── Section 6: Events ────────────────────────────────────── */}
+                {eventPosts.length > 0 && (
+                    <section>
+                        <SectionHeader title="رویدادها" href={route('front.blog.category', 'event')} />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {eventPosts.map(post => (
+                                <EventPostCard key={post.id} post={post} />
+                            ))}
+                        </div>
                     </section>
                 )}
 
