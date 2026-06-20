@@ -6,6 +6,8 @@ import CategoryMultiSelect from '@/Components/CategoryMultiSelect';
 import type { Asset, BlogCategory, BlogPost, BlogTag, PostMedia, CategoryFieldDefinition } from '@/types/models';
 import type { PageProps } from '@/types';
 import PersianDatePicker from '@/Components/PersianDatePicker';
+import PersianDateTimePicker from '@/Components/PersianDateTimePicker';
+import { localDateTimeStr } from '@/utils/date';
 import { useState, useRef } from 'react';
 import React from 'react';
 
@@ -23,7 +25,8 @@ interface FormData {
     title: string;
     excerpt: string;
     body: string;
-    status: 'draft' | 'published';
+    status: 'draft' | 'scheduled' | 'published';
+    publish_at: string;
     category_ids: number[];
     tag_ids: number[];
     featured_image: string | null;
@@ -273,6 +276,7 @@ export default function BlogEdit({ post, categories, tags, postMedia, fieldDefin
         excerpt: post.excerpt ?? '',
         body: post.body,
         status: post.status,
+        publish_at: post.publish_at ? localDateTimeStr(new Date(post.publish_at)) : '',
         category_ids: post.categories?.map(c => c.id) ?? [],
         tag_ids: post.tags?.map(t => t.id) ?? [],
         featured_image: post.featured_image ?? null,
@@ -303,6 +307,7 @@ export default function BlogEdit({ post, categories, tags, postMedia, fieldDefin
         data.append('excerpt', form.excerpt);
         data.append('body', form.body);
         data.append('status', form.status);
+        if (form.status === 'scheduled' && form.publish_at) data.append('publish_at', form.publish_at);
         form.category_ids.forEach(id => data.append('category_ids[]', String(id)));
         form.tag_ids.forEach(id => data.append('tag_ids[]', String(id)));
         data.append('featured_image', form.featured_image ?? '');
@@ -371,17 +376,32 @@ export default function BlogEdit({ post, categories, tags, postMedia, fieldDefin
                             <div className="relative">
                                 <select
                                     value={form.status}
-                                    onChange={e => setForm(p => ({ ...p, status: e.target.value as 'draft' | 'published' }))}
+                                    onChange={e => {
+                                        const status = e.target.value as 'draft' | 'scheduled' | 'published';
+                                        setForm(p => ({ ...p, status, publish_at: status !== 'scheduled' ? '' : (p.publish_at || localDateTimeStr()) }));
+                                    }}
                                     className="w-full appearance-none rounded-md border border-gray-300 pr-3 pl-8 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                     style={{ background: 'none' }}
                                 >
                                     <option value="draft">پیش‌نویس</option>
+                                    <option value="scheduled">زمان‌بندی شده</option>
                                     <option value="published">منتشر شده</option>
                                 </select>
                                 <svg className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </div>
+                            {form.status === 'scheduled' && (
+                                <div className="mt-3">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">زمان انتشار <span className="text-red-500">*</span></label>
+                                    <PersianDateTimePicker
+                                        value={form.publish_at}
+                                        onChange={v => setForm(p => ({ ...p, publish_at: v }))}
+                                        minDateTime={localDateTimeStr()}
+                                        error={errors.publish_at}
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         {/* Featured image */}

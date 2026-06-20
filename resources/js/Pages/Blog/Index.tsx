@@ -12,9 +12,10 @@ interface Props {
     filters: { search: string };
 }
 
-const statusLabel: Record<string, string> = { draft: 'پیش‌نویس', published: 'منتشر شده' };
+const statusLabel: Record<string, string> = { draft: 'پیش‌نویس', scheduled: 'زمان‌بندی شده', published: 'منتشر شده' };
 const statusClass: Record<string, string> = {
     draft: 'bg-yellow-50 text-yellow-700',
+    scheduled: 'bg-gray-100 text-gray-600',
     published: 'bg-green-50 text-green-700',
 };
 
@@ -73,7 +74,7 @@ export default function BlogIndex({ posts, activeCategory, statusCounts, filters
             <Head title="مقالات وبلاگ" />
 
             <div className="lg:py-8 lg:px-0 px-4 py-5">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-4">
+                <div className="mx-auto max-w-8xl sm:px-6 lg:px-8 space-y-4">
 
                     {activeCategory && (
                         <div className="flex items-center gap-2 rounded-md bg-indigo-50 px-4 py-2.5 text-sm text-indigo-700">
@@ -198,9 +199,15 @@ export default function BlogIndex({ posts, activeCategory, statusCounts, filters
                                                     <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${statusClass[post.status]}`}>
                                                         {statusLabel[post.status]}
                                                     </span>
+                                                    {post.status === 'scheduled' && post.publish_at && (
+                                                        <p className="mt-1 text-xs text-gray-400">{toJalali(post.publish_at, true)}</p>
+                                                    )}
                                                 </td>
                                                 <td className="px-4 py-3 text-sm text-gray-500">
-                                                    {post.published_at ? toJalali(post.published_at) : toJalali(post.created_at)}
+                                                    {post.status === 'scheduled' && post.publish_at
+                                                        ? <span title="زمان انتشار برنامه‌ریزی شده">{toJalali(post.publish_at)}</span>
+                                                        : post.published_at ? toJalali(post.published_at) : toJalali(post.created_at)
+                                                    }
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <div className="flex items-center justify-end gap-1">

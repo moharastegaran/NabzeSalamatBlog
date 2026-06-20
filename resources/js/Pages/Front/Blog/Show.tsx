@@ -1,5 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import axios from 'axios';
 import BlogLayout from '@/Layouts/BlogLayout';
 import AdBannerSlot from '@/Components/AdBannerSlot';
 import MostReadWidget from '@/Components/MostReadWidget';
@@ -137,28 +138,71 @@ function ActionSidebar({ commentCount }: { commentCount: number }) {
 }
 
 // ── Comment form ───────────────────────────────────────────────────────────────
-function CommentForm({ postId }: { postId: number }) {
-    const [form, setForm] = useState({ name: '', email: '', body: '' });
-    const [submitted, setSubmitted] = useState(false);
+type FieldErrors = Partial<Record<'name' | 'email' | 'body', string>>;
 
-    const submit = (e: FormEvent) => {
+function CommentForm({ postId }: { postId: number }) {
+    const [form,   setForm]   = useState({ name: '', email: '', body: '' });
+    const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+    const [fieldErrors,  setFieldErrors]  = useState<FieldErrors>({});
+    const [globalError,  setGlobalError]  = useState('');
+
+    const inputCls = (field: keyof FieldErrors) =>
+        `w-full border bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:bg-white focus:outline-none focus:ring-1 transition-colors ${
+            fieldErrors[field]
+                ? 'border-red-400 focus:border-red-400 focus:ring-red-400'
+                : 'border-gray-200 focus:border-[#F24F00] focus:ring-[#F24F00]'
+        }`;
+
+    const submit = async (e: FormEvent) => {
         e.preventDefault();
-        router.post(route('blog.comments.store', postId), form, {
-            preserveScroll: true,
-            onSuccess: () => { setForm({ name: '', email: '', body: '' }); setSubmitted(true); },
-        });
+        setStatus('submitting');
+        setFieldErrors({});
+        setGlobalError('');
+
+        try {
+            await axios.post(route('blog.comments.store', postId), form);
+            setForm({ name: '', email: '', body: '' });
+            setStatus('success');
+        } catch (err: any) {
+            if (err.response?.status === 422) {
+                const raw: Record<string, string[]> = err.response.data?.errors ?? {};
+                const mapped: FieldErrors = {};
+                (Object.keys(raw) as (keyof FieldErrors)[]).forEach(k => { mapped[k] = raw[k][0]; });
+                setFieldErrors(mapped);
+                setStatus('idle');
+            } else {
+                setGlobalError('خطایی رخ داد. لطفاً دوباره تلاش کنید.');
+                setStatus('error');
+            }
+        }
     };
 
-    if (submitted) {
+    if (status === 'success') {
         return (
-            <div className="bg-green-50 border border-green-100 px-5 py-4 text-sm text-green-700">
-                نظر شما با موفقیت ثبت شد و پس از تأیید نمایش داده می‌شود.
+            <div className="flex items-start gap-3 bg-green-50 border border-green-200 px-5 py-4">
+                <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                    <p className="text-sm font-bold text-green-800">نظر شما ثبت شد</p>
+                    <p className="text-xs text-green-700 mt-0.5">پس از بررسی و تأیید نمایش داده خواهد شد.</p>
+                </div>
             </div>
         );
     }
 
     return (
         <form onSubmit={submit} className="space-y-4">
+
+            {status === 'error' && (
+                <div className="flex items-start gap-3 bg-red-50 border border-red-200 px-4 py-3">
+                    <svg className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-sm text-red-700">{globalError}</p>
+                </div>
+            )}
+
             <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                     <label className="mb-1 block text-xs font-medium text-gray-600">نام <span className="text-red-500">*</span></label>
@@ -167,8 +211,9 @@ function CommentForm({ postId }: { postId: number }) {
                         required
                         value={form.name}
                         onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                        className="w-full border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:border-[#F24F00] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#F24F00]"
+                        className={inputCls('name')}
                     />
+                    {fieldErrors.name && <p className="mt-1 text-xs text-red-500">{fieldErrors.name}</p>}
                 </div>
                 <div>
                     <label className="mb-1 block text-xs font-medium text-gray-600">ایمیل</label>
@@ -176,10 +221,12 @@ function CommentForm({ postId }: { postId: number }) {
                         type="email"
                         value={form.email}
                         onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
-                        className="w-full border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:border-[#F24F00] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#F24F00]"
+                        className={inputCls('email')}
                     />
+                    {fieldErrors.email && <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>}
                 </div>
             </div>
+
             <div>
                 <label className="mb-1 block text-xs font-medium text-gray-600">متن نظر <span className="text-red-500">*</span></label>
                 <textarea
@@ -187,15 +234,25 @@ function CommentForm({ postId }: { postId: number }) {
                     rows={4}
                     value={form.body}
                     onChange={e => setForm(p => ({ ...p, body: e.target.value }))}
-                    className="w-full border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:border-[#F24F00] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#F24F00] resize-none"
+                    className={`${inputCls('body')} resize-none`}
                 />
+                {fieldErrors.body && <p className="mt-1 text-xs text-red-500">{fieldErrors.body}</p>}
             </div>
+
             <button
                 type="submit"
-                className="bg-[#F24F00] px-6 py-2 text-sm font-bold text-white hover:bg-[#d44400] transition-colors"
+                disabled={status === 'submitting'}
+                className="bg-[#F24F00] px-6 py-2 text-sm font-bold text-white hover:bg-[#d44400] transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
             >
-                ارسال نظر
+                {status === 'submitting' && (
+                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                )}
+                {status === 'submitting' ? 'در حال ارسال...' : 'ارسال نظر'}
             </button>
+
         </form>
     );
 }

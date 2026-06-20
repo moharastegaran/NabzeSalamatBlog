@@ -70,7 +70,8 @@ class BlogPostController extends Controller
             ...$validated,
             'author_id'    => auth()->id(),
             'slug'         => Str::slug($validated['title']),
-            'published_at' => $validated['status'] === 'published' ? now() : null,
+            'publish_at'   => $validated['status'] === 'scheduled' ? ($validated['publish_at'] ?? null) : null,
+            'published_at' => $validated['status'] === 'published'  ? now() : null,
         ]);
 
         $post->tags()->sync($tagIds);
@@ -111,9 +112,17 @@ class BlogPostController extends Controller
         $tagIds      = $validated['tag_ids'] ?? [];
         unset($validated['category_ids'], $validated['tag_ids']);
 
-        if ($blog->status === 'draft' && $validated['status'] === 'published' && ! $blog->published_at) {
-            $validated['published_at'] = now();
-        }
+        $newStatus = $validated['status'];
+
+        // published_at: stamp now only on first transition to published; preserve it if already live.
+        $validated['published_at'] = match (true) {
+            $newStatus === 'published' && $blog->status !== 'published' => now(),
+            $newStatus === 'published'                                   => $blog->published_at,
+            default                                                      => null,
+        };
+
+        // publish_at: only meaningful for scheduled posts; clear it otherwise.
+        $validated['publish_at'] = $newStatus === 'scheduled' ? ($validated['publish_at'] ?? null) : null;
 
         $blog->update($validated);
         $blog->tags()->sync($tagIds);
@@ -142,7 +151,8 @@ class BlogPostController extends Controller
             'title'            => ['required', 'string', 'max:255'],
             'excerpt'          => ['nullable', 'string', 'max:500'],
             'body'             => ['required', 'string'],
-            'status'           => ['required', 'in:draft,published'],
+            'status'           => ['required', 'in:draft,scheduled,published'],
+            'publish_at'       => ['required_if:status,scheduled', 'nullable', 'date', 'after:now'],
             'featured_image'   => ['nullable', 'string', 'max:500'],
             'tag_ids'          => ['nullable', 'array'],
             'tag_ids.*'        => ['exists:blog_tags,id'],

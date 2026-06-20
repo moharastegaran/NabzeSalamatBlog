@@ -11,6 +11,18 @@ export function toRelative(date: string | Date): string {
     return momentJalaali(date).fromNow();
 }
 
+const pad = (n: number) => String(n).padStart(2, '0');
+
+/** Returns local datetime as 'YYYY-MM-DD HH:mm' using native getters — no locale/timezone ambiguity. */
+export function localDateTimeStr(date = new Date()): string {
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+/** Returns local date as 'YYYY-MM-DD' using native getters. */
+export function localDateStr(date = new Date()): string {
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 const PD = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
 
 /** Convert an ISO date label (YYYY-MM-DD) from the chart backend into a Jalali string. */

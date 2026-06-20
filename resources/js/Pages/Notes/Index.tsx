@@ -1,6 +1,6 @@
 ﻿import PersianDatePicker from '@/Components/PersianDatePicker';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { toJalali } from '@/utils/date';
+import { toJalali, localDateStr } from '@/utils/date';
 import { Head, router, useForm } from '@inertiajs/react';
 import { FormEvent } from 'react';
 
@@ -63,7 +63,7 @@ function NoteRow({ note }: { note: Note }) {
                     <span>{toJalali(note.created_at)}</span>
                     {note.due_date && (
                         <span className={`flex items-center gap-1 font-medium ${
-                            !note.is_done && note.due_date < new Date().toISOString().slice(0, 10)
+                            !note.is_done && note.due_date < localDateStr()
                                 ? 'text-red-500'
                                 : 'text-indigo-500'
                         }`}>

@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('notes:remind')->dailyAt('08:00');
 Schedule::command('views:sync')->everyFiveMinutes();
+Schedule::command('posts:publish-scheduled')->everyMinute()->withoutOverlapping();

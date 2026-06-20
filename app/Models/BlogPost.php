@@ -22,12 +22,14 @@ class BlogPost extends Model
         'featured_image',
         'video_url',
         'status',
+        'publish_at',
         'published_at',
     ];
 
     protected function casts(): array
     {
         return [
+            'publish_at'   => 'datetime',
             'published_at' => 'datetime',
         ];
     }
@@ -69,8 +71,9 @@ class BlogPost extends Model
 
     public function scopePublished($query)
     {
-        return $query->where('status', 'published')
-                     ->where(fn ($q) => $q->whereNull('published_at')->orWhere('published_at', '<=', now()));
+        // status = 'published' is the single source of truth;
+        // published_at is just the system-stamped fact of when it went live.
+        return $query->where('status', 'published');
     }
 
     /**
