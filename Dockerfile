@@ -21,6 +21,7 @@ RUN apk add --no-cache \
         libxml2-dev \
         zip \
         unzip \
+    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
         pdo_mysql \
@@ -33,10 +34,17 @@ RUN apk add --no-cache \
         intl \
         xml \
         opcache \
-    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
-    && pecl install redis \
+    && mkdir /tmp/phpredis \
+    && wget -qO- https://github.com/phpredis/phpredis/archive/refs/tags/6.1.0.tar.gz \
+        | tar xz -C /tmp/phpredis --strip-components=1 \
+    && cd /tmp/phpredis \
+    && phpize \
+    && ./configure \
+    && make -j$(nproc) \
+    && make install \
     && docker-php-ext-enable redis \
-    && apk del .build-deps
+    && apk del .build-deps \
+    && rm -rf /tmp/phpredis
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
