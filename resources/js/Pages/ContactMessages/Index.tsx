@@ -48,14 +48,14 @@ function ExpandedMessage({ msg, onClose }: { msg: ContactMessage; onClose: () =>
                     <div className="flex flex-wrap gap-6 text-sm">
                         <div>
                             <span className="text-xs text-gray-400 block mb-0.5">شماره موبایل</span>
-                            <a href={`tel:${msg.phone_number}`} className="font-mono font-semibold text-gray-800 hover:text-[#F24F00]" dir="ltr">
+                            <a href={`tel:${msg.phone_number}`} className="font-mono font-semibold text-gray-800 hover:text-[#F24F00]">
                                 {msg.phone_number}
                             </a>
                         </div>
                         {msg.email && (
                             <div>
                                 <span className="text-xs text-gray-400 block mb-0.5">ایمیل</span>
-                                <a href={`mailto:${msg.email}`} className="font-mono text-gray-700 hover:text-[#F24F00]" dir="ltr">
+                                <a href={`mailto:${msg.email}`} className="font-mono text-gray-700 hover:text-[#F24F00]">
                                     {msg.email}
                                 </a>
                             </div>
@@ -71,7 +71,7 @@ function ExpandedMessage({ msg, onClose }: { msg: ContactMessage; onClose: () =>
                                     href={route('contact-messages.download', msg.id)}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:underline"
+                                    className="inline-flex  items-center gap-1.5 text-sm text-indigo-600 hover:underline"
                                 >
                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -235,8 +235,8 @@ export default function ContactMessagesIndex({ messages, unreadCount, filters }:
                                                     </div>
                                                     <p className="text-xs text-gray-400 mt-0.5 line-clamp-1 pr-4">{msg.message}</p>
                                                 </td>
-                                                <td className="px-4 py-3 text-sm font-mono text-gray-600" dir="ltr">{msg.phone_number}</td>
-                                                <td className="px-4 py-3 text-sm text-gray-500" dir="ltr">{msg.email ?? '—'}</td>
+                                                <td className="px-4 py-3 text-sm font-mono text-gray-600">{msg.phone_number}</td>
+                                                <td className="px-4 py-3 text-sm text-gray-500">{msg.email ?? '—'}</td>
                                                 <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">{toJalali(msg.created_at)}</td>
                                                 <td className="px-4 py-3">
                                                     <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${

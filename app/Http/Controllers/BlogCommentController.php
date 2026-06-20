@@ -43,7 +43,7 @@ class BlogCommentController extends Controller
     {
         $validated = $request->validate([
             'name'  => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
             'body'  => ['required', 'string', 'max:2000'],
         ]);
 
