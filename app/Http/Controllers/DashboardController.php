@@ -34,7 +34,13 @@ class DashboardController extends Controller
                         ->pluck('total', 'slug');
                     return ['total' => (int) $byRole->sum(), 'by_role' => $byRole];
                 })() : null,
-                'published_posts' => $user->hasPermissionTo('blog.create') ? BlogPost::published()->count() : null,
+                'posts'           => $user->hasPermissionTo('blog.create') ? (function () {
+                    $byStatus = BlogPost::selectRaw('status, count(*) as total')
+                        ->groupBy('status')
+                        ->pluck('total', 'status')
+                        ->map(fn ($c) => (int) $c);
+                    return ['total' => (int) $byStatus->sum(), 'by_status' => $byStatus];
+                })() : null,
                 'blog_categories' => $user->hasPermissionTo('blog.create') ? BlogCategory::count() : null,
                 'assets'          => $user->hasPermissionTo('attachments.add') ? (function () {
                     $byType = Asset::selectRaw('type, count(*) as total')->groupBy('type')->pluck('total', 'type');

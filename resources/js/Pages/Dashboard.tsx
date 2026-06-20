@@ -20,10 +20,11 @@ interface RecentPost {
 }
 
 interface UserStats { total: number; by_role: Record<string, number>; }
+interface PostStats { total: number; by_status: Record<string, number>; }
 
 interface Stats {
     users: UserStats | null;
-    published_posts: number | null;
+    posts: PostStats | null;
     blog_categories: number | null;
     assets: AssetStats | null;
 }
@@ -336,12 +337,26 @@ export default function Dashboard({ stats, profile, roles, recent_posts, range, 
                             />
                         )}
 
-                        {stats.published_posts !== null ? (
+                        {stats.posts !== null ? (
                             <StatCard
                                 icon={<IconBlog />}
                                 color={{ bar: 'bg-violet-500', iconBg: 'bg-violet-50', iconText: 'text-violet-600', iconRing: 'ring-violet-100' }}
-                                title="مطالب منتشرشده"
-                                value={stats.published_posts}
+                                title="مطالب"
+                                value={stats.posts.total}
+                                badge={
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {Object.entries(stats.posts.by_status).map(([status, count]) => (
+                                            <span key={status} className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs ${
+                                                status === 'published' ? 'bg-emerald-50 text-emerald-700' :
+                                                status === 'scheduled' ? 'bg-sky-50 text-sky-700' :
+                                                'bg-gray-100 text-gray-600'
+                                            }`}>
+                                                <span className="font-medium">{count.toLocaleString()}</span>
+                                                <span>{ status === 'published' ? 'منتشرشده' : status === 'scheduled' ? 'زمان‌بندی‌شده' : 'پیش‌نویس' }</span>
+                                            </span>
+                                        ))}
+                                    </div>
+                                }
                                 subValue={<span>{stats.blog_categories} دسته‌بندی</span>}
                                 actions={
                                     <>
@@ -354,7 +369,7 @@ export default function Dashboard({ stats, profile, roles, recent_posts, range, 
                             <StatCard
                                 icon={<IconBlog />}
                                 color={{ bar: 'bg-gray-300', iconBg: 'bg-gray-50', iconText: 'text-gray-400', iconRing: 'ring-gray-100' }}
-                                title="مطالب منتشرشده" value="—"
+                                title="مطالب" value="—"
                                 subValue={<span className="italic">بدون دسترسی</span>}
                                 actions={<ActionDisabled>مدیریت مطالب</ActionDisabled>}
                             />

@@ -339,12 +339,12 @@ function SidebarNav({
                             className={`relative flex w-full items-center overflow-hidden rounded-lg py-2.5 text-sm font-medium transition-colors ${
                                 collapsed ? 'justify-center px-2' : 'justify-between px-3'
                             } ${
-                                route().current('blog.*') || route().current('blog.tags.*')
+                                route().current('blog.*') || route().current('blog.tags.*') || route().current('analytics.blog')
                                     ? 'bg-[#075F26]/10 text-[#075F26]'
                                     : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                             }`}
                         >
-                            {!collapsed && (route().current('blog.*') || route().current('blog.tags.*')) && (
+                            {!collapsed && (route().current('blog.*') || route().current('blog.tags.*') || route().current('analytics.blog')) && (
                                 <span className="absolute inset-y-0 left-0 w-0.5 rounded-r-sm bg-[#075F26]/80" />
                             )}
                             <span className={`flex items-center ${collapsed ? '' : 'gap-3'}`}>
@@ -369,6 +369,9 @@ function SidebarNav({
                                         </SubNavItem>
                                         <SubNavItem href={route('blog.comments.index')} active={!!route().current('blog.comments.*')}>
                                             نظرات
+                                        </SubNavItem>
+                                        <SubNavItem href={route('analytics.blog')} active={!!route().current('analytics.blog')}>
+                                            آنالیتیکس
                                         </SubNavItem>
                                     </div>
                                 </div>
@@ -743,7 +746,7 @@ export default function Authenticated({
     const canWithdrawal  = !!user.is_withdrawal && (user.roles?.includes('sales_retail') || user.roles?.includes('sales_manager'));
 
     const [usersOpen, setUsersOpen]     = useState(!!route().current('users.*'));
-    const [blogOpen, setBlogOpen]       = useState(!!route().current('blog.*'));
+    const [blogOpen, setBlogOpen]       = useState(!!route().current('blog.*') || !!route().current('analytics.blog'));
     const [ticketsOpen, setTicketsOpen] = useState(!!route().current('tickets.*'));
 
     const [unreadCount, setUnreadCount] = useState(0);

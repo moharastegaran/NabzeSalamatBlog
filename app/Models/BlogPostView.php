@@ -9,7 +9,17 @@ class BlogPostView extends Model
 {
     public $timestamps = false;
 
-    protected $fillable = ['post_id', 'view_count', 'viewed_at'];
+    protected $fillable = [
+        'post_id',
+        'token',
+        'view_count',
+        'referrer_domain',
+        'utm_source',
+        'utm_medium',
+        'device_type',
+        'reading_seconds',
+        'viewed_at',
+    ];
 
     protected function casts(): array
     {

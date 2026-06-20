@@ -15,6 +15,7 @@ use App\Http\Controllers\BlogPostController;
 use App\Http\Controllers\BlogTagController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\BlogAnalyticsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\ProfileController;
@@ -153,6 +154,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/notes',                 [NoteController::class, 'store']) ->name('notes.store');
     Route::patch('/notes/{note}/toggle',  [NoteController::class, 'toggle'])->name('notes.toggle');
     Route::delete('/notes/{note}',        [NoteController::class, 'destroy'])->name('notes.destroy');
+
+    // Blog analytics (admin & writer only)
+    Route::middleware('role:admin|writer')->group(function () {
+        Route::get('/blog-analytics', [BlogAnalyticsController::class, 'index'])->name('analytics.blog');
+    });
 
     // Blog (admin & writer only)
     Route::middleware('role:admin|writer')->group(function () {

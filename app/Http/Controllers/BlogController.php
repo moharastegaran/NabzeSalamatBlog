@@ -197,7 +197,7 @@ class BlogController extends Controller
             ])
             ->firstOrFail();
 
-        $this->viewTracker->track($post->id, $request);
+        $viewToken = $this->viewTracker->track($post->id, $request);
 
         $related = BlogPost::published()
             ->where('id', '!=', $post->id)
@@ -219,6 +219,7 @@ class BlogController extends Controller
             'recentPosts' => $recentPosts,
             'mostRead'    => $this->mostRead(),
             'adBanners'   => AdBanner::activeForLocation('blogsingle')->get(),
+            'viewToken'   => $viewToken,
         ]);
     }
 }

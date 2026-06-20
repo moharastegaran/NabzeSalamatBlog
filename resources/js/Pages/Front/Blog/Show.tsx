@@ -12,6 +12,7 @@ interface Props {
     recentPosts: BlogPost[];
     mostRead: BlogPost[];
     adBanners: AdBanner[];
+    viewToken: string | null;
 }
 
 function formatDate(iso: string) {
@@ -258,9 +259,54 @@ function CommentForm({ postId }: { postId: number }) {
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
-export default function BlogShow({ post, related, recentPosts, mostRead, adBanners }: Props) {
+function useReadingTimeBeacon(token: string | null) {
+    useEffect(() => {
+        if (!token) return;
+
+        let activeSeconds = 0;
+        let lastVisible = !document.hidden ? Date.now() : null;
+        let interval: ReturnType<typeof setInterval>;
+
+        const tick = () => {
+            if (!document.hidden && lastVisible !== null) {
+                activeSeconds += (Date.now() - lastVisible) / 1000;
+                lastVisible = Date.now();
+            }
+        };
+
+        const onVisibility = () => {
+            if (document.hidden) {
+                tick();
+                lastVisible = null;
+            } else {
+                lastVisible = Date.now();
+            }
+        };
+
+        const send = () => {
+            tick();
+            const seconds = Math.round(activeSeconds);
+            if (seconds < 1) return;
+            navigator.sendBeacon('/api/reading-time', JSON.stringify({ token, seconds }));
+        };
+
+        interval = setInterval(tick, 1000);
+        document.addEventListener('visibilitychange', onVisibility);
+        window.addEventListener('pagehide', send);
+
+        return () => {
+            clearInterval(interval);
+            document.removeEventListener('visibilitychange', onVisibility);
+            window.removeEventListener('pagehide', send);
+        };
+    }, [token]);
+}
+
+export default function BlogShow({ post, related, recentPosts, mostRead, adBanners, viewToken }: Props) {
     const date = post.published_at ? formatDate(post.published_at) : null;
     const comments = post.approved_comments ?? [];
+
+    useReadingTimeBeacon(viewToken);
 
     return (
         <BlogLayout>
