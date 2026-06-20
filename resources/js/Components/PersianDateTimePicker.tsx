@@ -10,9 +10,16 @@ function jDaysInMonth(year: number, month0: number): number {
     return [1, 5, 9, 13, 17, 22, 26, 30].includes(year % 33) ? 30 : 29;
 }
 
+function jToGreg(jy: number, jm0: number, jd: number): string {
+    const g = (momentJalaali as any).jConvert.toGregorian(jy, jm0, jd);
+    if (isNaN(g.gy)) return '';
+    return `${g.gy}-${String(g.gm + 1).padStart(2, '0')}-${String(g.gd).padStart(2, '0')}`;
+}
+
 function jFirstDayOfWeek(year: number, month0: number): number {
-    const m = momentJalaali(`${year}/${month0 + 1}/1`, 'jYYYY/jM/jD');
-    return (m.day() + 1) % 7;
+    const g = (momentJalaali as any).jConvert.toGregorian(year, month0, 1);
+    if (isNaN(g.gy)) return 0;
+    return (new Date(g.gy, g.gm, g.gd).getDay() + 1) % 7;
 }
 
 interface Props {
@@ -39,13 +46,20 @@ export default function PersianDateTimePicker({
         const timePart = v.length >= 16 ? v.slice(11, 16) : '00:00';
         const m = momentJalaali(datePart, 'YYYY-MM-DD');
         if (!m.isValid()) return null;
-        return { y: m.jYear(), mo: m.jMonth(), d: m.jDate(), greg: datePart, time: timePart };
+        // jYear()/format('jYYYY') both go through the same broken path in v0.10.x
+        // when the moment was parsed with a Gregorian format string.
+        // jConvert.toJalaali(gy, gm0, gd) is the internal conversion function that
+        // accepts 0-indexed gm (like m.month()) and returns 0-indexed jm.
+        const j = (momentJalaali as any).jConvert.toJalaali(m.year(), m.month(), m.date());
+        if (isNaN(j.jy)) return null;
+        return { y: j.jy, mo: j.jm, d: j.jd, greg: datePart, time: timePart };
     };
 
     const parsed = parseValue(value);
     const todayM = momentJalaali();
     const todayGreg = todayM.format('YYYY-MM-DD');
-    const todayJ = { y: todayM.jYear(), mo: todayM.jMonth() };
+    const _todayJ = (momentJalaali as any).jConvert.toJalaali(todayM.year(), todayM.month(), todayM.date());
+    const todayJ = { y: _todayJ.jy, mo: _todayJ.jm };
 
     const [open, setOpen] = useState(false);
     const [pos, setPos] = useState({ top: 0, right: 0 });
@@ -102,8 +116,7 @@ export default function PersianDateTimePicker({
         if (!value) return '';
         const p = parseValue(value);
         if (!p) return '';
-        const m = momentJalaali(p.greg, 'YYYY-MM-DD');
-        return `${m.jYear()}/${String(m.jMonth() + 1).padStart(2, '0')}/${String(m.jDate()).padStart(2, '0')} ${p.time}`;
+        return `${p.y}/${String(p.mo + 1).padStart(2, '0')}/${String(p.d).padStart(2, '0')} ${p.time}`;
     })();
 
     const minDate = minDateTime ? minDateTime.slice(0, 10) : '';
@@ -112,8 +125,8 @@ export default function PersianDateTimePicker({
     const isDisabled = (greg: string) => !!minDate && greg < minDate;
 
     const selectDay = (day: number) => {
-        const m = momentJalaali(`${viewYear}/${viewMonth + 1}/${day}`, 'jYYYY/jM/jD');
-        const greg = m.format('YYYY-MM-DD');
+        const greg = jToGreg(viewYear, viewMonth, day);
+        if (!greg) return;
         if (isDisabled(greg)) return;
         setPendingGreg(greg);
         setTimeError('');
@@ -230,11 +243,10 @@ export default function PersianDateTimePicker({
                     <div className="grid grid-cols-7 gap-y-0.5 px-2 pb-2">
                         {cells.map((day, i) => {
                             if (!day) return <div key={i} />;
-                            const m = momentJalaali(`${viewYear}/${viewMonth + 1}/${day}`, 'jYYYY/jM/jD');
-                            const greg = m.format('YYYY-MM-DD');
-                            const disabled = isDisabled(greg);
-                            const selected = pendingGreg === greg;
-                            const isToday = greg === todayGreg;
+                            const greg = jToGreg(viewYear, viewMonth, day);
+                            const disabled = !greg || isDisabled(greg);
+                            const selected = !!greg && pendingGreg === greg;
+                            const isToday = !!greg && greg === todayGreg;
                             return (
                                 <button
                                     key={i}

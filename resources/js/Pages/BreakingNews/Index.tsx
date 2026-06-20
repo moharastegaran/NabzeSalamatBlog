@@ -72,7 +72,7 @@ export default function BreakingNewsIndex({ items }: Props) {
         title: '',
         url: '',
         is_active: true,
-        active_from: '',
+        active_from: nowString(),
         active_until: '',
     });
     const [addClientErrors, setAddClientErrors] = useState<Record<string, string>>({});
