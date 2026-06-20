@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
+use App\Models\BlogPostView;
 
 class BlogPost extends Model
 {
@@ -70,6 +71,39 @@ class BlogPost extends Model
     {
         return $query->where('status', 'published')
                      ->where(fn ($q) => $q->whereNull('published_at')->orWhere('published_at', '<=', now()));
+    }
+
+    /**
+     * Order by trending score: last-24h views × 3 + last-7d views.
+     * Falls back to all-time views when the view log is empty.
+     */
+    public function scopeTrending($query, int $days = 7)
+    {
+        return $query->orderByRaw(
+            '(SELECT COALESCE(SUM(CASE WHEN viewed_at >= ? THEN view_count * 3 ELSE view_count END), 0)
+              FROM blog_post_views WHERE post_id = blog_posts.id AND viewed_at >= ?) DESC',
+            [now()->subDay(), now()->subDays($days)]
+        )->orderByDesc('views');
+    }
+
+    /**
+     * Order by view count within the given period ('today' or 'week').
+     * Falls back to all-time views when the view log is empty.
+     */
+    public function scopeMostRead($query, string $period = 'week')
+    {
+        $since = $period === 'today' ? now()->startOfDay() : now()->subWeek();
+
+        return $query->orderByRaw(
+            '(SELECT COALESCE(SUM(view_count), 0)
+              FROM blog_post_views WHERE post_id = blog_posts.id AND viewed_at >= ?) DESC',
+            [$since]
+        )->orderByDesc('views');
+    }
+
+    public function viewLogs(): HasMany
+    {
+        return $this->hasMany(BlogPostView::class, 'post_id');
     }
 
     /**

@@ -6,12 +6,24 @@ use App\Models\AdBanner;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogTag;
+use App\Services\PostViewTracker;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class BlogController extends Controller
 {
+    public function __construct(private PostViewTracker $viewTracker) {}
+
+    private function mostRead(int $limit = 5): \Illuminate\Database\Eloquent\Collection
+    {
+        return BlogPost::published()
+            ->mostRead('week')
+            ->select('id', 'title', 'slug', 'featured_image', 'published_at', 'views')
+            ->limit($limit)
+            ->get();
+    }
+
     public function index(Request $request): Response
     {
         $categorySlug = $request->query('category');
@@ -114,6 +126,7 @@ class BlogController extends Controller
             'category'    => $category,
             'posts'       => $posts,
             'recentPosts' => $recentPosts,
+            'mostRead'    => $this->mostRead(),
             'search'      => $search,
             'adBanners'   => AdBanner::activeForLocation('catarchive')->get(),
         ]);
@@ -149,6 +162,7 @@ class BlogController extends Controller
             'tag'         => $tag,
             'posts'       => $posts,
             'recentPosts' => $recentPosts,
+            'mostRead'    => $this->mostRead(),
             'search'      => $search,
             'adBanners'   => AdBanner::activeForLocation('catarchive')->get(),
         ]);
@@ -171,7 +185,7 @@ class BlogController extends Controller
         return response()->json($posts);
     }
 
-    public function show(string $slug): Response
+    public function show(Request $request, string $slug): Response
     {
         $post = BlogPost::published()
             ->where('slug', $slug)
@@ -183,7 +197,7 @@ class BlogController extends Controller
             ])
             ->firstOrFail();
 
-        $post->increment('views');
+        $this->viewTracker->track($post->id, $request);
 
         $related = BlogPost::published()
             ->where('id', '!=', $post->id)
@@ -203,6 +217,7 @@ class BlogController extends Controller
             'post'        => $post,
             'related'     => $related,
             'recentPosts' => $recentPosts,
+            'mostRead'    => $this->mostRead(),
             'adBanners'   => AdBanner::activeForLocation('blogsingle')->get(),
         ]);
     }

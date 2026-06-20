@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
 import AdBannerSlot from '@/Components/AdBannerSlot';
+import MostReadWidget from '@/Components/MostReadWidget';
 import type { AdBanner, BlogCategory, BlogPost, PaginatedData } from '@/types/models';
 
 interface CategoryChild extends Pick<BlogCategory, 'id' | 'name' | 'slug'> {
@@ -18,6 +19,7 @@ interface Props {
     category: CategoryWithMeta;
     posts: PaginatedData<BlogPost>;
     recentPosts: BlogPost[];
+    mostRead: BlogPost[];
     search: string;
     adBanners: AdBanner[];
 }
@@ -276,7 +278,7 @@ function SocialWidget() {
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
-export default function BlogCategory({ category, posts, recentPosts, search, adBanners }: Props) {
+export default function BlogCategory({ category, posts, recentPosts, mostRead, search, adBanners }: Props) {
     return (
         <BlogLayout>
             <Head title={`${category.name} | وبلاگ`} />
@@ -405,6 +407,12 @@ export default function BlogCategory({ category, posts, recentPosts, search, adB
                         {!category.parent_id && category.children.length > 0 && (
                             <div className="bg-white p-4 shadow-sm">
                                 <ChildrenWidget children={category.children} />
+                            </div>
+                        )}
+
+                        {mostRead.length > 0 && (
+                            <div className="bg-white p-4 shadow-sm">
+                                <MostReadWidget posts={mostRead} />
                             </div>
                         )}
 

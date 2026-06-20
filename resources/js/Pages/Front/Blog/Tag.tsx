@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
 import AdBannerSlot from '@/Components/AdBannerSlot';
+import MostReadWidget from '@/Components/MostReadWidget';
 import type { AdBanner, BlogPost, BlogTag, PaginatedData } from '@/types/models';
 
 interface TagWithMeta extends BlogTag {
@@ -12,6 +13,7 @@ interface Props {
     tag: TagWithMeta;
     posts: PaginatedData<BlogPost>;
     recentPosts: BlogPost[];
+    mostRead: BlogPost[];
     search: string;
     adBanners: AdBanner[];
 }
@@ -222,7 +224,7 @@ function SocialWidget() {
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
-export default function BlogTag({ tag, posts, recentPosts, search, adBanners }: Props) {
+export default function BlogTag({ tag, posts, recentPosts, mostRead, search, adBanners }: Props) {
     return (
         <BlogLayout>
             <Head title={`#${tag.name} | وبلاگ`} />
@@ -325,6 +327,12 @@ export default function BlogTag({ tag, posts, recentPosts, search, adBanners }: 
                         <div className="bg-white p-4 shadow-sm">
                             <SearchWidget slug={tag.slug} defaultValue={search} />
                         </div>
+
+                        {mostRead.length > 0 && (
+                            <div className="bg-white p-4 shadow-sm">
+                                <MostReadWidget posts={mostRead} />
+                            </div>
+                        )}
 
                         {recentPosts.length > 0 && (
                             <div className="bg-white p-4 shadow-sm">

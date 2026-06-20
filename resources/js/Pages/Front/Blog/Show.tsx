@@ -2,12 +2,14 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
 import AdBannerSlot from '@/Components/AdBannerSlot';
+import MostReadWidget from '@/Components/MostReadWidget';
 import type { AdBanner, BlogComment, BlogPost, BlogTag } from '@/types/models';
 
 interface Props {
     post: BlogPost & { approved_comments: BlogComment[] };
     related: BlogPost[];
     recentPosts: BlogPost[];
+    mostRead: BlogPost[];
     adBanners: AdBanner[];
 }
 
@@ -199,7 +201,7 @@ function CommentForm({ postId }: { postId: number }) {
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
-export default function BlogShow({ post, related, recentPosts, adBanners }: Props) {
+export default function BlogShow({ post, related, recentPosts, mostRead, adBanners }: Props) {
     const date = post.published_at ? formatDate(post.published_at) : null;
     const comments = post.approved_comments ?? [];
 
@@ -391,6 +393,13 @@ export default function BlogShow({ post, related, recentPosts, adBanners }: Prop
 
                     {/* Left sidebar */}
                     <aside className="space-y-6 lg:sticky lg:top-6">
+
+                        {/* Most read this week */}
+                        {mostRead.length > 0 && (
+                            <div className="bg-white p-4 shadow-sm">
+                                <MostReadWidget posts={mostRead} />
+                            </div>
+                        )}
 
                         {/* Recent posts */}
                         {recentPosts.length > 0 && (

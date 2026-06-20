@@ -28,8 +28,8 @@ class ShopController extends Controller
             'suggestionPosts' => $recent->skip(4)->values(),
             'trendingPosts'   => BlogPost::published()
                 ->with('category:id,name,slug')
+                ->trending()
                 ->select($postSelect)
-                ->orderByDesc('views')
                 ->take(5)
                 ->get(),
             'recentPosts'     => BlogPost::published()
