@@ -11,13 +11,14 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(PermissionsSeeder::class);
-        $this->call(BlogPostsSeeder::class);
 
         $adminUser = User::firstOrCreate(
             ['email' => 'admin@salesportal.test'],
             ['name' => 'Admin', 'password' => Hash::make('password'), 'mobile' => '09000000000', 'melli_code' => '1742714439']
         );
         $adminUser->syncRoles('admin');
+
+        $this->call(BlogPostsSeeder::class);
 
         $contributorUser = User::firstOrCreate(
             ['email' => 'contributor@salesportal.test'],

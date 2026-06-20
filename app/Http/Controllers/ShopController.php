@@ -48,8 +48,8 @@ class ShopController extends Controller
                 ->orderByDesc('posts_count')
                 ->get(['id', 'name', 'slug']),
             'eventPosts'      => (function () {
-                $eventCategoryIds = BlogCategory::where('id', 69)
-                    ->orWhere('parent_id', 69)
+                $eventCategoryIds = BlogCategory::where('id', 8)
+                    ->orWhere('parent_id', 8)
                     ->pluck('id');
 
                 return BlogPost::published()
@@ -71,7 +71,7 @@ class ShopController extends Controller
                 ->get(),
             'adBanners'       => AdBanner::activeForLocation('landing')->limit(2)->get(),
             'audioPosts'      => BlogPost::published()
-                ->whereHas('categories', fn ($q) => $q->whereIn('blog_categories.slug', ['nbd-sda', 'padkst', 'fayl-soty']))
+                ->whereHas('categories', fn ($q) => $q->where('blog_categories.id', 6))
                 ->with([
                     'categories:id,name,slug',
                     'media' => fn ($q) => $q->where('collection_name', 'audio')->orderBy('order_column'),
