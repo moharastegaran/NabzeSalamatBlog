@@ -303,9 +303,10 @@ export default function BlogShow({ post, related, recentPosts, adBanners }: Prop
                         {post.tags && post.tags.length > 0 && (
                             <div className="mb-6 flex flex-wrap gap-2">
                                 {post.tags.map((tag: BlogTag) => (
-                                    <span key={tag.id} className="bg-[#F24F00]/10 px-3 py-1 text-xs font-bold text-[#F24F00]">
+                                    <Link key={tag.id} href={route('front.blog.tag', tag.slug)}
+                                        className="bg-[#F24F00]/10 px-3 py-1 text-xs font-bold text-[#F24F00] hover:bg-[#F24F00] hover:text-white transition-colors">
                                         #{tag.name}
-                                    </span>
+                                    </Link>
                                 ))}
                             </div>
                         )}
@@ -407,9 +408,10 @@ export default function BlogShow({ post, related, recentPosts, adBanners }: Prop
                                 <SideboxHeader title="برچسب‌ها" />
                                 <div className="flex flex-wrap gap-2">
                                     {post.tags.map((tag: BlogTag) => (
-                                        <span key={tag.id} className="bg-[#F24F00]/10 px-3 py-1 text-xs font-bold text-[#F24F00]">
+                                        <Link key={tag.id} href={route('front.blog.tag', tag.slug)}
+                                            className="bg-[#F24F00]/10 px-3 py-1 text-xs font-bold text-[#F24F00] hover:bg-[#F24F00] hover:text-white transition-colors">
                                             {tag.name}
-                                        </span>
+                                        </Link>
                                     ))}
                                 </div>
                             </div>

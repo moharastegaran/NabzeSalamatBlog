@@ -345,7 +345,9 @@ function parseYouTubeId(url: string): string | null {
 }
 
 function VideoPlayer({ post }: { post: BlogPost }) {
-    const url = post.video_url;
+    const url = post.video_url
+        ?? post.media?.find(m => m.collection_name === 'video')?.url
+        ?? null;
     if (url) {
         const ytId = parseYouTubeId(url);
         if (ytId) {
@@ -936,7 +938,7 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                                 return (
                                     <Link
                                         key={tag.id}
-                                        href={route('front.blog.index', { tag: tag.slug })}
+                                        href={route('front.blog.tag', tag.slug)}
                                         className={`${base} ${sizes[tier]} ${styles[tier]}`}
                                     >
                                         <span className="opacity-50">#</span>

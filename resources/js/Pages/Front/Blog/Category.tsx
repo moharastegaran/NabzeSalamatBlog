@@ -56,9 +56,11 @@ function PostCard({ post }: { post: BlogPost }) {
                 {post.tags && post.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                         {post.tags.slice(0, 3).map(tag => (
-                            <span key={tag.id} className="bg-[#F24F00]/10 px-2 py-0.5 text-[10px] font-semibold text-[#F24F00]">
+                            <Link key={tag.id} href={route('front.blog.tag', tag.slug)}
+                                onClick={e => e.stopPropagation()}
+                                className="bg-[#F24F00]/10 px-2 py-0.5 text-[10px] font-semibold text-[#F24F00] hover:bg-[#F24F00] hover:text-white transition-colors">
                                 {tag.name}
-                            </span>
+                            </Link>
                         ))}
                     </div>
                 )}

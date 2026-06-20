@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AdBanner;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
+use App\Models\BlogTag;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -111,6 +112,41 @@ class BlogController extends Controller
 
         return Inertia::render('Front/Blog/Category', [
             'category'    => $category,
+            'posts'       => $posts,
+            'recentPosts' => $recentPosts,
+            'search'      => $search,
+            'adBanners'   => AdBanner::activeForLocation('catarchive')->get(),
+        ]);
+    }
+
+    public function tag(Request $request, string $slug): Response
+    {
+        $search = trim($request->query('search', ''));
+
+        $tag = BlogTag::where('slug', $slug)
+            ->withCount(['posts' => fn ($q) => $q->published()])
+            ->firstOrFail();
+
+        $posts = BlogPost::published()
+            ->whereHas('tags', fn ($q) => $q->where('blog_tags.slug', $slug))
+            ->with(['author:id,name', 'category:id,name,slug', 'tags:id,name,slug'])
+            ->withCount('approvedComments')
+            ->when($search, fn ($q) => $q->where(fn ($q) => $q
+                ->where('title',   'like', "%{$search}%")
+                ->orWhere('excerpt', 'like', "%{$search}%")
+                ->orWhere('body',    'like', "%{$search}%")
+            ))
+            ->latest('published_at')
+            ->paginate(9)
+            ->withQueryString();
+
+        $recentPosts = BlogPost::published()
+            ->latest('published_at')
+            ->limit(6)
+            ->get(['id', 'title', 'slug', 'featured_image', 'published_at']);
+
+        return Inertia::render('Front/Blog/Tag', [
+            'tag'         => $tag,
             'posts'       => $posts,
             'recentPosts' => $recentPosts,
             'search'      => $search,

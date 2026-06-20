@@ -63,12 +63,23 @@ class ShopController extends Controller
                     ->take(6)
                     ->get();
             })(),
-            'videoPosts'      => BlogPost::published()
-                ->with('category:id,name,slug')
-                ->select('id', 'title', 'slug', 'excerpt', 'featured_image', 'video_url', 'blog_category_id', 'published_at', 'views')
-                ->latest('published_at')
-                ->take(8)
-                ->get(),
+            'videoPosts'      => (function () {
+                $videoCategoryIds = BlogCategory::where('id', 7)
+                    ->orWhere('parent_id', 7)
+                    ->pluck('id');
+
+                return BlogPost::published()
+                    ->whereHas('categories', fn ($q) => $q->whereIn('blog_categories.id', $videoCategoryIds))
+                    ->with([
+                        'category:id,name,slug',
+                        'media'       => fn ($q) => $q->where('collection_name', 'video'),
+                        'fieldValues' => fn ($q) => $q->with('definition:id,field_key,field_type,label,options'),
+                    ])
+                    ->select('id', 'title', 'slug', 'excerpt', 'featured_image', 'video_url', 'blog_category_id', 'published_at', 'views')
+                    ->latest('published_at')
+                    ->take(8)
+                    ->get();
+            })(),
             'adBanners'       => AdBanner::activeForLocation('landing')->limit(2)->get(),
             'audioPosts'      => BlogPost::published()
                 ->whereHas('categories', fn ($q) => $q->where('blog_categories.id', 6))
