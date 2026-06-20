@@ -117,7 +117,7 @@ function HeroSlider({ posts }: { posts: BlogPost[] }) {
 
             <button
                 onClick={() => setActive(i => (i - 1 + posts.length) % posts.length)}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 bg-black/40 hover:bg-[#F24F00] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 bg-black/40 hover:bg-[#F24F00] text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all"
                 aria-label="قبلی"
             >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -126,7 +126,7 @@ function HeroSlider({ posts }: { posts: BlogPost[] }) {
             </button>
             <button
                 onClick={() => setActive(i => (i + 1) % posts.length)}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 bg-black/40 hover:bg-[#F24F00] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 bg-black/40 hover:bg-[#F24F00] text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all"
                 aria-label="بعدی"
             >
                 <svg className="w-4 h-4 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -416,8 +416,8 @@ function VideoCard({ post, active, onClick }: { post: BlogPost; active: boolean;
 
 function VideoSection({ posts }: { posts: BlogPost[] }) {
     const [activeIdx, setActiveIdx] = useState(0);
-    const active = posts[activeIdx] ?? posts[0];
     if (!posts.length) return null;
+    const active = posts[activeIdx] ?? posts[0];
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 bg-white">
@@ -552,7 +552,7 @@ function BlogAudioCard({ post }: { post: BlogPost }) {
 
                 {/* Player */}
                 {(() => {
-                    const audioFile = post.media?.[0];
+                    const audioFile = post.media?.find(m => m.collection_name === 'audio');
                     return (
                         <div className="mt-auto pt-3 border-t border-gray-100">
                             {audioFile && (
@@ -621,7 +621,7 @@ function EventPostCard({ post }: { post: BlogPost }) {
     );
 
     return (
-        <Link href={route('front.blog.show', post.slug)} className="group flex flex-col bg-white hover:shadow-md transition-shadow duration-200">
+        <Link href={route('front.blog.show', post.slug)} className="group flex flex-col h-full bg-white hover:shadow-md transition-shadow duration-200">
             {/* Image */}
             <div className="overflow-hidden aspect-video bg-gray-100 flex-shrink-0">
                 {post.featured_image
@@ -670,7 +670,7 @@ function EventPostCard({ post }: { post: BlogPost }) {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <span className="font-medium text-gray-600 shrink-0">{fv.definition!.label}:</span>
+                                <span className="font-medium text-gray-600 shrink-0">{fv.definition?.label}:</span>
                                 <span className="line-clamp-1">{fv.value}</span>
                             </div>
                         ))}
@@ -678,6 +678,81 @@ function EventPostCard({ post }: { post: BlogPost }) {
                 )}
             </div>
         </Link>
+    );
+}
+
+// ── Events carousel ───────────────────────────────────────────────────────────
+function EventsCarousel({ posts }: { posts: BlogPost[] }) {
+    const [index, setIndex] = useState(0);
+    const [perPage, setPerPage] = useState(3);
+
+    useEffect(() => {
+        const update = () => {
+            const n = window.innerWidth >= 1024 ? 3 : window.innerWidth >= 640 ? 2 : 1;
+            setPerPage(n);
+            setIndex(0);
+        };
+        update();
+        window.addEventListener('resize', update);
+        return () => window.removeEventListener('resize', update);
+    }, []);
+
+    const maxIndex  = Math.max(0, posts.length - perPage);
+    const safeIndex = Math.min(index, maxIndex);
+    const itemWidth = 100 / perPage;
+
+    return (
+        <div className="relative group/carousel">
+            <div className="overflow-hidden">
+                <div
+                    dir="ltr"
+                    className="flex transition-transform duration-300 ease-in-out"
+                    style={{ transform: `translateX(-${safeIndex * itemWidth}%)` }}
+                >
+                    {posts.map(post => (
+                        <div key={post.id} dir="rtl" className="flex-shrink-0 px-2" style={{ width: `${itemWidth}%` }}>
+                            <EventPostCard post={post} />
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {maxIndex > 0 && (
+                <div className="flex justify-center gap-1.5 mt-4">
+                    {Array.from({ length: maxIndex + 1 }).map((_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setIndex(i)}
+                            className={`rounded-sm transition-all duration-300 ${i === safeIndex ? 'w-5 h-1.5 bg-[#F24F00]' : 'w-1.5 h-1.5 bg-gray-300 hover:bg-gray-400'}`}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {safeIndex > 0 && (
+                <button
+                    onClick={() => setIndex(i => i - 1)}
+                    className="absolute right-0 top-[45%] -translate-y-1/2 z-10 w-9 h-9 bg-white shadow-md hover:bg-[#F24F00] hover:text-white text-gray-700 flex items-center justify-center transition-all opacity-0 group-hover/carousel:opacity-100"
+                    aria-label="قبلی"
+                >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            )}
+
+            {safeIndex < maxIndex && (
+                <button
+                    onClick={() => setIndex(i => i + 1)}
+                    className="absolute left-0 top-[45%] -translate-y-1/2 z-10 w-9 h-9 bg-white shadow-md hover:bg-[#F24F00] hover:text-white text-gray-700 flex items-center justify-center transition-all opacity-0 group-hover/carousel:opacity-100"
+                    aria-label="بعدی"
+                >
+                    <svg className="w-4 h-4 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            )}
+        </div>
     );
 }
 
@@ -815,7 +890,7 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                     {/* Audio posts — 2 cols */}
                     {audioPosts.length > 0 && (
                         <div className="lg:col-span-2 flex flex-col">
-                            <SectionHeader title="نبض صدا" href={route('front.blog.category', 'nbd-sda')} />
+                            <SectionHeader title="نبض صدا" href={route('front.blog.category', 'nabze-seda')} />
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
                                 {audioPosts.map(post => (
                                     <BlogAudioCard key={post.id} post={post} />
@@ -838,11 +913,7 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                 {eventPosts.length > 0 && (
                     <section>
                         <SectionHeader title="رویدادها" href={route('front.blog.category', 'event')} />
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {eventPosts.map(post => (
-                                <EventPostCard key={post.id} post={post} />
-                            ))}
-                        </div>
+                        <EventsCarousel posts={eventPosts} />
                     </section>
                 )}
 
