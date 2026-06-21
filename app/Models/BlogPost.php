@@ -115,6 +115,7 @@ class BlogPost extends Model
      * (null means unrestricted). Category requirements may narrow these further.
      */
     public const MEDIA_COLLECTIONS = [
+        'image'      => ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
         'audio'      => ['audio/mpeg', 'audio/mp4', 'audio/ogg', 'audio/wav', 'audio/aac', 'audio/flac', 'audio/x-flac'],
         'video'      => ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm', 'video/x-matroska'],
         'transcript' => ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'],

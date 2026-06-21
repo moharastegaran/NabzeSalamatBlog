@@ -34,7 +34,11 @@
       "PowerShell(Copy-Item *)",
       "Bash(Get-ChildItem *)",
       "Bash(docker exec *)",
-      "Bash([ -f \"$outputFile\" ])"
+      "Bash([ -f \"$outputFile\" ])",
+      "PowerShell(docker compose exec *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{url_effective}\" -L --max-time 10 \"https://loremflickr.com/800/500/pharmacy\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{url_effective}\" -L --max-time 10 \"https://picsum.photos/800/500\")",
+      "PowerShell(docker compose restart *)"
     ]
   }
 }

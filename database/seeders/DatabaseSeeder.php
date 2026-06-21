@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $adminUser->syncRoles('admin');
 
         $this->call(BlogPostsSeeder::class);
+        $this->call(PostImagesSeeder::class);
 
         $contributorUser = User::firstOrCreate(
             ['email' => 'contributor@salesportal.test'],

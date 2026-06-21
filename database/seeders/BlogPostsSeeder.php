@@ -561,6 +561,10 @@ class BlogPostsSeeder extends Seeder
                 ]
             );
 
+            if (Storage::disk('public')->exists($imagePath)) {
+                $post->update(['featured_image' => $imagePath]);
+            }
+
             $categoryIds = $data['extra_categories'];
             $categoryIds[] = $cat;
             $post->categories()->sync(array_unique($categoryIds));
