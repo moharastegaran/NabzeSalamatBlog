@@ -185,6 +185,12 @@ class BlogController extends Controller
         return response()->json($posts);
     }
 
+    public function shortLink(string $code): \Illuminate\Http\RedirectResponse
+    {
+        $post = BlogPost::published()->where('short_link', $code)->firstOrFail();
+        return redirect()->route('front.blog.show', $post->slug, 301);
+    }
+
     public function show(Request $request, string $slug): Response
     {
         $post = BlogPost::published()
@@ -196,6 +202,8 @@ class BlogController extends Controller
                 'approvedComments' => fn ($q) => $q->latest(),
             ])
             ->firstOrFail();
+
+        $post->append('time_to_read');
 
         $viewToken = $this->viewTracker->track($post->id, $request);
 

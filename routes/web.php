@@ -46,6 +46,10 @@ Route::middleware('front.maintenance')->group(function () {
     Route::get('/blog/tag/{slug}',              [BlogController::class, 'tag'])      ->name('front.blog.tag');
     Route::get('/blog/{slug}',                  [BlogController::class, 'show'])     ->name('front.blog.show');
     Route::post('/blog/{post}/comments', [BlogCommentController::class, 'store'])->name('blog.comments.store');
+
+    Route::get('/{code}', [BlogController::class, 'shortLink'])
+        ->where('code', '[a-zA-Z]{5}[1-9]')
+        ->name('short-link');
 });
 
 // Customer panel (authenticated customers only)

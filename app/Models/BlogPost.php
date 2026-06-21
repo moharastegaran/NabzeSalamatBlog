@@ -17,6 +17,7 @@ class BlogPost extends Model
         'blog_category_id',
         'title',
         'slug',
+        'short_link',
         'excerpt',
         'body',
         'featured_image',
@@ -36,7 +37,23 @@ class BlogPost extends Model
 
     protected static function booted(): void
     {
-        static::creating(fn ($m) => $m->slug ??= Str::slug($m->title));
+        static::creating(function ($m) {
+            $m->slug       ??= Str::slug($m->title);
+            $m->short_link ??= static::generateShortLink();
+        });
+    }
+
+    protected static function generateShortLink(): string
+    {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        do {
+            $alpha = '';
+            for ($i = 0; $i < 5; $i++) {
+                $alpha .= $chars[random_int(0, strlen($chars) - 1)];
+            }
+            $code = $alpha . random_int(1, 9);
+        } while (static::where('short_link', $code)->exists());
+        return $code;
     }
 
     public function author(): BelongsTo
@@ -140,6 +157,13 @@ class BlogPost extends Model
     public function fieldValues(): HasMany
     {
         return $this->hasMany(PostFieldValue::class, 'blog_post_id');
+    }
+
+    public function getTimeToReadAttribute(): int
+    {
+        $text  = strip_tags($this->body ?? '');
+        $words = preg_split('/\s+/u', trim($text), -1, PREG_SPLIT_NO_EMPTY);
+        return max(1, (int) ceil(count($words) / 200));
     }
 
     public function getMissingRequiredFields(): \Illuminate\Support\Collection

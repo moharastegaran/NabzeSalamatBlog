@@ -88,6 +88,8 @@ export interface BlogPost {
     publish_at?: string | null;
     published_at?: string | null;
     views: number;
+    short_link?: string;
+    time_to_read?: number;
     created_at: string;
     updated_at: string;
     author?: Pick<User, 'id' | 'name'>;
