@@ -168,6 +168,32 @@ class BlogController extends Controller
         ]);
     }
 
+    public function author(Request $request, int $id): Response
+    {
+        $author = \App\Models\User::findOrFail($id);
+
+        $posts = BlogPost::published()
+            ->where('author_id', $id)
+            ->with(['category:id,name,slug', 'tags:id,name,slug'])
+            ->withCount('approvedComments')
+            ->latest('published_at')
+            ->paginate(9)
+            ->withQueryString();
+
+        $recentPosts = BlogPost::published()
+            ->latest('published_at')
+            ->limit(6)
+            ->get(['id', 'title', 'slug', 'featured_image', 'published_at']);
+
+        return Inertia::render('Front/Blog/Author', [
+            'author'      => ['id' => $author->id, 'name' => $author->name],
+            'posts'       => $posts,
+            'recentPosts' => $recentPosts,
+            'mostRead'    => $this->mostRead(),
+            'adBanners'   => AdBanner::activeForLocation('catarchive')->get(),
+        ]);
+    }
+
     public function search(Request $request): \Illuminate\Http\JsonResponse
     {
         $q = trim($request->query('q', ''));

@@ -345,9 +345,11 @@ function parseYouTubeId(url: string): string | null {
 }
 
 function VideoPlayer({ post }: { post: BlogPost }) {
-    const url = post.video_url
-        ?? post.media?.find(m => m.collection_name === 'video')?.url
-        ?? null;
+    const videoMedia = post.media?.find(m => m.collection_name === 'video') ?? null;
+    const mediaUrl   = videoMedia
+        ? (videoMedia.disk === 'public' ? `/storage/${videoMedia.path}` : videoMedia.url)
+        : null;
+    const url = post.video_url ?? mediaUrl ?? null;
     if (url) {
         const ytId = parseYouTubeId(url);
         if (ytId) {
@@ -468,14 +470,24 @@ function BlogAudioCard({ post }: { post: BlogPost }) {
     const [progress, setProgress] = useState(0);
     const [current, setCurrent]   = useState(0);
     const [duration, setDuration] = useState(0);
+    const [audioError, setAudioError] = useState(false);
+
+    const audioFile = post.media?.find(m => m.collection_name === 'audio') ?? null;
+    // Use a relative src for public-disk files to avoid APP_URL mismatch in dev
+    const audioSrc  = audioFile
+        ? (audioFile.disk === 'public' ? `/storage/${audioFile.path}` : audioFile.url)
+        : null;
 
     const toggle = () => {
-        if (!audioRef.current) return;
+        if (!audioRef.current || !audioSrc) return;
         if (playing) {
             audioRef.current.pause();
             setPlaying(false);
         } else {
-            audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
+            setAudioError(false);
+            audioRef.current.play()
+                .then(() => setPlaying(true))
+                .catch(() => setAudioError(true));
         }
     };
 
@@ -499,6 +511,19 @@ function BlogAudioCard({ post }: { post: BlogPost }) {
     return (
         <div className="bg-white shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col">
 
+            {/* Hidden audio element */}
+            {audioSrc && (
+                <audio
+                    ref={audioRef}
+                    src={audioSrc}
+                    preload="metadata"
+                    onTimeUpdate={onTimeUpdate}
+                    onLoadedMetadata={() => audioRef.current && setDuration(audioRef.current.duration)}
+                    onEnded={() => { setPlaying(false); setProgress(0); setCurrent(0); }}
+                    onError={() => { setPlaying(false); setAudioError(true); }}
+                />
+            )}
+
             {/* Thumbnail */}
             <div className="relative aspect-video overflow-hidden bg-gray-100 flex-shrink-0">
                 {post.featured_image
@@ -519,18 +544,20 @@ function BlogAudioCard({ post }: { post: BlogPost }) {
                 </div>
 
                 {/* Play overlay button */}
-                <button
-                    onClick={toggle}
-                    className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200"
-                    aria-label={playing ? 'توقف' : 'پخش'}
-                >
-                    <div className="w-12 h-12 rounded-full bg-[#F24F00]/90 flex items-center justify-center shadow-lg">
-                        {playing
-                            ? <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                            : <svg className="w-5 h-5 text-white translate-x-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        }
-                    </div>
-                </button>
+                {audioSrc && (
+                    <button
+                        onClick={toggle}
+                        className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200"
+                        aria-label={playing ? 'توقف' : 'پخش'}
+                    >
+                        <div className="w-12 h-12 rounded-full bg-[#F24F00]/90 flex items-center justify-center shadow-lg">
+                            {playing
+                                ? <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                                : <svg className="w-5 h-5 text-white translate-x-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            }
+                        </div>
+                    </button>
+                )}
             </div>
 
             {/* Body */}
@@ -553,59 +580,48 @@ function BlogAudioCard({ post }: { post: BlogPost }) {
                 )}
 
                 {/* Player */}
-                {(() => {
-                    const audioFile = post.media?.find(m => m.collection_name === 'audio');
-                    return (
-                        <div className="mt-auto pt-3 border-t border-gray-100">
-                            {audioFile && (
-                                <audio
-                                    ref={audioRef}
-                                    src={audioFile.url}
-                                    onTimeUpdate={onTimeUpdate}
-                                    onLoadedMetadata={() => audioRef.current && setDuration(audioRef.current.duration)}
-                                    onEnded={() => { setPlaying(false); setProgress(0); setCurrent(0); }}
-                                />
-                            )}
-                            {audioFile && (
-                                <div className="flex justify-end items-center gap-1.5 mb-2.5">
-                                    <span className="text-[10px] text-gray-300 flex-shrink-0">{audioFile.human_readable_size}</span>
-                                    <span className="grow text-[10px] text-gray-400 truncate text-left">{audioFile.file_name}</span>
-                                    <svg className="h-3 w-3 flex-shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                                    </svg>
-                                </div>
-                            )}
-                            <div className="flex items-end gap-3">
-                                {/* Scrubber + times */}
-                                <div className="flex-1 flex flex-col gap-1">
-                                    <input
-                                        type="range" min={0} max={100} value={progress}
-                                        onChange={onSeek}
-                                        disabled={!audioFile}
-                                        className="w-full h-1 border-none rounded-full cursor-pointer accent-[#F24F00] disabled:opacity-40" dir="ltr"
-                                    />
-                                    <div className="flex justify-between text-[10px] text-gray-400 tabular-nums">
-                                        <span>{duration ? fmt(duration) : '--:--'}</span>
-                                        <span>{fmt(current)}</span>
-                                    </div>
-                                </div>
-
-                                {/* Play/pause */}
-                                <button
-                                    onClick={toggle}
-                                    disabled={!audioFile}
-                                    className="flex-shrink-0 w-9 h-9 rounded-full bg-[#F24F00] hover:bg-[#075F26] disabled:bg-gray-300 text-white flex items-center justify-center transition-colors shadow-sm"
-                                    aria-label={playing ? 'توقف' : 'پخش'}
-                                >
-                                    {playing
-                                        ? <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                                        : <svg className="w-4 h-4 translate-x-px" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                    }
-                                </button>
+                <div className="mt-auto pt-3 border-t border-gray-100">
+                    {audioFile && (
+                        <div className="flex justify-end items-center gap-1.5 mb-2.5">
+                            <span className="text-[10px] text-gray-300 flex-shrink-0">{audioFile.human_readable_size}</span>
+                            <span className="grow text-[10px] text-gray-400 truncate text-left">{audioFile.file_name}</span>
+                            <svg className="h-3 w-3 flex-shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                            </svg>
+                        </div>
+                    )}
+                    {audioError && (
+                        <p className="text-[10px] text-red-500 mb-2 text-center">بارگذاری فایل صوتی ناموفق بود</p>
+                    )}
+                    <div className="flex items-end gap-3">
+                        {/* Scrubber + times */}
+                        <div className="flex-1 flex flex-col gap-1">
+                            <input
+                                type="range" min={0} max={100} value={progress}
+                                onChange={onSeek}
+                                disabled={!audioSrc}
+                                className="w-full h-1 border-none rounded-full cursor-pointer accent-[#F24F00] disabled:opacity-40" dir="ltr"
+                            />
+                            <div className="flex justify-between text-[10px] text-gray-400 tabular-nums">
+                                <span>{duration ? fmt(duration) : '--:--'}</span>
+                                <span>{fmt(current)}</span>
                             </div>
                         </div>
-                    );
-                })()}
+
+                        {/* Play/pause */}
+                        <button
+                            onClick={toggle}
+                            disabled={!audioSrc}
+                            className="flex-shrink-0 w-9 h-9 rounded-full bg-[#F24F00] hover:bg-[#075F26] disabled:bg-gray-300 text-white flex items-center justify-center transition-colors shadow-sm"
+                            aria-label={playing ? 'توقف' : 'پخش'}
+                        >
+                            {playing
+                                ? <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                                : <svg className="w-4 h-4 translate-x-px" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            }
+                        </button>
+                    </div>
+                </div>
             </div>
 
         </div>

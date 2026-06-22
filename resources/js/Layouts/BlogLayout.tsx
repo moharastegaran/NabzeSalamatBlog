@@ -361,7 +361,7 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                         {/* Brand */}
                         <div className="md:col-span-1 flex flex-col gap-4">
                             <Link href={route('front.landing')}>
-                                <img src={logoSrc} alt="نبض سلامت" className="h-20 w-auto brightness-0 invert opacity-80" />
+                                <img src={logoSrc} alt="نبض سلامت" className="h-24 w-auto brightness-0 invert opacity-80" />
                             </Link>
                             <p className="text-sm leading-7 text-gray-400">
                                 نبض سلامت، منبع معتبر اخبار پزشکی و سبک زندگی سالم به زبان فارسی.
@@ -409,9 +409,13 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                                     { label: 'انجمن ملی صنعت پخش ایران',                     href: 'https://apir.ir/'            },
                                     { label: 'انجمن علمی مدیریت و اقتصاد دارویی ایران',     href: 'https://iapme.ir/'           },
                                     { label: 'اتحادیه واردکنندگان دارو',                     href: 'https://siphi.org/'          },
-                                    { label: 'سندیکای مکمل رژیمی غذایی ایران',              href: 'http://www.idsms.org/'       },
+                                    { label: 'انجمن متخصصین داروسازی بالینی ایران',         href: 'https://clinicalpharmacy.ir/'    },
                                     { label: 'سینارسانه دانشگاه علوم پزشکی تهران',          href: 'https://tums.ac.ir/'         },
                                     { label: 'وزارت بهداشت، درمان وآموزش پزشکی',            href: 'https://dotic.ir/cat/129'    },
+                                    { label: 'سندیکای مکمل رژیمی غذایی ایران',              href: 'http://www.idsms.org/'       },
+                                    { label: 'انجمن شرکتهای پخش دارو و مکمل های انسانی ایران',            href: 'https://phasda.com'    },
+                                    { label: 'مجمع تشکل های دانش بنیان ایران', href:'https://daneshbonyan.co/'},
+                                    { label: 'انجمن تولیدکنندگان داروهای طبیعی ایران', href:'https://intma.ir/'},
                                 ].map(({ label, href }) => (
                                     <li key={label}>
                                         <a href={href} target="_blank"

@@ -44,6 +44,7 @@ Route::middleware('front.maintenance')->group(function () {
     Route::get('/blog/search',                  [BlogController::class, 'search'])  ->name('front.blog.search');
     Route::get('/blog/category/{slug}',         [BlogController::class, 'category']) ->name('front.blog.category');
     Route::get('/blog/tag/{slug}',              [BlogController::class, 'tag'])      ->name('front.blog.tag');
+    Route::get('/blog/author/{id}',             [BlogController::class, 'author'])   ->name('front.blog.author');
     Route::get('/blog/{slug}',                  [BlogController::class, 'show'])     ->name('front.blog.show');
     Route::post('/blog/{post}/comments', [BlogCommentController::class, 'store'])->name('blog.comments.store');
 

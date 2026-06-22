@@ -76,7 +76,15 @@ function PostCard({ post }: { post: BlogPost }) {
                 )}
 
                 <div className="mt-auto flex items-center justify-between pt-3 border-t border-gray-50 text-xs text-gray-400">
-                    {post.author && <span>{post.author.name}</span>}
+                    {post.author && (
+                        <Link
+                            href={route('front.blog.author', post.author.id)}
+                            onClick={e => e.stopPropagation()}
+                            className="hover:text-[#F24F00] transition-colors"
+                        >
+                            {post.author.name}
+                        </Link>
+                    )}
                     <div className="flex items-center gap-3">
                         {(post.approved_comments_count ?? 0) > 0 && (
                             <span className="flex items-center gap-1">

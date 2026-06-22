@@ -45,4 +45,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Ticket::class);
     }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(\App\Models\BlogPost::class, 'author_id');
+    }
 }
