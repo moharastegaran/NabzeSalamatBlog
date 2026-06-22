@@ -162,7 +162,7 @@ export default function Activities({ stats, products }: Props) {
                         <div className="flex items-center justify-between px-6 py-4">
                             <h3 className="text-lg font-bold text-right">جدیدترین محصولات</h3>
                             <Link
-                                href={route('front.index')}
+                                href={route('front.landing')}
                                 className="text-sm font-medium text-[#075F26] hover:underline"
                             >
                                 مشاهده همه

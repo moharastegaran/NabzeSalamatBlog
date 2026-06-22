@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class ShopController extends Controller
+class FrontController extends Controller
 {
     public function landing(): Response
     {
@@ -95,23 +95,6 @@ class ShopController extends Controller
         ]);
     }
 
-    public function index(): Response
-    {
-        return Inertia::render('Front/Index', [
-            'products'     => [],
-            'categories'   => [],
-            'filters'      => [],
-            'priceMin'     => 0,
-            'priceMax'     => 0,
-            'colorOptions' => [],
-            'cartCount'    => $this->cartCount(),
-        ]);
-    }
-
-    public function show(): Response
-    {
-        abort(404);
-    }
 
     public function search(): JsonResponse
     {

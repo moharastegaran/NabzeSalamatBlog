@@ -24,7 +24,7 @@ use App\Http\Controllers\CustomerPanelController;
 use App\Http\Controllers\CustomerProfileController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\GalleryController;
-use App\Http\Controllers\ShopController;
+use App\Http\Controllers\FrontController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,11 +33,11 @@ Route::get('/maintenance', [MaintenanceController::class, 'show'])->name('front.
 
 // Public routes (gated by maintenance mode)
 Route::middleware('front.maintenance')->group(function () {
-    Route::get('/',            [ShopController::class, 'landing'])->name('front.landing');
-    Route::get('/about-us',    [ShopController::class, 'aboutUs'])     ->name('front.about-us');
-    Route::get('/contact',     [ShopController::class, 'contact'])     ->name('front.contact');
+    Route::get('/',            [FrontController::class, 'landing'])->name('front.landing');
+    Route::get('/about-us',    [FrontController::class, 'aboutUs'])     ->name('front.about-us');
+    Route::get('/contact',     [FrontController::class, 'contact'])     ->name('front.contact');
     Route::post('/contact',    [ContactController::class, 'store'])   ->name('front.contact.store');
-    Route::get('/gallery',     [ShopController::class, 'gallery'])     ->name('front.gallery');
+    Route::get('/gallery',     [FrontController::class, 'gallery'])     ->name('front.gallery');
 
     // Public blog
     Route::get('/blog',                         [BlogController::class, 'index'])   ->name('front.blog.index');

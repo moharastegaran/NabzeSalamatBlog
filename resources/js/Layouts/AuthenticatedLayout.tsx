@@ -568,7 +568,7 @@ function SidebarNav({
             {canWithdrawal && (
                 <div className="shrink-0 border-t border-gray-200 px-3 py-3">
                     <Link
-                        href={route('front.show', 149)}
+                        href={route('front.landing')}
                         title={collapsed ? 'برداشت اعتبار کارت' : undefined}
                         className={`flex items-center rounded-lg py-2.5 text-sm font-medium text-indigo-600 hover:bg-gray-100 hover:text-indigo-700 transition-colors ${
                             collapsed ? 'justify-center px-2' : 'gap-3 px-3'

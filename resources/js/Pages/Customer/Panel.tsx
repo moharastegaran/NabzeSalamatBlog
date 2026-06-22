@@ -107,10 +107,10 @@ export default function Panel({ orders, stats, tab }: Props) {
                         </svg>
                         <p className="text-sm">هنوز سفارشی ثبت نشده است.</p>
                         <Link
-                            href={route('front.index')}
+                            href={route('front.landing')}
                             className="mt-1 rounded-lg bg-[#F24F00] px-4 py-2 text-sm font-medium text-white hover:bg-[#075F26] transition-colors"
                         >
-                            رفتن به فروشگاه
+                            رفتن به سایت
                         </Link>
                     </div>
                 ) : (
