@@ -23,7 +23,9 @@ interface Props {
 
 interface FormData {
     title: string;
+    subtitle: string;
     excerpt: string;
+    lead: string;
     body: string;
     status: 'draft' | 'scheduled' | 'published';
     publish_at: string;
@@ -273,7 +275,9 @@ export default function BlogEdit({ post, categories, tags, postMedia, fieldDefin
 
     const [form, setForm] = useState<FormData>({
         title: post.title,
+        subtitle: post.subtitle ?? '',
         excerpt: post.excerpt ?? '',
+        lead: post.lead ?? '',
         body: post.body,
         status: post.status,
         publish_at: post.publish_at ? localDateTimeStr(new Date(post.publish_at)) : '',
@@ -304,7 +308,9 @@ export default function BlogEdit({ post, categories, tags, postMedia, fieldDefin
         const data = new FormData();
         data.append('_method', 'PUT');
         data.append('title', form.title);
+        data.append('subtitle', form.subtitle);
         data.append('excerpt', form.excerpt);
+        data.append('lead', form.lead);
         data.append('body', form.body);
         data.append('status', form.status);
         if (form.status === 'scheduled' && form.publish_at) data.append('publish_at', form.publish_at);
@@ -340,6 +346,18 @@ export default function BlogEdit({ post, categories, tags, postMedia, fieldDefin
                             {errors.title && <p className="mt-1 text-xs text-red-600">{errors.title}</p>}
                         </div>
 
+                        {/* Subtitle */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">زیرعنوان</label>
+                            <textarea
+                                value={form.subtitle}
+                                onChange={e => setForm(p => ({ ...p, subtitle: e.target.value }))}
+                                rows={2}
+                                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            />
+                            {errors.subtitle && <p className="mt-1 text-xs text-red-600">{errors.subtitle}</p>}
+                        </div>
+
                         {/* Excerpt */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">خلاصه</label>
@@ -350,6 +368,18 @@ export default function BlogEdit({ post, categories, tags, postMedia, fieldDefin
                                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             />
                             {errors.excerpt && <p className="mt-1 text-xs text-red-600">{errors.excerpt}</p>}
+                        </div>
+
+                        {/* Lead */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">لید</label>
+                            <textarea
+                                value={form.lead}
+                                onChange={e => setForm(p => ({ ...p, lead: e.target.value }))}
+                                rows={3}
+                                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            />
+                            {errors.lead && <p className="mt-1 text-xs text-red-600">{errors.lead}</p>}
                         </div>
 
                         {/* Body */}

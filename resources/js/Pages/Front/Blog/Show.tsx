@@ -54,6 +54,58 @@ function RecentCard({ post }: { post: BlogPost }) {
     );
 }
 
+// ── Mobile share bar (shown below title block, hidden on lg) ─────────────────
+function MobileShareBar({ commentCount }: { commentCount: number }) {
+    const [pageUrl, setPageUrl] = useState('');
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => { setPageUrl(window.location.href); }, []);
+
+    const shareUrl = encodeURIComponent(pageUrl);
+
+    const copyLink = () => {
+        navigator.clipboard.writeText(pageUrl).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        });
+    };
+
+    const scrollToComments = () => {
+        document.getElementById('post-comments')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    return (
+        <div className="lg:hidden flex items-center gap-2 border-t border-b border-gray-100 py-2.5 mb-6">
+            <a href={pageUrl ? `https://t.me/share/url?url=${shareUrl}` : '#'} target="_blank" rel="noopener noreferrer"
+               title="تلگرام" className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-[#229ED9] transition-colors">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                </svg>
+            </a>
+            <a href={pageUrl ? `https://wa.me/?text=${shareUrl}` : '#'} target="_blank" rel="noopener noreferrer"
+               title="واتساپ" className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-[#25D366] transition-colors">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+            </a>
+            <button onClick={copyLink} title={copied ? 'کپی شد!' : 'کپی لینک'}
+                    className={`w-9 h-9 flex items-center justify-center transition-colors ${copied ? 'text-green-500' : 'text-gray-400 hover:text-[#F24F00]'}`}>
+                {copied
+                    ? <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    : <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                }
+            </button>
+            <div className="flex-1" />
+            <button onClick={scrollToComments} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-[#F24F00] transition-colors">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/>
+                </svg>
+                <span className="font-semibold tabular-nums">{commentCount} نظر</span>
+            </button>
+        </div>
+    );
+}
+
 // ── Thin right action sidebar ──────────────────────────────────────────────────
 function ActionSidebar({ commentCount }: { commentCount: number }) {
     const [pageUrl, setPageUrl] = useState('');
@@ -336,79 +388,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                             </Link>
                         </>
                     )}
-                    <span>/</span>
-                    <span className="text-gray-700 line-clamp-1">{post.title}</span>
                 </nav>
-
-                {/* Post title block */}
-                <div className="mb-6">
-                    {post.category && (
-                        <Link
-                            href={route('front.blog.category', post.category.slug)}
-                            className="mb-2 inline-block text-xs font-bold text-[#F24F00] uppercase tracking-wide hover:underline"
-                        >
-                            {post.category.name}
-                        </Link>
-                    )}
-                    <h1 className="text-2xl font-black leading-snug text-gray-900 sm:text-3xl">{post.title}</h1>
-                    {post.excerpt && (
-                        <p className="mt-2 text-base text-gray-500 leading-7">{post.excerpt}</p>
-                    )}
-                    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-400 border-b border-gray-100 pb-4">
-                        {post.author && (
-                            <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                                </svg>
-                                {post.author.name}
-                            </span>
-                        )}
-                        {date && (
-                            <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
-                                </svg>
-                                {date}
-                            </span>
-                        )}
-                        {post.time_to_read && (
-                            <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                {post.time_to_read.toLocaleString('fa-IR')} دقیقه مطالعه
-                            </span>
-                        )}
-                        {post.views > 0 && (
-                            <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                {post.views.toLocaleString('fa-IR')} بازدید
-                            </span>
-                        )}
-                        {comments.length > 0 && (
-                            <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
-                                </svg>
-                                {comments.length} نظر
-                            </span>
-                        )}
-                    </div>
-                </div>
-
-                {/* Featured image — below title */}
-                {post.featured_image && (
-                    <div className="mb-8 w-full overflow-hidden bg-gray-100 max-h-[460px]">
-                        <img
-                            src={`/storage/${post.featured_image}`}
-                            alt={post.title}
-                            className="w-full h-full object-cover"
-                        />
-                    </div>
-                )}
 
                 {/* 3-column: RTL → col1=right(44px action) | col2=middle(article) | col3=left(sidebar) */}
                 <div className="grid grid-cols-1 lg:grid-cols-[44px_1fr_272px] gap-6 items-start">
@@ -421,16 +401,86 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                     {/* Main article */}
                     <article className="min-w-0">
 
-                        {/* Tags */}
-                        {post.tags && post.tags.length > 0 && (
-                            <div className="mb-6 flex flex-wrap gap-2">
-                                {post.tags.map((tag: BlogTag) => (
-                                    <Link key={tag.id} href={route('front.blog.tag', tag.slug)}
-                                        className="bg-[#F24F00]/10 px-3 py-1 text-xs font-bold text-[#F24F00] hover:bg-[#F24F00] hover:text-white transition-colors">
-                                        #{tag.name}
-                                    </Link>
-                                ))}
-                            </div>
+                      <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
+                          {/* Post title block */}
+                          <div className="mb-4">
+
+                              {post.subtitle && (
+                                  <div className="inline-flex items-center gap-2 mb-3 bg-[#F24F00]/5 px-3 py-1.5">
+                                      <span className="w-2 h-2 bg-[#F24F00] shrink-0" />
+                                      <p className="text-sm font-semibold text-[#F24F00] leading-snug">{post.subtitle}</p>
+                                  </div>
+                              )}
+                              <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl lg:text-3xl mb-3">{post.title}</h1>
+                              {post.excerpt && (
+                                  <p className="mt-2 text-base text-gray-500 leading-6">{post.excerpt}</p>
+                              )}
+                              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-400 border-b border-gray-100 pb-4">
+                                  {post.author && (
+                                      <span className="flex items-center gap-1">
+                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                </svg>
+                                          {post.author.name}
+                            </span>
+                                  )}
+                                  {date && (
+                                      <span className="flex items-center gap-1">
+                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+                                </svg>
+                                          {date}
+                            </span>
+                                  )}
+                                  {post.time_to_read && (
+                                      <span className="flex items-center gap-1">
+                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                          {post.time_to_read.toLocaleString('fa-IR')} دقیقه مطالعه
+                            </span>
+                                  )}
+                                  {post.views > 0 && (
+                                      <span className="flex items-center gap-1">
+                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                          {post.views.toLocaleString('fa-IR')} بازدید
+                            </span>
+                                  )}
+                                  {comments.length > 0 && (
+                                      <span className="flex items-center gap-1">
+                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                                </svg>
+                                          {comments.length} نظر
+                            </span>
+                                  )}
+                              </div>
+                          </div>
+
+                          {/* Featured image — beside title on desktop, below on mobile */}
+                          {post.featured_image && (
+                              <div className="w-full overflow-hidden bg-gray-100 aspect-video lg:aspect-auto lg:max-h-[420px]">
+                                  <img
+                                      src={`/storage/${post.featured_image}`}
+                                      alt={post.title}
+                                      className="w-full h-full object-cover"
+                                  />
+                              </div>
+                          )}
+                      </div>
+
+
+                        {/* Mobile share bar */}
+                        <MobileShareBar commentCount={comments.length} />
+
+                        {/* Lead */}
+                        {post.lead && (
+                            <blockquote className="mb-8 mt-2 border-r-4 border-[#F24F00] bg-[#F24F00]/5 px-5 py-4 text-base font-semibold leading-8 text-gray-800 not-italic">
+                                {post.lead}
+                            </blockquote>
                         )}
 
                         {/* Body */}
@@ -514,7 +564,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                             <section className="mt-14">
                                 <h2 className="mb-5 flex items-center gap-2 text-base font-black text-gray-900">
                                     <span className="inline-block w-3 h-3 bg-[#F24F00]" />
-                                    مقالات مرتبط
+                                    خبرهای مرتبط
                                 </h2>
                                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                     {related.map(p => (
@@ -562,7 +612,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                         {/* Recent posts */}
                         {recentPosts.length > 0 && (
                             <div className="bg-white p-4 shadow-sm">
-                                <SideboxHeader title="جدیدترین مقالات" />
+                                <SideboxHeader title="جدیدترین خبرها" />
                                 <div>
                                     {recentPosts.map(p => <RecentCard key={p.id} post={p} />)}
                                 </div>

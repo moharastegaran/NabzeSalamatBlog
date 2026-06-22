@@ -175,7 +175,7 @@ export default function Contact() {
                             href={route('front.blog.index')}
                             className="inline-flex items-center gap-2 border border-gray-600 px-5 py-2.5 text-sm font-bold text-gray-300 hover:border-gray-400 hover:text-white transition-colors"
                         >
-                            مشاهده مقالات
+                            مشاهده اخبار
                         </Link>
                     </div>
                 </div>

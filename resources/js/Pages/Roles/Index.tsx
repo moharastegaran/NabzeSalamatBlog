@@ -50,7 +50,7 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const PERMISSION_GROUPS: { label: string; prefix: string }[] = [
-    { label: 'مقالات وبلاگ',    prefix: 'blog' },
+    { label: 'اخبار وبلاگ',    prefix: 'blog' },
     { label: 'دسته‌بندی‌ها',    prefix: 'blog_categories' },
     { label: 'برچسب‌ها',        prefix: 'tags' },
     { label: 'نظرات',           prefix: 'comments' },

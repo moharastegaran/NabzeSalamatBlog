@@ -72,7 +72,7 @@ export default function BlogTags({ tags }: Props) {
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        {['نام', 'اسلاگ', 'مقالات', ''].map(h => (
+                                        {['نام', 'اسلاگ', 'اخبار', ''].map(h => (
                                             <th key={h} className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">{h}</th>
                                         ))}
                                     </tr>

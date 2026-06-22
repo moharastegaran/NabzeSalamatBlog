@@ -206,14 +206,14 @@ function CategoryStrip({ categories }: { categories: NavCategory[] }) {
     if (!categories.length) return null;
 
     return (
-        <div className="flex gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
             {categories.map((cat, i) => {
                 const [c1, c2] = BRAND_GRADIENTS[i % BRAND_GRADIENTS.length];
                 return (
                     <Link
                         key={cat.id}
                         href={route('front.blog.category', cat.slug)}
-                        className="group relative flex-1 h-44 overflow-hidden rounded-sm shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 focus:outline-none"
+                        className="group relative flex-1 h-28 sm:h-44 overflow-hidden rounded-sm shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 focus:outline-none"
                     >
                         {/* Background: thumbnail or brand gradient */}
                         {cat.thumbnail ? (
@@ -239,18 +239,18 @@ function CategoryStrip({ categories }: { categories: NavCategory[] }) {
                         <div className="absolute inset-0 flex flex-col items-center justify-between p-3">
 
                             {/* Icon — frosted glass circle */}
-                            <div className="mt-2 w-12 h-12 rounded-full bg-white/20 ring-2 ring-white/35 flex items-center justify-center backdrop-blur-sm group-hover:bg-white/30 transition-colors duration-300">
+                            <div className="mt-2 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white/20 ring-2 ring-white/35 flex items-center justify-center backdrop-blur-sm group-hover:bg-white/30 transition-colors duration-300">
                                 {cat.icon ? (
                                     <img src={`/storage/${cat.icon}`} alt="" className="w-6 h-6 object-contain brightness-0 invert" />
                                 ) : (
-                                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                     </svg>
                                 )}
                             </div>
 
                             {/* Name */}
-                            <span className="mb-1 text-center text-lg font-black text-white leading-snug line-clamp-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]">
+                            <span className="mb-1 text-center text-lg font-bold sm:font-black text-white leading-snug line-clamp-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]">
                                 {cat.name}
                             </span>
 
@@ -683,6 +683,83 @@ function EventPostCard({ post }: { post: BlogPost }) {
     );
 }
 
+// ── Collapsible tag cloud ─────────────────────────────────────────────────────
+const TAGS_COLLAPSE_PX = 128; // ~3 rows on mobile
+
+function CollapsibleTags({ tags }: { tags: BlogTag[] }) {
+    const [expanded, setExpanded]   = useState(false);
+    const [overflows, setOverflows] = useState(false);
+    const innerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const check = () => {
+            if (!innerRef.current) return;
+            const mobile = window.innerWidth < 768;
+            setOverflows(mobile && innerRef.current.scrollHeight > TAGS_COLLAPSE_PX);
+            if (!mobile) setExpanded(false);
+        };
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, [tags]);
+
+    return (
+        <div>
+            <div
+                ref={innerRef}
+                className="relative flex flex-wrap gap-2 overflow-hidden"
+                style={{
+                    maxHeight: overflows && !expanded ? `${TAGS_COLLAPSE_PX}px` : '9999px',
+                    transition: 'max-height 0.35s ease-in-out',
+                }}
+            >
+                {tags.map(tag => {
+                    const count = tag.posts_count ?? 0;
+                    const tier  = count >= 5 ? 3 : count >= 3 ? 2 : count >= 2 ? 1 : 0;
+                    const base  = 'inline-flex items-center gap-1 font-semibold transition-colors duration-200';
+                    const sizes  = ['text-xs px-2.5 py-1', 'text-xs px-3 py-1', 'text-sm px-3 py-1', 'text-sm px-3.5 py-1.5'] as const;
+                    const styles = [
+                        'border border-gray-200 text-gray-500 hover:border-[#F24F00] hover:text-[#F24F00]',
+                        'border border-gray-300 text-gray-600 hover:border-[#F24F00] hover:text-[#F24F00]',
+                        'border border-[#F24F00]/40 text-[#075F26] hover:bg-[#F24F00] hover:text-white',
+                        'bg-[#F24F00] text-white border border-[#F24F00] hover:bg-[#075F26]',
+                    ] as const;
+                    return (
+                        <Link
+                            key={tag.id}
+                            href={route('front.blog.tag', tag.slug)}
+                            className={`${base} ${sizes[tier]} ${styles[tier]}`}
+                        >
+                            <span className="opacity-50">#</span>
+                            {tag.name}
+                        </Link>
+                    );
+                })}
+
+                {/* bottom-fade overlay when collapsed */}
+                {overflows && !expanded && (
+                    <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none" />
+                )}
+            </div>
+
+            {overflows && (
+                <button
+                    onClick={() => setExpanded(e => !e)}
+                    className="mt-2 flex items-center gap-1 text-xs font-bold text-[#F24F00] hover:text-[#075F26] transition-colors"
+                >
+                    {expanded ? 'نمایش کمتر' : 'نمایش بیشتر'}
+                    <svg
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            )}
+        </div>
+    );
+}
+
 // ── Events carousel ───────────────────────────────────────────────────────────
 function EventsCarousel({ posts }: { posts: BlogPost[] }) {
     const [index, setIndex] = useState(0);
@@ -707,7 +784,6 @@ function EventsCarousel({ posts }: { posts: BlogPost[] }) {
         <div className="relative group/carousel">
             <div className="overflow-hidden">
                 <div
-                    dir="ltr"
                     className="flex transition-transform duration-300 ease-in-out"
                     style={{ transform: `translateX(-${safeIndex * itemWidth}%)` }}
                 >
@@ -923,30 +999,7 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                 {tags.length > 0 && (
                     <section>
                         <SectionHeader title="موضوعات" />
-                        <div className="flex flex-wrap gap-2">
-                            {tags.map(tag => {
-                                const count = tag.posts_count ?? 0;
-                                const tier = count >= 5 ? 3 : count >= 3 ? 2 : count >= 2 ? 1 : 0;
-                                const base = 'inline-flex items-center gap-1 font-semibold transition-colors duration-200';
-                                const sizes  = ['text-xs px-2.5 py-1',   'text-xs px-3 py-1',    'text-sm px-3 py-1',    'text-sm px-3.5 py-1.5'] as const;
-                                const styles = [
-                                    'border border-gray-200 text-gray-500 hover:border-[#F24F00] hover:text-[#F24F00]',
-                                    'border border-gray-300 text-gray-600 hover:border-[#F24F00] hover:text-[#F24F00]',
-                                    'border border-[#F24F00]/40 text-[#075F26] hover:bg-[#F24F00] hover:text-white',
-                                    'bg-[#F24F00] text-white border border-[#F24F00] hover:bg-[#075F26]',
-                                ] as const;
-                                return (
-                                    <Link
-                                        key={tag.id}
-                                        href={route('front.blog.tag', tag.slug)}
-                                        className={`${base} ${sizes[tier]} ${styles[tier]}`}
-                                    >
-                                        <span className="opacity-50">#</span>
-                                        {tag.name}
-                                    </Link>
-                                );
-                            })}
-                        </div>
+                        <CollapsibleTags tags={tags} />
                     </section>
                 )}
 

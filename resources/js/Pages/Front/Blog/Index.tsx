@@ -150,7 +150,7 @@ function SearchSideWidget({
                     type="text"
                     value={value}
                     onChange={e => onChange(e.target.value)}
-                    placeholder="جستجو در مقالات..."
+                    placeholder="جستجو در اخبار..."
                     className="w-full border border-gray-200 bg-gray-50 py-2 pr-9 pl-3 text-sm text-gray-700 placeholder-gray-400 focus:border-[#F24F00] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#F24F00] transition-colors"
                 />
                 <button
@@ -195,7 +195,7 @@ function CategoriesSideWidget({
                     }`}
                 >
                     <span className={`w-1.5 h-1.5 flex-shrink-0 rounded-full ${!activeCategory ? 'bg-[#F24F00]' : 'bg-gray-300'}`} />
-                    همه مقالات
+                    همه اخبار
                 </button>
 
                 {categories.map(cat => {

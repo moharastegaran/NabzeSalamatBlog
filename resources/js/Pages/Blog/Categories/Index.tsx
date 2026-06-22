@@ -151,7 +151,7 @@ export default function BlogCategoriesIndex({ categories }: Props) {
                                             className="h-4 w-4 rounded border-gray-300 accent-indigo-600"
                                         />
                                     </th>
-                                    {['نام', 'آیکون', 'توضیحات', 'مقالات', ''].map(h => (
+                                    {['نام', 'آیکون', 'توضیحات', 'اخبار', ''].map(h => (
                                         <th key={h} className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>

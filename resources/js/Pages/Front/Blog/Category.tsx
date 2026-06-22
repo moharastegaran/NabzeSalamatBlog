@@ -150,7 +150,7 @@ function SearchWidget({ slug, defaultValue }: { slug: string; defaultValue: stri
                 <input
                     value={q}
                     onChange={e => setQ(e.target.value)}
-                    placeholder="جستجو در مقالات..."
+                    placeholder="جستجو در اخبار..."
                     className="w-full border border-gray-200 bg-gray-50 px-3 py-2 pr-9 text-sm focus:border-[#F24F00] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#F24F00] transition-colors"
                 />
                 <button type="submit" className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#F24F00] transition-colors">
@@ -193,7 +193,7 @@ function ChildrenWidget({ children }: { children: CategoryChild[] }) {
 function RecentWidget({ posts }: { posts: BlogPost[] }) {
     return (
         <div>
-            <SideboxHeader title="جدیدترین مقالات" />
+            <SideboxHeader title="جدیدترین اخبار" />
             <div>
                 {posts.map((post, index) => (
                     <Link
@@ -383,7 +383,7 @@ export default function BlogCategory({ category, posts, recentPosts, mostRead, s
                                 <p className="mt-1 text-xs text-gray-400 max-w-xs">
                                     {search
                                         ? 'عبارت دیگری جستجو کنید یا فیلتر جستجو را پاک کنید.'
-                                        : 'به زودی مقالاتی در این دسته‌بندی منتشر خواهد شد.'}
+                                        : 'به زودی اخبار در این دسته‌بندی منتشر خواهد شد.'}
                                 </p>
                                 {search && (
                                     <Link

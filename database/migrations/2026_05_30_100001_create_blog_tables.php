@@ -28,8 +28,10 @@ return new class extends Migration
             $table->foreignId('author_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('blog_category_id')->nullable()->constrained()->nullOnDelete();
             $table->string('title');
+            $table->text('subtitle')->nullable();
             $table->string('slug')->unique();
             $table->text('excerpt')->nullable();
+            $table->text('lead')->nullable();
             $table->longText('body');
             $table->string('featured_image')->nullable();
             $table->enum('status', ['draft', 'published'])->default('draft');

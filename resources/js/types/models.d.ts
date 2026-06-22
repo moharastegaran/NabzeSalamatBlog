@@ -79,8 +79,10 @@ export interface BlogPost {
     author_id: number;
     blog_category_id?: number;
     title: string;
+    subtitle?: string | null;
     slug: string;
     excerpt?: string;
+    lead?: string | null;
     body: string;
     featured_image?: string;
     video_url?: string | null;

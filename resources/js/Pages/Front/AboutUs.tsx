@@ -116,7 +116,7 @@ export default function AboutUs() {
                             href={route('front.blog.index')}
                             className="inline-flex items-center gap-2 border border-gray-600 px-5 py-2.5 text-sm font-bold text-gray-300 hover:border-gray-400 hover:text-white transition-colors"
                         >
-                            مشاهده مقالات
+                            مشاهده اخبار
                         </Link>
                     </div>
                 </div>
@@ -263,7 +263,7 @@ export default function AboutUs() {
                             {
                                 step: '۰۳',
                                 title: 'انتشار و به‌روزرسانی',
-                                desc: 'پس از انتشار، مقالات به‌صورت دوره‌ای بازبینی و با یافته‌های جدید به‌روز می‌شوند.',
+                                desc: 'پس از انتشار، اخبار به‌صورت دوره‌ای بازبینی و با یافته‌های جدید به‌روز می‌شوند.',
                             },
                         ].map(item => (
                             <div key={item.step} className="bg-white shadow-sm p-6 flex gap-4">
@@ -293,7 +293,7 @@ export default function AboutUs() {
                                 href={route('front.blog.index')}
                                 className="inline-flex items-center gap-2 bg-[#F24F00] px-6 py-3 text-sm font-bold text-white hover:opacity-90 transition-opacity"
                             >
-                                مشاهده مقالات
+                                مشاهده اخبار
                                 <svg className="h-4 w-4 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                                 </svg>

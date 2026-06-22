@@ -59,19 +59,19 @@ export default function BlogIndex({ posts, activeCategory, statusCounts, filters
         <AuthenticatedLayout
             header={
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-bold leading-tight text-gray-800">مقالات وبلاگ</h2>
+                    <h2 className="text-xl font-bold leading-tight text-gray-800">اخبار وبلاگ</h2>
                     {canCreate && (
                         <Link
                             href={route('blog.create')}
                             className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
                         >
-                            + مقاله جدید
+                            + خبر جدید
                         </Link>
                     )}
                 </div>
             }
         >
-            <Head title="مقالات وبلاگ" />
+            <Head title="اخبار وبلاگ" />
 
             <div className="lg:py-8 lg:px-0 px-4 py-5">
                 <div className="mx-auto max-w-8xl sm:px-6 lg:px-8 space-y-4">

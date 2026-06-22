@@ -27,7 +27,7 @@ export default function LoginLayout({ children, title, subtitle }: Props) {
                             پنل مدیریت سایت نبض سلامت
                         </h2>
                         <p className="mt-2 text-sm text-white/70 leading-relaxed">
-                            منبع معتبر مقالات پزشکی و سبک زندگی سالم به زبان فارسی
+                            منبع معتبر اخبار پزشکی و سبک زندگی سالم به زبان فارسی
                         </p>
                     </div>
                 </div>

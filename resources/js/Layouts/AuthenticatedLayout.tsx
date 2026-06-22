@@ -367,7 +367,7 @@ function SidebarNav({
                                 <div className="overflow-hidden">
                                     <div className="mt-1 ml-5 mr-3 space-y-0.5 border-l border-gray-200 pl-3">
                                         <SubNavItem href={route('blog.index')} active={!!route().current('blog.index') || !!route().current('blog.create') || !!route().current('blog.edit')}>
-                                            مقالات
+                                            اخبار
                                         </SubNavItem>
                                         <SubNavItem href={route('blog.categories.index')} active={!!route().current('blog.categories.*')}>
                                             دسته‌بندی‌ها

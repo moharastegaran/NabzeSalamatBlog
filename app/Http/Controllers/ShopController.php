@@ -46,6 +46,7 @@ class ShopController extends Controller
                 ->get(),
             'tags'            => BlogTag::withCount('posts')
                 ->orderByDesc('posts_count')
+                ->take(26)
                 ->get(['id', 'name', 'slug']),
             'eventPosts'      => (function () {
                 $eventCategoryIds = BlogCategory::where('id', 8)
