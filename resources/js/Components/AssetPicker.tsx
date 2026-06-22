@@ -262,7 +262,7 @@ export default function AssetPicker({ open, onClose, onSelect, accept, canUpload
                                     <div className="aspect-square w-full overflow-hidden bg-gray-50">
                                         {asset.type === 'image' ? (
                                             <img
-                                                src={asset.url} alt={asset.alt ?? asset.name} loading="lazy"
+                                                src={asset.disk === 'public' ? `/storage/${asset.path}` : asset.url} alt={asset.alt ?? asset.name} loading="lazy"
                                                 className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-200"
                                             />
                                         ) : (

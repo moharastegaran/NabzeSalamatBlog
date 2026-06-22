@@ -24,7 +24,7 @@ interface Props {
 
 function AssetThumb({ asset }: { asset: Asset }) {
     if (asset.type === 'image') {
-        return <img src={asset.url} alt={asset.alt ?? asset.name} className="h-full w-full object-cover" loading="lazy" />;
+        return <img src={asset.disk === 'public' ? `/storage/${asset.path}` : asset.url} alt={asset.alt ?? asset.name} className="h-full w-full object-cover" loading="lazy" />;
     }
     const cfg = {
         video:    { color: 'text-sky-400',    path: 'M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
@@ -168,7 +168,7 @@ export default function AssetsIndex({ assets, filters }: Props) {
     }
 
     function copyUrl(asset: Asset) {
-        navigator.clipboard.writeText(asset.url);
+        navigator.clipboard.writeText(asset.disk === 'public' ? (window.location.origin + `/storage/${asset.path}`) : asset.url);
         setCopied(asset.id);
         setTimeout(() => setCopied(null), 2000);
     }

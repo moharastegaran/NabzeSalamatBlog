@@ -202,7 +202,7 @@ function MediaCollection({
                             </div>
                             <div className="flex items-center gap-1 flex-shrink-0">
                                 <a
-                                    href={item.url}
+                                    href={item.disk === 'public' ? `/storage/${item.path}` : item.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="rounded p-1 text-gray-400 hover:text-indigo-600 transition-colors"

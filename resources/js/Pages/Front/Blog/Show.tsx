@@ -401,9 +401,9 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                     {/* Main article */}
                     <article className="min-w-0">
 
-                      <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
+                      <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 mb-4">
                           {/* Post title block */}
-                          <div className="mb-4">
+                          <div className="flex flex-col gap-0.5">
 
                               {post.subtitle && (
                                   <div className="inline-flex items-center gap-2 mb-3 bg-[#F24F00]/5 px-3 py-1.5">
@@ -413,7 +413,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                               )}
                               <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl lg:text-3xl mb-3">{post.title}</h1>
                               {post.excerpt && (
-                                  <p className="mt-2 text-base text-gray-500 leading-6">{post.excerpt}</p>
+                                  <p className="grow mt-2 text-base text-gray-500 leading-6">{post.excerpt}</p>
                               )}
                               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-400 border-b border-gray-100 pb-4">
                                   {post.author && (
@@ -490,11 +490,11 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
 
                         {/* Short link */}
                         {post.short_link && (
-                            <div className="mt-8 flex items-center gap-3 border border-gray-200 bg-gray-50 px-4 py-3" dir="ltr">
+                            <div className="mt-8 flex items-center gap-3 border border-gray-200 bg-gray-50 px-4 py-3 w-full lg:w-2/3">
                                 <svg className="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
                                 </svg>
-                                <span className="text-xs text-gray-400 flex-shrink-0 font-medium" dir="rtl">لینک کوتاه:</span>
+                                <span className="text-xs text-gray-400 flex-shrink-0 font-medium">لینک کوتاه:</span>
                                 <span className="font-mono text-sm text-gray-700 flex-1 select-all truncate">
                                     {typeof window !== 'undefined' ? window.location.origin : ''}/{post.short_link}
                                 </span>
@@ -504,7 +504,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                                     className={`flex-shrink-0 flex items-center gap-1.5 text-xs px-2.5 py-1 transition-colors ${
                                         copiedShort
                                             ? 'text-[#075F26] bg-green-50'
-                                            : 'text-gray-500 hover:text-[#F24F00] hover:bg-[#F24F00]/5'
+                                            : 'hover:text-gray-500 text-[#F24F00] bg-[#F24F00]/5'
                                     }`}
                                 >
                                     {copiedShort ? (
