@@ -391,9 +391,9 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                     {/* Main article */}
                     <article className="min-w-0">
 
-                        <div className="flex justify-between items-center border-b border-gray-200">
+                        <div className="flex flex-col lg:flex-row lg:justify-between items-center border-b border-gray-200 py-2 lg:py-5 mb-3 lg:mb-0 gap-2 ">
 
-                            <nav className="flex items-center gap-2 text-sm text-gray-500 flex-wrap my-5">
+                            <nav className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
                                 <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
                                 <span>/</span>
                                 <Link href={route('front.blog.index')} className="hover:text-gray-600 transition-colors">وبلاگ</Link>
@@ -410,7 +410,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                                 })()}
                             </nav>
 
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-600">
+                            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-1.5 text-xs text-gray-600">
                                 {post.author && (
                                     <span className="flex items-center gap-1">
                                 <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -464,10 +464,10 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                               {post.subtitle && (
                                   <div className="inline-flex items-start gap-2 mb-3 bg-transparent px-3 py-1.5">
                                       <span className="w-2 h-2 bg-[#F24F00] shrink-0 mt-1" />
-                                      <p className="text-sm font-semibold text-[#F24F00] leading-snug">{post.subtitle}</p>
+                                      <p className="text-sm font-semibold text-[#F24F00] leading-snug text-center lg:text-right">{post.subtitle}</p>
                                   </div>
                               )}
-                              <h1 className="text-2xl font-bold text-gray-900 lg:text-3xl mb-3 lg:leading-snug">{post.title}</h1>
+                              <h1 className="text-2xl font-bold text-gray-900 lg:text-3xl mb-3 lg:leading-snug text-center lg:text-right">{post.title}</h1>
                           </div>
 
                           {/* Featured image — beside title on desktop, below on mobile */}

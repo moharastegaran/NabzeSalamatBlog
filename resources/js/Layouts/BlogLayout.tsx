@@ -90,7 +90,7 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                 {/* ── 1 · Dark topbar ──────────────────────────────────────── */}
                 <div className="bg-[#042F10] text-gray-300 text-xs">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex items-center justify-between h-8">
+                        <div className="flex items-center justify-center sm:justify-between h-8">
 
                             {/* Right: secondary links */}
                             <div className="flex items-center gap-4">
@@ -318,7 +318,7 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                                 <span className="animate-pulse w-2 h-2 rounded-full bg-white flex-shrink-0" />
                                 <span className="text-white text-xs font-black whitespace-nowrap">اخبار فوری</span>
                             </div>
-                            <div className="flex-1 relative h-10 overflow-hidden">
+                            <div className="flex-1 relative h-16 sm:h-10 overflow-hidden">
                                 {breakingNews.map((item, i) => {
                                     const isCurrent = i === bnIdx;
                                     const isPrev    = i === prevBnIdx;
@@ -333,11 +333,11 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                                         >
                                             {item.url ? (
                                                 <a href={item.url} target="_blank" rel="noopener noreferrer"
-                                                   className="text-gray-200 text-sm hover:text-[#F24F00] transition-colors truncate w-full">
+                                                   className="text-gray-200 text-sm hover:text-[#F24F00] transition-colors w-full">
                                                     {item.title}
                                                 </a>
                                             ) : (
-                                                <span className="text-gray-200 text-sm truncate w-full">{item.title}</span>
+                                                <span className="text-gray-200 text-sm w-full">{item.title}</span>
                                             )}
                                         </div>
                                     );
@@ -361,7 +361,7 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                         {/* Brand */}
                         <div className="md:col-span-1 flex flex-col gap-4">
                             <Link href={route('front.landing')}>
-                                <img src={logoSrc} alt="نبض سلامت" className="h-24 w-auto brightness-0 invert opacity-80" />
+                                <img src={logoSrc} alt="نبض سلامت" className="h-20 sm:h-24 object-contain w-auto brightness-0 invert opacity-80" />
                             </Link>
                             <p className="text-sm leading-7 text-gray-400">
                                 نبض سلامت، منبع معتبر اخبار پزشکی و سبک زندگی سالم به زبان فارسی.
