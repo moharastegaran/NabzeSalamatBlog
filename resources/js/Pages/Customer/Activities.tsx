@@ -1,8 +1,6 @@
 ﻿import CustomerLayout from '@/Layouts/CustomerLayout';
 
-import { Head, Link } from '@inertiajs/react';
-import { useRef } from 'react';
-import { Product } from '@/types/models';
+import { Head } from '@inertiajs/react';
 
 import iconOrdersCancelled from '../../../images/shapes/ic-orders-failed.png';
 import iconOrdersShipped from '../../../images/shapes/ic-orders-inprogress.png';
@@ -18,7 +16,6 @@ interface Stats {
 
 interface Props {
     stats: Stats;
-    products: Product[];
 }
 
 // ── Stat icons ─────────────────────────────────────────────────────────────
@@ -43,24 +40,6 @@ function IconCancelled() {
     return (
         <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-    );
-}
-
-// ── Carousel arrows ────────────────────────────────────────────────────────
-
-function IconChevronLeft() {
-    return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 18l-6-6 6-6" />
-        </svg>
-    );
-}
-
-function IconChevronRight() {
-    return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 18l6-6-6-6" />
         </svg>
     );
 }
@@ -111,15 +90,7 @@ function ContactRow({ icon, label, href }: { icon: React.ReactNode; label: strin
 
 // ── Main component ─────────────────────────────────────────────────────────
 
-export default function Activities({ stats, products }: Props) {
-    const trackRef = useRef<HTMLDivElement>(null);
-
-    const scrollCarousel = (dir: 'prev' | 'next') => {
-        const el = trackRef.current;
-        if (!el) return;
-        const cardWidth = el.scrollWidth / Math.max(products.length, 1);
-        el.scrollBy({ left: dir === 'prev' ? cardWidth : -cardWidth, behavior: 'smooth' });
-    };
+export default function Activities({ stats }: Props) {
 
     return (
         <CustomerLayout>
@@ -154,56 +125,6 @@ export default function Activities({ stats, products }: Props) {
                     </div>
 
                 </div>
-
-                {/* ── Newest products carousel ── */}
-                {products.length > 0 && (
-                    <div id="customerpanel-activities--recentproducts_section" className="rounded-2xl bg-[#F2F2F2] shadow-sm ring-1 ring-gray-100 overflow-hidden">
-                        {/* Header */}
-                        <div className="flex items-center justify-between px-6 py-4">
-                            <h3 className="text-lg font-bold text-right">جدیدترین محصولات</h3>
-                            <Link
-                                href={route('front.landing')}
-                                className="text-sm font-medium text-[#075F26] hover:underline"
-                            >
-                                مشاهده همه
-                            </Link>
-                        </div>
-
-                        {/* Carousel */}
-                        <div className="relative px-14 py-3">
-                            {/* Prev arrow — right side in RTL */}
-                            <button
-                                onClick={() => scrollCarousel('prev')}
-                                aria-label="قبلی"
-                                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 hover:text-[#075F26] transition-colors"
-                            >
-                                <IconChevronRight />
-                            </button>
-
-                            {/* Next arrow — left side in RTL */}
-                            <button
-                                onClick={() => scrollCarousel('next')}
-                                aria-label="بعدی"
-                                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 text-gray-600 hover:text-[#075F26] transition-colors"
-                            >
-                                <IconChevronLeft />
-                            </button>
-
-                            {/* Track — dir=ltr normalises RTL scroll behaviour */}
-                            <div
-                                ref={trackRef}
-                                className="flex gap-4 overflow-x-scroll scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                            >
-                                {products.map(product => (
-                                    <div
-                                        key={product.id}
-                                        className="shrink-0 w-full sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)]"
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                )}
 
             </div>
         </CustomerLayout>

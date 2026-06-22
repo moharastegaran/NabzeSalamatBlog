@@ -9,4 +9,5 @@ php artisan route:cache || true
 php artisan view:cache || true
 php artisan event:cache || true
 
+touch /tmp/ready
 exec "$@"

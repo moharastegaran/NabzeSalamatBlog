@@ -6,7 +6,7 @@ RUN npm ci
 COPY resources/ ./resources/
 COPY public/ ./public/
 COPY vite.config.js tsconfig.json postcss.config.js tailwind.config.js ./
-RUN npm run build
+RUN npx vite build
 
 # Stage 2: shared PHP base (extensions + composer)
 FROM php:8.2-fpm-alpine AS php-base
@@ -65,7 +65,8 @@ RUN composer dump-autoload --optimize \
 
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
 COPY docker/php/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY docker/php/entrypoint-worker.sh /entrypoint-worker.sh
+RUN chmod +x /entrypoint.sh /entrypoint-worker.sh
 
 EXPOSE 9000
 ENTRYPOINT ["/entrypoint.sh"]

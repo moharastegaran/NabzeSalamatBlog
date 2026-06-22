@@ -157,12 +157,12 @@ export default function PersianDateTimePicker({
     };
 
     const prevMonth = () => {
-        if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
-        else setViewMonth(m => m - 1);
+        if (viewMonth === 0) { setViewMonth(11); setViewYear((y: number) => y - 1); }
+        else setViewMonth((m: number) => m - 1);
     };
     const nextMonth = () => {
-        if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
-        else setViewMonth(m => m + 1);
+        if (viewMonth === 11) { setViewMonth(0); setViewYear((y: number) => y + 1); }
+        else setViewMonth((m: number) => m + 1);
     };
 
     const firstDow = jFirstDayOfWeek(viewYear, viewMonth);

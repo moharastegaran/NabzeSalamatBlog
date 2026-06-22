@@ -95,7 +95,7 @@ export interface BlogPost {
     updated_at: string;
     author?: Pick<User, 'id' | 'name'>;
     category?: Pick<BlogCategory, 'id' | 'name' | 'slug'>;
-    categories?: Pick<BlogCategory, 'id' | 'name'>[];
+    categories?: Pick<BlogCategory, 'id' | 'name' | 'slug'>[];
     tags?: BlogTag[];
     media?: PostMedia[];
     field_values?: PostFieldValue[];
