@@ -151,7 +151,6 @@ class BlogPostController extends Controller
             'title'            => ['required', 'string', 'max:255'],
             'subtitle'         => ['nullable', 'string'],
             'excerpt'          => ['nullable', 'string', 'max:500'],
-            'lead'             => ['nullable', 'string'],
             'body'             => ['required', 'string'],
             'status'           => ['required', 'in:draft,scheduled,published'],
             'publish_at'       => ['required_if:status,scheduled', 'nullable', 'date', 'after:now'],

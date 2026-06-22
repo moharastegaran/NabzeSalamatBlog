@@ -684,7 +684,7 @@ function MobileSideMenu({
 }
 
 // ── Advertise modal ───────────────────────────────────────────────────────────
-const WA_NUMBER = '989121234567';
+const WA_NUMBER = '989129591578';
 
 function AdvertiseModal({ open, onClose }: { open: boolean; onClose: () => void }) {
     const close = useCallback(onClose, [onClose]);

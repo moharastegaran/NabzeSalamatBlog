@@ -38,6 +38,11 @@ function SectionHeader({ title, href }: { title: string; href?: string }) {
 }
 
 function fmtDate(iso: string) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('fa-IR') + ' — ' + d.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function fmtDateOnly(iso: string) {
     return new Date(iso).toLocaleDateString('fa-IR');
 }
 
@@ -444,7 +449,7 @@ function VideoSection({ posts }: { posts: BlogPost[] }) {
                         )}
                         {active.published_at && (
                             <span className="text-xs text-gray-400">
-                                {new Date(active.published_at).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                {fmtDate(active.published_at)}
                             </span>
                         )}
                     </div>
@@ -668,7 +673,7 @@ function EventPostCard({ post }: { post: BlogPost }) {
                         {dateFVs.map((fv, i) => (
                             <React.Fragment key={fv.id}>
                                 {i > 0 && <span className="text-gray-300">—</span>}
-                                <span>{fmtDate(fv.value)}</span>
+                                <span>{fmtDateOnly(fv.value)}</span>
                             </React.Fragment>
                         ))}
                     </div>

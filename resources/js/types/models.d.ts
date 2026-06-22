@@ -82,7 +82,6 @@ export interface BlogPost {
     subtitle?: string | null;
     slug: string;
     excerpt?: string;
-    lead?: string | null;
     body: string;
     featured_image?: string;
     video_url?: string | null;

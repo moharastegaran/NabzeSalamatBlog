@@ -26,7 +26,10 @@ interface Props {
 
 // ── Post card ─────────────────────────────────────────────────────────────────
 function PostCard({ post }: { post: BlogPost }) {
-    const date = post.published_at ? new Date(post.published_at).toLocaleDateString('fa-IR') : null;
+    const date = post.published_at ? (() => {
+        const d = new Date(post.published_at);
+        return d.toLocaleDateString('fa-IR') + ' — ' + d.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+    })() : null;
 
     return (
         <Link

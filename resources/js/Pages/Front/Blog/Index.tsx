@@ -40,9 +40,11 @@ function SideboxHeader({ title }: { title: string }) {
 // ── Post card ─────────────────────────────────────────────────────────────────
 
 function PostCard({ post }: { post: BlogPost }) {
-    const date = post.published_at
-        ? new Date(post.published_at).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })
-        : null;
+    const date = post.published_at ? (() => {
+        const d = new Date(post.published_at);
+        return d.toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })
+            + ' — ' + d.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+    })() : null;
 
     return (
         <Link

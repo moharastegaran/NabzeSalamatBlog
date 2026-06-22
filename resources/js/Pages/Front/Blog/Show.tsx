@@ -16,7 +16,10 @@ interface Props {
 }
 
 function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' });
+    const d = new Date(iso);
+    const date = d.toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' });
+    const time = d.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+    return `${date} — ${time}`;
 }
 
 // ── Sidebar header (matches Category.tsx) ─────────────────────────────────────
@@ -373,22 +376,9 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
         <BlogLayout>
             <Head title={`${post.title} | وبلاگ`} />
 
-            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl px-4 pb-8 py-6 sm:px-6 lg:px-8">
 
                 {/* Breadcrumb */}
-                <nav className="mb-5 flex items-center gap-2 text-sm text-gray-400 flex-wrap">
-                    <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
-                    <span>/</span>
-                    <Link href={route('front.blog.index')} className="hover:text-gray-600 transition-colors">وبلاگ</Link>
-                    {post.category && (
-                        <>
-                            <span>/</span>
-                            <Link href={route('front.blog.category', post.category.slug)} className="hover:text-gray-600 transition-colors">
-                                {post.category.name}
-                            </Link>
-                        </>
-                    )}
-                </nav>
 
                 {/* 3-column: RTL → col1=right(44px action) | col2=middle(article) | col3=left(sidebar) */}
                 <div className="grid grid-cols-1 lg:grid-cols-[44px_1fr_272px] gap-6 items-start">
@@ -401,65 +391,83 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                     {/* Main article */}
                     <article className="min-w-0">
 
-                      <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 mb-4">
-                          {/* Post title block */}
-                          <div className="flex flex-col gap-0.5">
+                        <div className="flex justify-between items-center border-b border-gray-200">
 
-                              {post.subtitle && (
-                                  <div className="inline-flex items-center gap-2 mb-3 bg-[#F24F00]/5 px-3 py-1.5">
-                                      <span className="w-2 h-2 bg-[#F24F00] shrink-0" />
-                                      <p className="text-sm font-semibold text-[#F24F00] leading-snug">{post.subtitle}</p>
-                                  </div>
-                              )}
-                              <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl lg:text-3xl mb-3">{post.title}</h1>
-                              {post.excerpt && (
-                                  <p className="grow mt-2 text-base text-gray-500 leading-6">{post.excerpt}</p>
-                              )}
-                              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-400 border-b border-gray-100 pb-4">
-                                  {post.author && (
-                                      <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <nav className="flex items-center gap-2 text-sm text-gray-500 flex-wrap my-5">
+                                <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
+                                <span>/</span>
+                                <Link href={route('front.blog.index')} className="hover:text-gray-600 transition-colors">وبلاگ</Link>
+                                {(() => {
+                                    const cat = post.category ?? post.categories?.[0] ?? null;
+                                    return cat && (
+                                        <>
+                                            <span>/</span>
+                                            <Link href={route('front.blog.category', cat.slug)} className="hover:text-gray-600 transition-colors">
+                                                {cat.name}
+                                            </Link>
+                                        </>
+                                    );
+                                })()}
+                            </nav>
+
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-600">
+                                {post.author && (
+                                    <span className="flex items-center gap-1">
+                                <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                                 </svg>
                                           <Link href={route('front.blog.author', post.author.id)} className="hover:text-[#F24F00] transition-colors">
                                               {post.author.name}
                                           </Link>
                             </span>
-                                  )}
-                                  {date && (
-                                      <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                )}
+                                {date && (
+                                    <span className="flex items-center gap-1">
+                                <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
                                 </svg>
-                                          {date}
+                                        {date}
                             </span>
-                                  )}
-                                  {post.time_to_read && (
-                                      <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                )}
+                                {post.time_to_read && (
+                                    <span className="flex items-center gap-1">
+                                <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                          {post.time_to_read.toLocaleString('fa-IR')} دقیقه مطالعه
+                                        {post.time_to_read.toLocaleString('fa-IR')} دقیقه مطالعه
                             </span>
-                                  )}
-                                  {post.views > 0 && (
-                                      <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                )}
+                                {post.views > 0 && (
+                                    <span className="flex items-center gap-1">
+                                <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z" />
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                          {post.views.toLocaleString('fa-IR')} بازدید
+                                        {post.views.toLocaleString('fa-IR')} بازدید
                             </span>
-                                  )}
-                                  {comments.length > 0 && (
-                                      <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                )}
+                                {comments.length > 0 && (
+                                    <span className="flex items-center gap-1">
+                                <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
                                 </svg>
-                                          {comments.length} نظر
+                                        {comments.length} نظر
                             </span>
-                                  )}
-                              </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="grid lg:grid-cols-[2fr_3fr] gap-6 lg:gap-8 mb-4">
+                          {/* Post title block */}
+                          <div className="flex flex-col justify-center gap-0.5 h-full">
+
+                              {post.subtitle && (
+                                  <div className="inline-flex items-start gap-2 mb-3 bg-transparent px-3 py-1.5">
+                                      <span className="w-2 h-2 bg-[#F24F00] shrink-0 mt-1" />
+                                      <p className="text-sm font-semibold text-[#F24F00] leading-snug">{post.subtitle}</p>
+                                  </div>
+                              )}
+                              <h1 className="text-2xl font-bold text-gray-900 lg:text-3xl mb-3 lg:leading-snug">{post.title}</h1>
                           </div>
 
                           {/* Featured image — beside title on desktop, below on mobile */}
@@ -478,10 +486,10 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                         {/* Mobile share bar */}
                         <MobileShareBar commentCount={comments.length} />
 
-                        {/* Lead */}
-                        {post.lead && (
+                        {/* Lead / Excerpt */}
+                        {post.excerpt && (
                             <blockquote className="mb-8 mt-2 border-r-4 border-[#F24F00] bg-[#F24F00]/5 px-5 py-4 text-base font-semibold leading-8 text-gray-800 not-italic">
-                                {post.lead}
+                                {post.excerpt}
                             </blockquote>
                         )}
 
