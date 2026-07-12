@@ -381,7 +381,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                 {/* Breadcrumb */}
 
                 {/* 3-column: RTL → col1=right(44px action) | col2=middle(article) | col3=left(sidebar) */}
-                <div className="grid grid-cols-1 lg:grid-cols-[44px_1fr_272px] gap-6 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-[50px_1fr_325px] gap-8 items-start">
 
                     {/* Thin right action sidebar */}
                     <div className="hidden lg:block">
@@ -457,44 +457,40 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                             </div>
                         </div>
 
-                        <div className="grid lg:grid-cols-[2fr_3fr] gap-6 lg:gap-8 mb-4">
                           {/* Post title block */}
-                          <div className="flex flex-col justify-center gap-0.5 h-full">
-
+                          <div className="flex flex-col justify-center gap-2 my-8 h-full">
                               {post.subtitle && (
-                                  <div className="inline-flex items-start gap-2 mb-3 bg-transparent px-3 py-1.5">
-                                      <span className="w-2 h-2 bg-[#F24F00] shrink-0 mt-1" />
+                                  <div className="inline-flex items-start gap-2 bg-transparent">
+                                      <span className="w-1.5 h-1.5 bg-[#F24F00] shrink-0 mt-1" />
                                       <p className="text-sm font-semibold text-[#F24F00] leading-snug text-center lg:text-right">{post.subtitle}</p>
                                   </div>
                               )}
-                              <h1 className="text-2xl font-bold text-gray-900 lg:text-3xl mb-3 lg:leading-snug text-center lg:text-right">{post.title}</h1>
-                          </div>
-
-                          {/* Featured image — beside title on desktop, below on mobile */}
-                          {post.featured_image && (
-                              <div className="w-full overflow-hidden bg-gray-100 aspect-video lg:aspect-auto lg:max-h-[420px]">
-                                  <img
-                                      src={`/storage/${post.featured_image}`}
-                                      alt={post.title}
-                                      className="w-full h-full object-cover"
-                                  />
-                              </div>
-                          )}
+                              <h1 className="text-xl font-bold text-gray-900 lg:text-2xl lg:leading-snug text-center lg:text-right">{post.title}</h1>
+                              {/* Lead / Excerpt */}
+                              {post.excerpt && (
+                                 <blockquote className="border-r-4 border-[#F24F00] bg-[#F24F00]/5 px-3 py-2 text-sm font-medium leading-snug text-gray-800 not-italic">
+                                     {post.excerpt}
+                                 </blockquote>
+                              )}
                       </div>
 
 
                         {/* Mobile share bar */}
                         <MobileShareBar commentCount={comments.length} />
 
-                        {/* Lead / Excerpt */}
-                        {post.excerpt && (
-                            <blockquote className="mb-8 mt-2 border-r-4 border-[#F24F00] bg-[#F24F00]/5 px-5 py-4 text-base font-semibold leading-8 text-gray-800 not-italic">
-                                {post.excerpt}
-                            </blockquote>
-                        )}
-
-                        {/* Body */}
-                        <div className="blog-body" dangerouslySetInnerHTML={{ __html: post.body }} />
+                        {/* Body — featured image beside content on desktop, above on mobile */}
+                        <div className="blog-body flow-root">
+                            {post.featured_image && (
+                                <div className="w-full lg:w-1/2 lg:float-start overflow-hidden max-h-[300px] lg:max-h-[420px] mb-5 lg:mb-4 lg:me-6">
+                                    <img
+                                        src={`/storage/${post.featured_image}`}
+                                        alt={post.title}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            )}
+                            <div dangerouslySetInnerHTML={{ __html: post.body }} />
+                        </div>
 
                         {/* Short link */}
                         {post.short_link && (
