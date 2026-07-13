@@ -727,6 +727,68 @@ function EventPostCard({ post }: { post: BlogPost }) {
     );
 }
 
+function EventPostCardCompact({ post }: { post: BlogPost }) {
+    const fieldValues = post.field_values ?? [];
+    const dateFVs = fieldValues.filter((fv): fv is PostFieldValue & { value: string } =>
+        fv.definition?.field_type === 'date' && !!fv.value
+    );
+    const locationFv = fieldValues.find((fv): fv is PostFieldValue & { value: string } =>
+        fv.definition?.field_type !== 'date' && !!fv.value
+    );
+
+    const cat = post.categories?.at(-1) ?? post.category;
+
+    const dateText = dateFVs.length > 0
+        ? dateFVs.map(fv => fmtDateOnly(fv.value)).join(' — ')
+        : post.published_at
+            ? fmtDateOnly(post.published_at)
+            : null;
+
+    const metaParts = [dateText, locationFv?.value].filter(Boolean);
+
+    return (
+        <Link
+            href={route('front.blog.show', post.slug)}
+            className="group flex items-center gap-4 py-3.5 px-2 border-t border-b border-gray-100 bg-white/50 hover:bg-gray-50/80 transition-colors h-full"
+        >
+            {/* Text block — first in DOM → right side in RTL */}
+            <div className="h-full flex flex-col justify-between flex-1 min-w-0">
+                {cat && (
+                    <span className="block text-[11px] text-gray-400 mb-1">{cat.name}</span>
+                )}
+                <h3 className="grow flex items-start gap-1.5 text-sm font-bold text-gray-900 leading-snug">
+                    <span className="line-clamp-2 flex-1 group-hover:text-[#F24F00] transition-colors">
+                        {post.title}
+                    </span>
+                    <svg
+                        className="w-3.5 h-3.5 shrink-0 mt-0.5 text-gray-400 group-hover:text-[#F24F00] transition-colors"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        aria-hidden
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                </h3>
+                {metaParts.length > 0 && (
+                    <p className="mt-1 text-xs text-gray-500 truncate">
+                        {metaParts.join(' · ')}
+                    </p>
+                )}
+            </div>
+
+            {/* Square thumbnail — second in DOM → left side in RTL */}
+            <div className="flex-shrink-0 w-[72px] h-[72px] sm:w-20 sm:h-20 overflow-hidden bg-gray-100">
+                {post.featured_image
+                    ? <img src={`/storage/${post.featured_image}`} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    : <div className="w-full h-full bg-gradient-to-br from-[#075F26]/20 to-[#F24F00]/10" />
+                }
+            </div>
+        </Link>
+    );
+}
+
 // ── Collapsible tag cloud ─────────────────────────────────────────────────────
 const TAGS_COLLAPSE_PX = 128; // ~3 rows on mobile
 
@@ -805,9 +867,12 @@ function CollapsibleTags({ tags }: { tags: BlogTag[] }) {
 }
 
 // ── Events carousel ───────────────────────────────────────────────────────────
-function EventsCarousel({ posts }: { posts: BlogPost[] }) {
+type EventCardVariant = 'default' | 'compact';
+
+function EventsCarousel({ posts, variant = 'default' }: { posts: BlogPost[]; variant?: EventCardVariant }) {
     const [index, setIndex] = useState(0);
     const [perPage, setPerPage] = useState(3);
+    const Card = variant === 'compact' ? EventPostCardCompact : EventPostCard;
 
     useEffect(() => {
         const update = () => {
@@ -833,7 +898,7 @@ function EventsCarousel({ posts }: { posts: BlogPost[] }) {
                 >
                     {posts.map(post => (
                         <div key={post.id} dir="rtl" className="flex-shrink-0 px-2" style={{ width: `${itemWidth}%` }}>
-                            <EventPostCard post={post} />
+                            <Card post={post} />
                         </div>
                     ))}
                 </div>
@@ -1032,15 +1097,15 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                     </section>
                 )}
 
-                {/* ── Section 6: Events ────────────────────────────────────── */}
+                {/* ── Section 5: Events ────────────────────────────────────── */}
                 {eventPosts.length > 0 && (
                     <section>
                         <SectionHeader title="رویدادها" href={route('front.blog.category', 'event')} />
-                        <EventsCarousel posts={eventPosts} />
+                        <EventsCarousel posts={eventPosts} variant="compact" />
                     </section>
                 )}
 
-                {/* ── Section 5: Tags / Topics ─────────────────────────────── */}
+                {/* ── Section 6: Tags / Topics ─────────────────────────────── */}
                 {tags.length > 0 && (
                     <section>
                         <SectionHeader title="موضوعات" />
