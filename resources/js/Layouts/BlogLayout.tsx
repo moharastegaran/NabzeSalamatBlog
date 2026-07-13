@@ -98,6 +98,9 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                                     <Link href={route('front.about-us')} className="hover:text-white transition-colors px-3">
                                         درباره ما
                                     </Link>
+                                    <Link href={route('front.health-timeline')} className="hover:text-white transition-colors px-3">
+                                        گاه‌شمار سلامت
+                                    </Link>
                                     <Link href={route('front.contact')} className="hover:text-white transition-colors px-3">
                                         تماس با ما
                                     </Link>
@@ -648,6 +651,10 @@ function MobileSideMenu({
                         <Link href={route('front.about-us')} onClick={onClose}
                               className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:text-[#F24F00] hover:bg-gray-50 transition-colors">
                             درباره ما
+                        </Link>
+                        <Link href={route('front.health-timeline')} onClick={onClose}
+                              className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:text-[#F24F00] hover:bg-gray-50 transition-colors">
+                            گاه‌شمار سلامت
                         </Link>
                         <Link href={route('front.contact')} onClick={onClose}
                               className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:text-[#F24F00] hover:bg-gray-50 transition-colors">

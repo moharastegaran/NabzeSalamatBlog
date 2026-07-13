@@ -129,6 +129,11 @@ class FrontController extends Controller
         ]);
     }
 
+    public function healthTimeline(): Response
+    {
+        return Inertia::render('Front/HealthTimeline');
+    }
+
     private function cartCount(): int
     {
         return (int) collect(session('cart', []))->sum('quantity');

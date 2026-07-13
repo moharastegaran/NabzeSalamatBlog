@@ -37,7 +37,8 @@ Route::middleware('front.maintenance')->group(function () {
     Route::get('/about-us',    [FrontController::class, 'aboutUs'])     ->name('front.about-us');
     Route::get('/contact',     [FrontController::class, 'contact'])     ->name('front.contact');
     Route::post('/contact',    [ContactController::class, 'store'])   ->name('front.contact.store');
-    Route::get('/gallery',     [FrontController::class, 'gallery'])     ->name('front.gallery');
+    Route::get('/gallery',          [FrontController::class, 'gallery'])         ->name('front.gallery');
+    Route::get('/health-timeline', [FrontController::class, 'healthTimeline'])  ->name('front.health-timeline');
 
     // Public blog
     Route::get('/blog',                         [BlogController::class, 'index'])   ->name('front.blog.index');

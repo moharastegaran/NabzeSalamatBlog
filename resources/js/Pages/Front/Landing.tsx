@@ -168,6 +168,29 @@ function HeroSideItem({ post }: { post: BlogPost }) {
     );
 }
 
+function HealthTimelinePromoCard() {
+    return (
+        <Link
+            href={route('front.health-timeline')}
+            className="mt-3 flex-shrink-0 group flex items-center gap-3 p-3 bg-gradient-to-l from-[#042F10] to-[#075F26] hover:shadow-md transition-all"
+        >
+            <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-[#F24F00] text-white group-hover:scale-105 transition-transform">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M4.5 8.25h15M4.5 19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V8.25H4.5v11.25z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 12h.008v.008H8.25V12zm3.75 0h.008v.008H12V12zm3.75 0h.008v.008H15.75V12z" />
+                </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+                <span className="block text-xs font-black text-white">گاه‌شمار سلامت</span>
+                <span className="block text-[10px] text-white/70 mt-0.5 leading-4">مناسبت‌های سلامت در ۱۲ ماه سال</span>
+            </div>
+            <svg className="w-4 h-4 flex-shrink-0 text-white/60 group-hover:text-white -scale-x-100 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+        </Link>
+    );
+}
+
 // ── Article card ──────────────────────────────────────────────────────────────
 function ArticleCard({ post }: { post: BlogPost }) {
     return (
@@ -883,7 +906,7 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                         <div className="flex-shrink-0">
                             <SectionHeader title="پیشنهادی" />
                         </div>
-                        <div className="flex-1 flex flex-col divide-y divide-gray-100 overflow-hidden">
+                        <div className="flex-1 flex flex-col divide-y divide-gray-100 overflow-hidden min-h-0">
                             {suggestionPosts.length > 0
                                 ? suggestionPosts.map(post => <HeroSideItem key={post.id} post={post} />)
                                 : [0, 1].map(i => (
@@ -897,6 +920,7 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                                 ))
                             }
                         </div>
+                        <HealthTimelinePromoCard />
                     </div>
 
                 </section>
