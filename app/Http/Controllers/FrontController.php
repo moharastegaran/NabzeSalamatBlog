@@ -81,6 +81,13 @@ class FrontController extends Controller
                     ->take(8)
                     ->get();
             })(),
+            'roundtablePosts' => BlogPost::published()
+                ->whereHas('categories', fn ($q) => $q->where('blog_categories.id', 40))
+                ->with('category:id,name,slug')
+                ->select('id', 'title', 'slug', 'excerpt', 'featured_image', 'blog_category_id', 'published_at', 'views')
+                ->latest('published_at')
+                ->take(8)
+                ->get(),
             'adBanners'       => AdBanner::activeForLocation('landing')->limit(2)->get(),
             'audioPosts'      => BlogPost::published()
                 ->whereHas('categories', fn ($q) => $q->where('blog_categories.id', 6))

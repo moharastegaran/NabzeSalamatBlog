@@ -14,6 +14,7 @@ interface Props {
     videoPosts: BlogPost[];
     audioPosts: BlogPost[];
     eventPosts: BlogPost[];
+    roundtablePosts: BlogPost[];
     adBanners: AdBanner[];
 }
 
@@ -943,8 +944,121 @@ function EventsCarousel({ posts, variant = 'default' }: { posts: BlogPost[]; var
     );
 }
 
+// ── Roundtable carousel ───────────────────────────────────────────────────────
+function RoundtableCarousel({ posts }: { posts: BlogPost[] }) {
+    const [idx, setIdx] = useState(0);
+    const max = Math.max(0, posts.length - 1);
+    const safe = Math.min(idx, max);
+
+    if (!posts.length) return null;
+
+    return (
+        <div className="relative">
+            <div className="overflow-hidden bg-white shadow-sm border border-gray-100">
+                <div
+                    className="flex transition-transform duration-500 ease-out"
+                    style={{ transform: `translateX(-${safe * 100}%)` }}
+                >
+                    {posts.map((post) => (
+                        <div key={post.id} className="w-full flex-shrink-0" dir="rtl">
+                            <Link
+                                href={route('front.blog.show', post.slug)}
+                                className="block group"
+                            >
+                                <div className="grid grid-cols-1 md:grid-cols-[1fr_1.4fr] gap-0 bg-[#fbf7f3]">
+                                    {/* Text */}
+                                    <div className="p-6 sm:p-8 flex flex-col justify-center">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span className="text-[11px] font-black text-gray-700">میزگرد نبض سلامت</span>
+                                            <span className="text-gray-300">•</span>
+                                            <span className="text-[11px] font-semibold text-gray-500">
+                                                {post.published_at ? fmtDateOnly(post.published_at) : ''}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-xl sm:text-2xl font-black text-gray-900 leading-snug line-clamp-3 group-hover:text-[#F24F00] transition-colors">
+                                            {post.title}
+                                        </h3>
+                                        {post.excerpt && (
+                                            <p className="mt-3 text-sm text-gray-600 leading-7 line-clamp-3">
+                                                {post.excerpt}
+                                            </p>
+                                        )}
+                                        <div className="mt-6">
+                                            <span className="inline-flex items-center gap-2 bg-[#F24F00] px-5 py-2.5 text-sm font-bold text-white group-hover:opacity-95 transition-opacity">
+                                                مشاهده جزئیات خبر
+                                                <svg className="w-4 h-4 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Image */}
+                                    <div className="relative overflow-hidden min-h-[210px] md:min-h-[260px]">
+                                        {post.featured_image ? (
+                                            <img
+                                                src={`/storage/${post.featured_image}`}
+                                                alt={post.title}
+                                                className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 bg-gradient-to-br from-[#075F26]/20 to-[#F24F00]/10" />
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-l from-black/15 via-transparent to-transparent" />
+                                    </div>
+                                </div>
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Dots */}
+            {posts.length > 1 && (
+                <div className="flex justify-center gap-1.5 mt-4">
+                    {posts.map((p, i) => (
+                        <button
+                            key={p.id}
+                            type="button"
+                            onClick={() => setIdx(i)}
+                            className={`rounded-sm transition-all duration-300 ${i === safe ? 'w-5 h-1.5 bg-[#F24F00]' : 'w-1.5 h-1.5 bg-gray-300 hover:bg-gray-400'}`}
+                            aria-label={`اسلاید ${i + 1}`}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {/* Arrows */}
+            {posts.length > 1 && safe > 0 && (
+                <button
+                    type="button"
+                    onClick={() => setIdx((v) => Math.max(0, v - 1))}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white shadow-md hover:bg-[#F24F00] hover:text-white text-gray-700 flex items-center justify-center transition-all"
+                    aria-label="قبلی"
+                >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            )}
+            {posts.length > 1 && safe < max && (
+                <button
+                    type="button"
+                    onClick={() => setIdx((v) => Math.min(max, v + 1))}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white shadow-md hover:bg-[#F24F00] hover:text-white text-gray-700 flex items-center justify-center transition-all"
+                    aria-label="بعدی"
+                >
+                    <svg className="w-4 h-4 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            )}
+        </div>
+    );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
-export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, recentPosts, analyzePosts, tags, videoPosts, audioPosts, eventPosts, adBanners }: Props) {
+export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, recentPosts, analyzePosts, tags, videoPosts, audioPosts, eventPosts, roundtablePosts, adBanners }: Props) {
     const { navCategories } = usePage<PageProps>().props;
     const [adsState, setAdsState] = useState<'visible' | 'fading' | 'hidden'>('visible');
     const dismissAds = () => {
@@ -1110,6 +1224,14 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                     <section>
                         <SectionHeader title="موضوعات" />
                         <CollapsibleTags tags={tags} />
+                    </section>
+                )}
+
+                {/* ── Section 7: میز گرد سلامت ─────────────────────────────── */}
+                {roundtablePosts.length > 0 && (
+                    <section>
+                        <SectionHeader title="میز گرد سلامت" />
+                        <RoundtableCarousel posts={roundtablePosts} />
                     </section>
                 )}
 
