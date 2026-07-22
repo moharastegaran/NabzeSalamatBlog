@@ -1,4 +1,4 @@
-# Sales Portal
+# نبض سلامت
 
 A WooCommerce-integrated sales management portal built with Laravel 12, Inertia.js, React, TypeScript, and Tailwind CSS. It provides role-based access control for managing orders, products, users, and banking/payment plans.
 
@@ -40,7 +40,7 @@ You will also need access to a **PostgreSQL** database (the project is pre-confi
 
 ```bash
 git clone <repository-url>
-cd salesportal
+cd NabzeSalamatBlog
 ```
 
 ### 2. Install PHP dependencies
@@ -105,7 +105,7 @@ DB_ENDPOINT=your-neon-endpoint-id   # only needed for Neon
 3. Copy the connection details from the Neon dashboard into the fields above
 
 **Using a local PostgreSQL instance:**
-1. Create a database: `createdb salesportal`
+1. Create a database: `createdb nabzesalamat_db`
 2. Set `DB_HOST=127.0.0.1`, `DB_SSLMODE=disable`, and remove `DB_ENDPOINT`
 
 ### WooCommerce Integration
@@ -152,7 +152,7 @@ php artisan migrate:fresh --seed
 
 ## Running the Application
 
-You need **two terminal windows** open at the same time, both inside the `salesportal` directory.
+You need **two terminal windows** open at the same time, both inside the `NabzeSalamatBlog` directory.
 
 ### Terminal 1 — Laravel backend
 
@@ -186,10 +186,10 @@ After running the seeder, the following accounts are available. All passwords ar
 
 | Email | Role | Access Level |
 |-------|------|-------------|
-| admin@salesportal.test | Admin | Full access |
-| manager@salesportal.test | Sales Manager | Orders, products, user management |
-| retail@salesportal.test | Sales Retail | View and create orders, view products |
-| cfo@salesportal.test | CFO | View and approve/discard orders |
+| admin@nabzesalamat.test | Admin | Full access |
+| manager@nabzesalamat.test | Sales Manager | Orders, products, user management |
+| retail@nabzesalamat.test | Sales Retail | View and create orders, view products |
+| cfo@nabzesalamat.test | CFO | View and approve/discard orders |
 
 ---
 
