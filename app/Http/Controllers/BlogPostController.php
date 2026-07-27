@@ -6,6 +6,7 @@ use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogTag;
 use App\Models\PostMedia;
+use App\Services\BlogPostPublisher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -66,16 +67,23 @@ class BlogPostController extends Controller
         $tagIds      = $validated['tag_ids'] ?? [];
         unset($validated['category_ids'], $validated['tag_ids']);
 
+        $status = $validated['status'];
+
         $post = BlogPost::create([
             ...$validated,
             'author_id'    => auth()->id(),
             'slug'         => Str::slug($validated['title']),
-            'publish_at'   => $validated['status'] === 'scheduled' ? ($validated['publish_at'] ?? null) : null,
-            'published_at' => $validated['status'] === 'published'  ? now() : null,
+            'status'       => $status === 'published' ? 'draft' : $status,
+            'publish_at'   => $status === 'scheduled' ? ($validated['publish_at'] ?? null) : null,
+            'published_at' => null,
         ]);
 
         $post->tags()->sync($tagIds);
         $post->categories()->sync($categoryIds);
+
+        if ($status === 'published') {
+            app(BlogPostPublisher::class)->publish($post);
+        }
 
         return redirect()->route('blog.index')->with('success', 'مقاله با موفقیت ایجاد شد.');
     }
@@ -113,16 +121,17 @@ class BlogPostController extends Controller
         unset($validated['category_ids'], $validated['tag_ids']);
 
         $newStatus = $validated['status'];
+        $wasPublished = $blog->status === 'published';
+        $transitioningToPublished = $newStatus === 'published' && ! $wasPublished;
 
-        // published_at: stamp now only on first transition to published; preserve it if already live.
-        $validated['published_at'] = match (true) {
-            $newStatus === 'published' && $blog->status !== 'published' => now(),
-            $newStatus === 'published'                                   => $blog->published_at,
-            default                                                      => null,
-        };
-
-        // publish_at: only meaningful for scheduled posts; clear it otherwise.
-        $validated['publish_at'] = $newStatus === 'scheduled' ? ($validated['publish_at'] ?? null) : null;
+        if ($transitioningToPublished) {
+            $validated['status']       = $blog->status;
+            $validated['published_at'] = $blog->published_at;
+            $validated['publish_at']   = $blog->publish_at;
+        } else {
+            $validated['published_at'] = $newStatus === 'published' ? $blog->published_at : null;
+            $validated['publish_at']   = $newStatus === 'scheduled' ? ($validated['publish_at'] ?? null) : null;
+        }
 
         $blog->update($validated);
         $blog->tags()->sync($tagIds);
@@ -133,6 +142,10 @@ class BlogPostController extends Controller
                 ['category_field_definition_id' => (int) $defId],
                 ['value' => $value === '' ? null : $value],
             );
+        }
+
+        if ($transitioningToPublished) {
+            app(BlogPostPublisher::class)->publish($blog->fresh());
         }
 
         return redirect()->route('blog.index')->with('success', 'مقاله به‌روزرسانی شد.');

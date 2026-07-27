@@ -50,6 +50,23 @@ services:
         condition: service_healthy
     env_file: .env
 
+  queue:
+    image: nabzesalamatblog-app:latest
+    restart: unless-stopped
+    command: php artisan queue:work --sleep=3 --tries=3 --timeout=90
+    volumes:
+      - .:/var/www/html
+      - dev-vendor:/var/www/html/vendor
+      - ./docker/php/php-dev.ini:/usr/local/etc/php/conf.d/custom.ini
+    networks:
+      - NabzeSalamat
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+
   nginx:
     image: nginx:alpine
     restart: unless-stopped

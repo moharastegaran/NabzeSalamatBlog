@@ -48,4 +48,36 @@ return [
         'webhook_secret' => env('WC_WEBHOOK_SECRET'),
     ],
 
+    'bale' => [
+        'enabled'                 => env('BALE_ENABLED', false),
+        'bot_token'               => env('BALE_BOT_TOKEN'),
+        'channel_id'              => env('BALE_CHANNEL_ID'),
+        'footer_bale_channel'     => env('BALE_FOOTER_BALE_CHANNEL', 'کانال بله رسانه خبری نبض سلامت'),
+        'footer_whatsapp_channel' => env('BALE_FOOTER_WHATSAPP_CHANNEL', 'کانال واتس آپ رسانه خبری نبض سلامت'),
+    ],
+
+    /*
+    | WhatsApp Channel broadcast — disabled by default (requires paid gateway).
+    */
+    'whatsapp' => [
+        'enabled'       => env('WHATSAPP_ENABLED', false),
+        'api_token'     => env('WHATSAPP_API_TOKEN'),
+        'api_base_url'  => env('WHATSAPP_API_BASE_URL', 'https://gate.whapi.cloud'),
+        'channel_id'    => env('WHATSAPP_CHANNEL_ID'),
+    ],
+
+    /*
+    | Telegram channel broadcast (official Bot API — channels only, not groups).
+    | 1. Create bot via @BotFather
+    | 2. Create a Telegram channel
+    | 3. Add bot as channel admin with "Post messages" permission
+    | 4. Set TELEGRAM_CHANNEL_ID to @channel_username or -100... numeric ID
+    */
+    'telegram' => [
+        'enabled'        => env('TELEGRAM_ENABLED', false),
+        'bot_token'      => env('TELEGRAM_BOT_TOKEN'),
+        'channel_id'     => env('TELEGRAM_CHANNEL_ID'),
+        'footer_channel' => env('TELEGRAM_FOOTER_CHANNEL', 'کانال تلگرام رسانه خبری نبض سلامت'),
+    ],
+
 ];

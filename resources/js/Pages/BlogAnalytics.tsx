@@ -70,6 +70,11 @@ const AXIS_STYLE  = { fontSize: 11, fill: '#9ca3af', fontFamily: 'inherit' };
 const TIP_STYLE   = { fontSize: 12, fontFamily: 'inherit' };
 const GRID_STROKE = '#f3f4f6';
 
+const formatViewsTip = (value: unknown): [string, string] => [
+    Number(value ?? 0).toLocaleString(),
+    'بازدید',
+];
+
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function Card({ title, children, className = '' }: { title?: string; children: React.ReactNode; className?: string }) {
@@ -118,7 +123,7 @@ function ViewsAreaChart({ data }: { data: ViewPoint[] }) {
                 <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
                 <XAxis dataKey="label" tick={AXIS_STYLE} interval="preserveStartEnd" />
                 <YAxis tick={AXIS_STYLE} allowDecimals={false} />
-                <Tooltip contentStyle={TIP_STYLE} formatter={(v) => [Number(v).toLocaleString(), 'بازدید']} />
+                <Tooltip contentStyle={TIP_STYLE} formatter={formatViewsTip} />
                 <Area type="monotone" dataKey="views" stroke="#6366f1" strokeWidth={2} fill="url(#viewsGrad)" dot={false} />
             </AreaChart>
         </ResponsiveContainer>
@@ -142,14 +147,14 @@ function DevicePieChart({ data }: { data: DevicePoint[] }) {
                     innerRadius={55}
                     outerRadius={85}
                     paddingAngle={3}
-                    label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}٪`}
+                    label={({ name, percent }: { name?: string; percent?: number }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}٪`}
                     labelLine={false}
                 >
                     {labelled.map((_, i) => (
                         <Cell key={i} fill={DEVICE_COLORS[i % DEVICE_COLORS.length]} />
                     ))}
                 </Pie>
-                <Tooltip contentStyle={TIP_STYLE} formatter={(v) => [Number(v).toLocaleString(), 'بازدید']} />
+                <Tooltip contentStyle={TIP_STYLE} formatter={formatViewsTip} />
                 <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, fontFamily: 'inherit' }} />
             </PieChart>
         </ResponsiveContainer>
@@ -165,7 +170,7 @@ function ReferrersBarChart({ data }: { data: ReferrerPoint[] }) {
                 <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} horizontal={false} />
                 <XAxis type="number" tick={AXIS_STYLE} allowDecimals={false} />
                 <YAxis type="category" dataKey="referrer_domain" tick={AXIS_STYLE} width={110} />
-                <Tooltip contentStyle={TIP_STYLE} formatter={(v) => [Number(v).toLocaleString(), 'بازدید']} />
+                <Tooltip contentStyle={TIP_STYLE} formatter={formatViewsTip} />
                 <Bar dataKey="views" fill="#6366f1" radius={[0, 4, 4, 0]} />
             </BarChart>
         </ResponsiveContainer>

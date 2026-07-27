@@ -36,6 +36,6 @@
         "quill": "^2.0.3",
         "react-apexcharts": "^2.1.0",
         "react-hot-toast": "^2.6.0",
-        "recharts": "^3.8.1"
+        "recharts": "^3.10.0"
     }
 }

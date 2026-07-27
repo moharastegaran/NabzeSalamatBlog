@@ -39,7 +39,10 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code} %{url_effective}\" -L --max-time 10 \"https://loremflickr.com/800/500/pharmacy\")",
       "Bash(curl -s -o /dev/null -w \"%{http_code} %{url_effective}\" -L --max-time 10 \"https://picsum.photos/800/500\")",
       "PowerShell(docker compose restart *)",
-      "Bash(composer install *)"
+      "Bash(composer install *)",
+      "PowerShell(Get-Command *)",
+      "PowerShell(& \"C:\\\\Program Files\\\\PuTTY\\\\plink.exe\" -ssh -pw $pass root@176.97.218.187 \"find /root /var/www /home /srv -maxdepth 5 -name 'docker-compose.prod.yml' 2>/dev/null\" 2>&1)",
+      "PowerShell($pass = \"CQk50pffzTf7qege\")"
     ]
   }
 }
