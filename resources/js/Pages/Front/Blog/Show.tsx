@@ -468,7 +468,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                               <h1 className="text-xl font-bold text-gray-900 lg:text-2xl lg:leading-snug text-center lg:text-right">{post.title}</h1>
                               {/* Lead / Excerpt */}
                               {post.excerpt && (
-                                 <blockquote className="border-r-4 border-[#F24F00] bg-[#F24F00]/5 px-3 py-2 text-sm font-medium leading-snug text-gray-800 not-italic">
+                                 <blockquote className="border-r-4 border-[#F24F00] bg-[#F24F00]/5 px-3 py-2 text-sm font-medium leading-relaxed text-gray-800 not-italic">
                                      {post.excerpt}
                                  </blockquote>
                               )}

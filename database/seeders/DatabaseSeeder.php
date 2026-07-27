@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PermissionsSeeder::class);
 
         $adminUser = User::firstOrCreate(
-            ['email' => 'admin@salesportal.test'],
+            ['email' => 'admin@nabzesalamat.test'],
             ['name' => 'محمدرضا رستگاران', 'password' => Hash::make('password'), 'mobile' => '09057507969', 'melli_code' => '1742714439']
         );
         $adminUser->syncRoles('admin');
@@ -22,13 +22,13 @@ class DatabaseSeeder extends Seeder
         $this->call(PostImagesSeeder::class);
 
         $contributorUser = User::firstOrCreate(
-            ['email' => 'contributor@salesportal.test'],
+            ['email' => 'contributor@nabzesalamat.test'],
             ['name' => 'کاربر مشارکت کننده', 'password' => Hash::make('password'), 'mobile' => '09128765432']
         );
         $contributorUser->syncRoles('contributor');
 
         $writerUser = User::firstOrCreate(
-            ['email' => 'writer@salesportal.test'],
+            ['email' => 'writer@nabzesalamat.test'],
             ['name' => 'کاربر نویسنده', 'password' => Hash::make('password'), 'mobile' => '09214856002']
         );
         $writerUser->syncRoles('writer');

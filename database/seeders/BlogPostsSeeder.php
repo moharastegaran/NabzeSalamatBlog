@@ -61,7 +61,7 @@ class BlogPostsSeeder extends Seeder
 
     public function run(): void
     {
-        $author = User::where('email', 'admin@salesportal.test')->first() ?? User::first();
+        $author = User::where('email', 'admin@nabzesalamat.test')->first() ?? User::first();
         $authorId = $author->id;
 
         // ── Tags ───────────────────────────────────────────────────────────

@@ -11,6 +11,9 @@ RUN npx vite build
 # Stage 2: shared PHP base (extensions + composer)
 FROM php:8.2-fpm-alpine AS php-base
 
+# dl-cdn.alpinelinux.org is often unreachable from Docker Desktop DNS
+RUN sed -i 's|dl-cdn.alpinelinux.org|mirrors.edge.kernel.org|g' /etc/apk/repositories
+
 RUN apk add --no-cache \
         libpng-dev \
         libjpeg-turbo-dev \
@@ -58,8 +61,8 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 
 COPY . .
 COPY --from=node-builder /app/public/build ./public/build
-
-RUN composer dump-autoload --optimize \
+RUN rm -f public/hot \
+    && composer dump-autoload --optimize \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 storage bootstrap/cache
 

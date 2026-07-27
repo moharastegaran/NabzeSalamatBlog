@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `gsun_salesportal_db`
+-- Database: `nabzesalamat_db`
 --
 
 -- --------------------------------------------------------
@@ -125,8 +125,8 @@ CREATE TABLE `cache` (
 --
 
 INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
-('gysan-cache-admin@salesportal.test|127.0.0.1', 'i:1;', 1779686058),
-('gysan-cache-admin@salesportal.test|127.0.0.1:timer', 'i:1779686058;', 1779686058),
+('gysan-cache-admin@nabzesalamat.test|127.0.0.1', 'i:1;', 1779686058),
+('gysan-cache-admin@nabzesalamat.test|127.0.0.1:timer', 'i:1779686058;', 1779686058),
 ('gysan-cache-otp_code|09121212477', 's:5:\"24582\";', 1779920176),
 ('gysan-cache-otp_send|09057507969', 'i:1;', 1780074664),
 ('gysan-cache-otp_send|09057507969:timer', 'i:1780074664;', 1780074664),
@@ -12881,7 +12881,7 @@ INSERT INTO `users` (`id`, `sales_sno`, `name`, `email`, `mobile`, `melli_code`,
 (1596, 31634, 'حمیدرضا شفیعی فلاورجانی', NULL, '9131149259', '1110034784', '3137424821', NULL, 'اصفهان فلاورجان خیابان امام روبروی مسجد حجتیه فروشگاه فیروزه', '8451817565', NULL, '09131149259111', 12, 0, NULL, NULL, NULL, 57, '2026-05-08 20:30:00', 'post_graduate'),
 (1597, 81635, 'بهروز بختیاری نیا', NULL, '9183351148', '4949620185', NULL, NULL, NULL, '6781865159', NULL, '09183351148494', 7, 0, NULL, NULL, NULL, 246, '2026-05-09 20:30:00', 'post_graduate'),
 (1598, 81636, 'سجاد عجم ', NULL, '9122731363', '4592203127', NULL, NULL, 'آزاد شهر - خیابان امام - نبش ولایت 11  و ولایت 14 (2 شعبه)', '4961643718', NULL, '09122731363459', 8, 0, NULL, NULL, NULL, 256, '2026-04-08 20:30:00', 'post_graduate'),
-(1599, NULL, 'Admin', 'admin@salesportal.test', '09000000000', NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$nC6R94ID2lp2FALuySsfJOOA73rwN9gZACk4iDa3A3TuOR2zeIZ9u', NULL, 0, NULL, '2026-05-27 18:20:31', '2026-05-27 18:20:31', NULL, NULL, NULL),
+(1599, NULL, 'Admin', 'admin@nabzesalamat.test', '09000000000', NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$nC6R94ID2lp2FALuySsfJOOA73rwN9gZACk4iDa3A3TuOR2zeIZ9u', NULL, 0, NULL, '2026-05-27 18:20:31', '2026-05-27 18:20:31', NULL, NULL, NULL),
 (1603, NULL, 'شهرزاد زندیه', NULL, '09124637465', '0520748581', NULL, NULL, NULL, NULL, NULL, '$2a$12$rP8rtBg7S4iUe9HlLWfi9OqzFy9.tdhAyC9ivpVCkxjVI2SV4Sz.K', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL),
 (1604, NULL, '09057507969', NULL, '09057507969', NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$PZpY8HzU1mtYsbyYds2juOgAjy3lO5aCJ5oYxU3FbmptpqFI69F/6', NULL, 0, NULL, '2026-05-27 18:47:16', '2026-05-27 18:47:16', NULL, NULL, NULL);
 
