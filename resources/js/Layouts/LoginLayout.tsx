@@ -21,7 +21,7 @@ export default function LoginLayout({ children, title, subtitle }: Props) {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                     <div className="relative z-10 p-8 text-white">
                         <Link href="/">
-                            <ApplicationLogo className="w-auto mb-5 drop-shadow-lg" />
+                            <ApplicationLogo className="h-28 w-auto mb-5 drop-shadow-lg" />
                         </Link>
                         <h2 className="text-2xl font-bold leading-snug drop-shadow">
                             پنل مدیریت سایت نبض سلامت

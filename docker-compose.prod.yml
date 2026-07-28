@@ -35,15 +35,34 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  ssr:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: ssr
-    image: nabzesalamat-ssr:latest
+  node:
+    image: node:20-alpine
+    working_dir: /app
     restart: unless-stopped
+    volumes:
+      - .:/app
+      - prod-node-modules:/app/node_modules
+    command: sh -c "npm ci && npx vite build --ssr && tail -f /dev/null"
     networks:
       - NabzeSalamat
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  ssr:
+    image: node:20-alpine
+    working_dir: /app
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - prod-node-modules:/app/node_modules
+    command: sh -c "until [ -f bootstrap/ssr/ssr.js ] && [ -d node_modules/@inertiajs/react ]; do echo 'waiting for SSR bundle and deps...'; sleep 3; done; node bootstrap/ssr/ssr.js"
+    networks:
+      - NabzeSalamat
+    depends_on:
+      - node
     logging:
       driver: json-file
       options:
@@ -66,9 +85,7 @@ services:
         condition: service_healthy
     networks:
       - NabzeSalamat
-    command: >
-      sh -c "ln -sf /var/www/html/storage/app/public /var/www/html/public/storage
-      && nginx -g 'daemon off;'"
+    command: nginx -g 'daemon off;'
     logging:
       driver: json-file
       options:
@@ -177,3 +194,4 @@ volumes:
   mysql-data:
   redis-data:
   app-storage:
+  prod-node-modules:

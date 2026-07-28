@@ -23,7 +23,7 @@ createServer((page) =>
             const ziggy = (page.props as { ziggy?: ZiggyConfig & { location: string } }).ziggy;
 
             // Make Ziggy's route() available during SSR (Blade @routes only exists in the browser).
-            globalThis.route = ((name, params, absolute, config) =>
+            globalThis.route = ((name: string, params: unknown, absolute: boolean, config: ZiggyConfig) =>
                 ziggyRoute(name, params as never, absolute, {
                     ...(ziggy ?? {}),
                     location: new URL(ziggy?.location ?? 'http://localhost'),
