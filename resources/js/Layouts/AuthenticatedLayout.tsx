@@ -1,9 +1,9 @@
-﻿import logo from '../../images/logo.png';
-import { Link, router, usePage } from '@inertiajs/react';
+﻿import { Link, router, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import NotificationBell, { type NotificationItem } from '@/Components/NotificationBell';
 import FlashToast from '@/Components/FlashToast';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 function IconDashboard() {
     return (
@@ -827,10 +827,7 @@ export default function Authenticated({
                 {/* Logo */}
                 <div className={`flex h-16 shrink-0 items-center border-b border-gray-200 px-4 ${collapsed ? 'justify-center' : ''}`}>
                     <Link href={route('dashboard')} className="flex items-center gap-3">
-                        <img src={logo} alt="Company Logo" className="h-8 w-auto shrink-0" />
-                        {!collapsed && (
-                            <span className="text-lg font-bold text-gray-900">پنل مدیریت سایت</span>
-                        )}
+                        <ApplicationLogo withText={!collapsed} className="h-14 w-auto shrink-0 object-contain" />
                     </Link>
                 </div>
 
@@ -866,7 +863,7 @@ export default function Authenticated({
             <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
 
                 {/* Top bar */}
-                <div className="flex h-14 shrink-0 items-center gap-2 border-b border-gray-200 bg-white px-4 shadow-sm">
+                <div className="flex h-16 shrink-0 items-center gap-2 border-b border-gray-200 bg-white px-4 shadow-sm">
                     <button
                         type="button"
                         onClick={() => setSidebarOpen(true)}

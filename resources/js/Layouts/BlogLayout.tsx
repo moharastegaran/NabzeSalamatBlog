@@ -3,8 +3,8 @@ import { PropsWithChildren, useState, useEffect, useRef, useCallback } from 'rea
 import { PageProps, NavCategory } from '@/types';
 import { BlogPost } from '@/types/models';
 import axios from 'axios';
-import logoSrc from '../../images/logo.png';
 import { SOCIAL_LINKS } from '@/constants/socials';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function BlogLayout({ children }: PropsWithChildren) {
     const { auth, navCategories, breakingNews } = usePage<PageProps>().props;
@@ -145,7 +145,7 @@ export default function BlogLayout({ children }: PropsWithChildren) {
 
                             {/* Logo */}
                             <Link href={route('front.landing')} className="flex-shrink-0">
-                                <img src={logoSrc} alt="نبض سلامت" className="h-16 md:h-20 w-auto" />
+                                <ApplicationLogo className="h-16 md:h-20 w-auto" />
                             </Link>
 
                             {/* Search — wraps to its own full-width row on mobile */}
@@ -365,10 +365,12 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                         {/* Brand */}
                         <div className="md:col-span-1 flex flex-col gap-4">
                             <Link href={route('front.landing')}>
-                                <img src={logoSrc} alt="نبض سلامت" className="h-20 sm:h-24 object-contain w-auto brightness-0 invert opacity-80" />
+                                <ApplicationLogo className="object-contain w-auto brightness-0 invert opacity-80" />
                             </Link>
-                            <p className="text-sm leading-7 text-gray-400">
-                                نبض سلامت، منبع معتبر اخبار پزشکی و سبک زندگی سالم به زبان فارسی.
+                            <p className="text-sm leading-6 text-gray-400">
+                                نبض سلامت، تپش آگاهی و امید در مسیر سلامت جامه است.
+                                <br />
+                                با ما همراه باشید تا تازه‌ترین اخبار، تحلیل‌ها و محتوای تخصصی در حوزه سلامت و دارو را دنبال کنید.
                             </p>
                             <div className="flex items-center gap-2 mt-1">
                                 {SOCIAL_LINKS.map((social) => {

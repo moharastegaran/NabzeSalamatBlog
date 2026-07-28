@@ -5,13 +5,15 @@ import ReactDOMServer from 'react-dom/server';
 import { route as ziggyRoute } from 'ziggy-js';
 import { Config as ZiggyConfig } from 'ziggy-js';
 
-const appName = import.meta.env.VITE_APP_NAME || 'نبض سلامت';
+const primaryTitle = 'پایگاه خبری نبض سلامت';
+const secondaryTitle = 'تپش آگاهی و امید در مسیر سلامت جامعه';
+const siteTitle = `${primaryTitle} - ${secondaryTitle}`;
 
 createServer((page) =>
     createInertiaApp({
         page,
         render: ReactDOMServer.renderToString,
-        title: (title) => (!title || title === appName) ? appName : `${title} - ${appName}`,
+        title: (title) => (!title || title === siteTitle) ? siteTitle : `${title} - ${siteTitle}`,
         resolve: (name) =>
             resolvePageComponent(
                 `./Pages/${name}.tsx`,

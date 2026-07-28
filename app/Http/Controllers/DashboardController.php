@@ -19,10 +19,6 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->hasRole('customer')) {
-            return redirect()->route('customer.panel');
-        }
-
         return Inertia::render('Dashboard', [
             'stats' => [
                 'users'           => $user->hasPermissionTo('users.edit') ? (function () {

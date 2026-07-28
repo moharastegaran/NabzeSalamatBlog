@@ -6,7 +6,9 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 
-const appName = import.meta.env.VITE_APP_NAME || 'نبض سلامت';
+const primaryTitle = 'پایگاه خبری نبض سلامت';
+const secondaryTitle = 'تپش آگاهی و امید در مسیر سلامت جامعه';
+const siteTitle = `${primaryTitle} - ${secondaryTitle}`;
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
     state = { error: null };
@@ -29,7 +31,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | 
 }
 
 createInertiaApp({
-    title: (title) => (!title || title === appName) ? appName : `${title} - ${appName}`,
+    title: (title) => (!title || title === siteTitle) ? siteTitle : `${title} - ${siteTitle}`,
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.tsx`,

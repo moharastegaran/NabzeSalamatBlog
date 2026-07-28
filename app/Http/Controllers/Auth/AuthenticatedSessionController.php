@@ -33,11 +33,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $destination = Auth::user()->hasRole('customer')
-            ? route('customer.activities', absolute: false)
-            : route('dashboard', absolute: false);
-
-        return redirect()->intended($destination);
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 
     /**
@@ -45,14 +41,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $isCustomer = Auth::user()?->hasRole('customer');
-
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
 
-        return redirect()->route($isCustomer ? 'customer.login' : 'login');
+        return redirect()->route('login');
     }
 }

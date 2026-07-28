@@ -4,11 +4,10 @@ import { PropsWithChildren, useState, useEffect, useRef } from 'react';
 import { PageProps } from '@/types';
 import { BlogPost } from '@/types/models';
 import axios from 'axios';
-import logoSrc from '../../images/logo.png';
-import logoSrc2 from '../../images/logo.png';
 import rubikalogo from '../../images/rubika.png';
 import balelogo from '../../images/bale.webp'
 import enamadLogo from '../../images/enamad-temp.png';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 interface Props extends PropsWithChildren {
     cartCount?: number;
     floatingHeader?: boolean;
@@ -109,7 +108,7 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                         {/* Right group: Logo + Nav */}
                         <div className="flex items-center gap-4">
                             <Link href={route('front.landing')} className="flex-shrink-0 sm:mr-0 mr-1">
-                                <img src={logoSrc} alt="جی‌سان" className="w-[70px]" />
+                                <ApplicationLogo className="w-[70px]" alt="جی‌سان" />
                             </Link>
 
                             <nav className="hidden md:flex items-center gap-1">
@@ -211,7 +210,7 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
 
                             {/* Login / Register */}
                             <Link
-                                href={route('customer.login')}
+                                href={route('login')}
                                 className="hidden lg:inline-flex flex-shrink-0 bg-[#F24F00] hover:bg-[#075F26] text-white text-sm font-semibold px-4 py-2.5 rounded-3xl transition-colors duration-200"
                             >
                                 {auth.user ? 'پنل کاربری' : 'ورود/ثبت نام'}
@@ -234,7 +233,7 @@ export default function ShopLayout({ children, cartCount = 0, floatingHeader = f
                         <div className="flex items-center gap-6">
                             {/* Logo — first child renders on the right in RTL */}
                             <div className="flex-shrink-0">
-                                <img src={logoSrc2} alt="جی‌سان" className="w-20 h-auto opacity-90" />
+                                <ApplicationLogo className="w-20 h-auto opacity-90" alt="جی‌سان" />
                             </div>
                             {/* Text — renders to the left of the logo in RTL */}
                             <div className="hidden sm:block">

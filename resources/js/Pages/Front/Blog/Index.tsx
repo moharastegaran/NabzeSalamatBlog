@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react';
 import BlogLayout from '@/Layouts/BlogLayout';
 import SeoHead from '@/Components/SeoHead';
 import SocialFollowWidget from '@/Components/SocialFollowWidget';
+import BlogPagination from '@/Components/BlogPagination';
 import type { BlogPost, PaginatedData } from '@/types/models';
 
 interface CategoryLeaf {
@@ -113,36 +114,6 @@ function PostCard({ post }: { post: BlogPost }) {
     );
 }
 
-// ── Pagination ────────────────────────────────────────────────────────────────
-
-function Pagination({ links }: { links: PaginatedData<unknown>['links'] }) {
-    if (links.filter(l => !l.label.includes('laquo') && !l.label.includes('raquo')).length <= 1) return null;
-    return (
-        <div className="flex items-center justify-center gap-1 flex-wrap pt-10">
-            {links.map((link, i) =>
-                link.url ? (
-                    <Link
-                        key={i}
-                        href={link.url}
-                        className={`px-3 py-1.5 text-sm font-medium transition-colors ${
-                            link.active
-                                ? 'bg-[#F24F00] text-white'
-                                : 'bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50'
-                        }`}
-                        dangerouslySetInnerHTML={{ __html: link.label }}
-                    />
-                ) : (
-                    <span
-                        key={i}
-                        className="px-3 py-1.5 text-sm text-gray-300 ring-1 ring-gray-100"
-                        dangerouslySetInnerHTML={{ __html: link.label }}
-                    />
-                )
-            )}
-        </div>
-    );
-}
-
 // ── Sidebar widgets ───────────────────────────────────────────────────────────
 
 function SearchSideWidget({
@@ -218,7 +189,7 @@ function CategoriesSideWidget({
 
                     return (
                         <div key={cat.id} className="border-b border-gray-100 last:border-0">
-                            <div className="flex items-center">
+                            <div className="flex w-full items-center">
                                 <button
                                     onClick={() => onSelect(isActive ? undefined : cat.slug)}
                                     className={`flex flex-1 items-center gap-2 py-2.5 text-sm transition-colors ${
@@ -342,15 +313,25 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                             </span>
                             <div className="flex items-center gap-2">
                                 <span className="text-xs text-gray-400">مرتب‌سازی:</span>
-                                <select
-                                    value={activeSort}
-                                    onChange={e => go({ sort: e.target.value })}
-                                    className="border border-gray-200 bg-white py-1.5 pr-2 pl-7 text-sm text-gray-700 focus:border-[#F24F00] focus:outline-none focus:ring-1 focus:ring-[#F24F00] transition-colors"
-                                >
-                                    {Object.entries(SORT_LABELS).map(([val, label]) => (
-                                        <option key={val} value={val}>{label}</option>
-                                    ))}
-                                </select>
+                                <div className="relative">
+                                    <select
+                                        value={activeSort}
+                                        onChange={e => go({ sort: e.target.value })}
+                                        className="appearance-none border border-gray-200 bg-white py-1.5 pe-8 ps-2 text-sm text-gray-700 focus:border-[#F24F00] focus:outline-none focus:ring-1 focus:ring-[#F24F00] transition-colors"
+                                        style={{backgroundImage: 'none'}}
+                                    >
+                                        {Object.entries(SORT_LABELS).map(([val, label]) => (
+                                            <option key={val} value={val}>{label}</option>
+                                        ))}
+                                    </select>
+                                    <svg
+                                        className="pointer-events-none absolute end-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+                                        aria-hidden="true"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
                             </div>
                         </div>
 
@@ -393,7 +374,7 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                                         <PostCard key={post.id} post={post} />
                                     ))}
                                 </div>
-                                <Pagination links={posts.links} />
+                                <BlogPagination links={posts.links} />
                             </>
                         ) : (
                             <div className="flex flex-col items-center justify-center bg-white py-24 text-center shadow-sm">

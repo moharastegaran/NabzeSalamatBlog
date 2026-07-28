@@ -1,5 +1,5 @@
 import SeoHead from '@/Components/SeoHead';
-import logoSrc from '../../../images/logo.png';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 const css = `
 @keyframes hb-draw {
@@ -40,7 +40,7 @@ export default function Maintenance() {
                     <div className="flex flex-col items-center text-center px-8 pt-10 pb-8">
 
                         {/* Logo */}
-                        <img src={logoSrc} alt="نبض سلامت" className="h-20 w-auto mb-8" />
+                        <ApplicationLogo className="h-20 w-auto mb-8" />
 
                         {/* Animated heartbeat line */}
                         <div className="w-full mb-7 select-none" aria-hidden="true">

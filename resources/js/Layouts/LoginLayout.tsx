@@ -21,13 +21,13 @@ export default function LoginLayout({ children, title, subtitle }: Props) {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                     <div className="relative z-10 p-8 text-white">
                         <Link href="/">
-                            <ApplicationLogo className="h-28 w-auto mb-5 drop-shadow-lg" />
+                            <ApplicationLogo className="w-auto mb-5 drop-shadow-lg" />
                         </Link>
                         <h2 className="text-2xl font-bold leading-snug drop-shadow">
                             پنل مدیریت سایت نبض سلامت
                         </h2>
                         <p className="mt-2 text-sm text-white/70 leading-relaxed">
-                            منبع معتبر اخبار پزشکی و سبک زندگی سالم به زبان فارسی
+                        با ما همراه باشید تا تازه‌ترین اخبار، تحلیل‌ها و محتوای تخصصی در حوزه سلامت و دارو را دنبال کنید.
                         </p>
                     </div>
                 </div>

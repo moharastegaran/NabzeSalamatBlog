@@ -6,7 +6,6 @@ use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\BreakingNewsController;
 use App\Http\Controllers\AssetController;
-use App\Http\Controllers\CustomerTicketController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\BlogCategoryController;
 use App\Http\Controllers\BlogCommentController;
@@ -20,8 +19,6 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\CustomerPanelController;
-use App\Http\Controllers\CustomerProfileController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\FrontController;
@@ -57,23 +54,6 @@ Route::middleware('front.maintenance')->group(function () {
     Route::get('/{code}', [BlogController::class, 'shortLink'])
         ->where('code', '[a-zA-Z]{5}[1-9]')
         ->name('short-link');
-});
-
-// Customer panel (authenticated customers only)
-Route::middleware(['auth', 'role:customer'])->group(function () {
-    Route::get('/customer/panel',      [CustomerPanelController::class, 'index'])     ->name('customer.panel');
-    Route::get('/customer/activities', [CustomerPanelController::class, 'activities'])->name('customer.activities');
-    Route::get('/customer/address',    [CustomerProfileController::class, 'address']) ->name('customer.address');
-    Route::patch('/customer/address',  [CustomerProfileController::class, 'updateAddress'])->name('customer.address.update');
-    Route::get('/customer/profile',    [CustomerProfileController::class, 'userInfo'])->name('customer.profile');
-    Route::patch('/customer/profile',  [CustomerProfileController::class, 'updateUserInfo'])->name('customer.profile.update');
-
-    // Customer tickets
-    Route::get('/customer/tickets',                       [CustomerTicketController::class, 'index']) ->name('customer.tickets.index');
-    Route::get('/customer/tickets/create',                [CustomerTicketController::class, 'create'])->name('customer.tickets.create');
-    Route::post('/customer/tickets',                      [CustomerTicketController::class, 'store']) ->name('customer.tickets.store');
-    Route::get('/customer/tickets/{ticket}',              [CustomerTicketController::class, 'show'])  ->name('customer.tickets.show');
-    Route::post('/customer/tickets/{ticket}/reply',       [CustomerTicketController::class, 'reply'])->name('customer.tickets.reply');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

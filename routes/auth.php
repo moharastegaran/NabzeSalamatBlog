@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\CustomerOtpController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
@@ -13,15 +12,6 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('customer/login', [CustomerOtpController::class, 'create'])
-        ->name('customer.login');
-
-    Route::post('customer/login/send-otp', [CustomerOtpController::class, 'sendOtp'])
-        ->name('customer.login.send-otp');
-
-    Route::post('customer/login/verify', [CustomerOtpController::class, 'verifyOtp'])
-        ->name('customer.login.verify');
-
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 

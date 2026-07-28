@@ -5,6 +5,7 @@ import AdBannerSlot from '@/Components/AdBannerSlot';
 import MostReadWidget from '@/Components/MostReadWidget';
 import SeoHead from '@/Components/SeoHead';
 import SocialFollowWidget from '@/Components/SocialFollowWidget';
+import BlogPagination from '@/Components/BlogPagination';
 import type { AdBanner, BlogCategory, BlogPost, PaginatedData } from '@/types/models';
 
 interface CategoryChild extends Pick<BlogCategory, 'id' | 'name' | 'slug'> {
@@ -104,37 +105,6 @@ function PostCard({ post }: { post: BlogPost }) {
                 </div>
             </div>
         </Link>
-    );
-}
-
-// ── Pagination ────────────────────────────────────────────────────────────────
-function Pagination({ links }: { links: PaginatedData<unknown>['links'] }) {
-    const pages = links.filter(l => l.label !== '&laquo; قبلی' && l.label !== 'بعدی &raquo;');
-    if (pages.length <= 1) return null;
-
-    return (
-        <div className="flex items-center justify-center gap-1 flex-wrap mt-8">
-            {links.map((link, i) => (
-                link.url ? (
-                    <Link
-                        key={i}
-                        href={link.url}
-                        className={`px-3 py-1.5 text-sm font-medium transition-colors ${
-                            link.active
-                                ? 'bg-[#F24F00] text-white'
-                                : 'bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50'
-                        }`}
-                        dangerouslySetInnerHTML={{ __html: link.label }}
-                    />
-                ) : (
-                    <span
-                        key={i}
-                        className="px-3 py-1.5 text-sm text-gray-300 ring-1 ring-gray-100"
-                        dangerouslySetInnerHTML={{ __html: link.label }}
-                    />
-                )
-            ))}
-        </div>
     );
 }
 
@@ -342,7 +312,7 @@ export default function BlogCategory({ category, posts, recentPosts, mostRead, s
                                 <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-2">
                                     {posts.data.map(post => <PostCard key={post.id} post={post} />)}
                                 </div>
-                                {posts.last_page > 1 && <Pagination links={posts.links} />}
+                                {posts.last_page > 1 && <BlogPagination links={posts.links} className="mt-8" />}
                             </>
                         ) : (
                             <div className="flex flex-col items-center justify-center bg-white py-20 text-center shadow-sm">
