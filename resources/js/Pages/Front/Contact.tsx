@@ -1,5 +1,6 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
+import SeoHead from '@/Components/SeoHead';
 import contactBG from '../../../images/contact-us.jpg';
 import type { PageProps } from '@/types';
 import { FormEvent, useRef, useEffect } from 'react';
@@ -137,7 +138,11 @@ export default function Contact() {
 
     return (
         <BlogLayout>
-            <Head title="تماس با ما | نبض سلامت" />
+            <SeoHead
+                title="تماس با ما"
+                description="راه‌های ارتباط با تحریریه نبض سلامت برای ارسال خبر، گزارش و همکاری رسانه‌ای."
+                url="/contact"
+            />
 
             {/* ── Hero ──────────────────────────────────────────────────── */}
             <div

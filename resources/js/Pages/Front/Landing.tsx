@@ -1,6 +1,7 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
+import SeoHead from '@/Components/SeoHead';
 import { AdBanner, BlogPost, BlogTag, PostFieldValue } from '@/types/models';
 import { NavCategory, PageProps } from '@/types';
 
@@ -1068,7 +1069,12 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
 
     return (
         <BlogLayout>
-            <Head title="نبض سلامت" />
+            <SeoHead
+                title="نبض سلامت"
+                description="نبض سلامت؛ رسانه خبری تخصصی حوزه سلامت، پزشکی و سبک زندگی سالم."
+                url="/"
+            />
+            <h1 className="sr-only">نبض سلامت — رسانه خبری سلامت</h1>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-7">
 

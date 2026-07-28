@@ -6,7 +6,7 @@ RUN npm ci
 COPY resources/ ./resources/
 COPY public/ ./public/
 COPY vite.config.js tsconfig.json postcss.config.js tailwind.config.js ./
-RUN npx vite build
+RUN npx vite build && npx vite build --ssr
 
 # Stage 2: shared PHP base (extensions + composer)
 FROM php:8.2-fpm-alpine AS php-base
@@ -61,6 +61,7 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 
 COPY . .
 COPY --from=node-builder /app/public/build ./public/build
+COPY --from=node-builder /app/bootstrap/ssr ./bootstrap/ssr
 RUN rm -f public/hot \
     && composer dump-autoload --optimize \
     && chown -R www-data:www-data /var/www/html \
@@ -88,7 +89,14 @@ EXPOSE 9000
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["php-fpm"]
 
-# Stage 5: nginx with static files baked in (prod only)
+# Stage 5: Inertia SSR Node server (prod)
+FROM node:20-alpine AS ssr
+WORKDIR /app
+COPY --from=node-builder /app/bootstrap/ssr ./bootstrap/ssr
+EXPOSE 13714
+CMD ["node", "bootstrap/ssr/ssr.js"]
+
+# Stage 6: nginx with static files baked in (prod only)
 FROM nginx:alpine AS nginx
 COPY --from=app /var/www/html/public /var/www/html/public
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf

@@ -1,7 +1,8 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
 import AdBannerSlot from '@/Components/AdBannerSlot';
 import MostReadWidget from '@/Components/MostReadWidget';
+import SeoHead from '@/Components/SeoHead';
 import type { AdBanner, BlogPost, PaginatedData } from '@/types/models';
 
 interface AuthorSummary {
@@ -157,7 +158,11 @@ function RecentWidget({ posts }: { posts: BlogPost[] }) {
 export default function BlogAuthor({ author, posts, recentPosts, mostRead, adBanners }: Props) {
     return (
         <BlogLayout>
-            <Head title={`${author.name} | نویسنده`} />
+            <SeoHead
+                title={author.name}
+                description={`مقالات نوشته‌شده توسط ${author.name} در نبض سلامت`}
+                url={`/blog/author/${author.id}`}
+            />
 
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 

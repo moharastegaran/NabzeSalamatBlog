@@ -8,6 +8,7 @@ use App\Models\ContactMessage;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Tighten\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -20,10 +21,24 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
+        // SSR is for public front pages only — skip admin/auth panels.
+        if (! $request->routeIs('front.*')) {
+            config(['inertia.ssr.enabled' => false]);
+        }
+
         $user = $request->user();
 
         return [
             ...parent::share($request),
+            'app' => [
+                'name'   => config('app.name', 'نبض سلامت'),
+                'url'    => rtrim(config('app.url'), '/'),
+                'locale' => 'fa_IR',
+            ],
+            'ziggy' => fn () => [
+                ...(new Ziggy)->toArray(),
+                'location' => $request->url(),
+            ],
             'auth' => [
                 'user' => $user ? [
                     'id'          => $user->id,

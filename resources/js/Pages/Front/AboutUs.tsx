@@ -1,5 +1,6 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
+import SeoHead from '@/Components/SeoHead';
 
 import aboutBG from '../../../images/about-us.jpg';
 import contactBG from '../../../images/contact-us.jpg';
@@ -83,7 +84,11 @@ function SectionTitle({ title }: { title: string }) {
 export default function AboutUs() {
     return (
         <BlogLayout>
-            <Head title="درباره ما | نبض سلامت" />
+            <SeoHead
+                title="درباره ما"
+                description="درباره رسانه خبری نبض سلامت؛ رسالت، هیئت سیاست‌گذاری و تعهد حرفه‌ای به اطلاع‌رسانی حوزه سلامت."
+                url="/about-us"
+            />
 
             {/* ── Hero ──────────────────────────────────────────── */}
             <div className="relative bg-gray-900 overflow-hidden"

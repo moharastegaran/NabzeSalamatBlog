@@ -132,8 +132,12 @@ class BlogPostBroadcastFormatter
         return [
             self::FOOTER_SEPARATOR,
             '🔗🆔همراه ما باشید👇🏻',
+            config('services.bale.footer_telegram_channel', 'کانال تلگرام رسانه خبری نبض سلامت'),
+            config('services.social.telegram'),
             config('services.bale.footer_bale_channel', 'کانال بله رسانه خبری نبض سلامت'),
-            config('services.telegram.footer_channel', 'کانال تلگرام رسانه خبری نبض سلامت'),
+            config('services.social.bale'),
+            config('services.bale.footer_whatsapp_channel', 'کانال واتس آپ رسانه خبری نبض سلامت'),
+            config('services.social.whatsapp'),
             self::FOOTER_CLOSER,
         ];
     }

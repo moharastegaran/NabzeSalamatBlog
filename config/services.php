@@ -48,11 +48,18 @@ return [
         'webhook_secret' => env('WC_WEBHOOK_SECRET'),
     ],
 
+    'social' => [
+        'telegram' => env('SOCIAL_TELEGRAM_URL', 'https://t.me/NabzSalamatMedia'),
+        'bale'     => env('SOCIAL_BALE_URL', 'https://ble.ir/nabze_salamat'),
+        'whatsapp' => env('SOCIAL_WHATSAPP_URL', 'https://chat.whatsapp.com/EiBcCxmF5TFAWahncFGRkS?s=sw&p=a&ilr=1&amv=3'),
+    ],
+
     'bale' => [
         'enabled'                 => env('BALE_ENABLED', false),
         'bot_token'               => env('BALE_BOT_TOKEN'),
         'channel_id'              => env('BALE_CHANNEL_ID'),
         'footer_bale_channel'     => env('BALE_FOOTER_BALE_CHANNEL', 'کانال بله رسانه خبری نبض سلامت'),
+        'footer_telegram_channel' => env('BALE_FOOTER_TELEGRAM_CHANNEL', 'کانال تلگرام رسانه خبری نبض سلامت'),
         'footer_whatsapp_channel' => env('BALE_FOOTER_WHATSAPP_CHANNEL', 'کانال واتس آپ رسانه خبری نبض سلامت'),
     ],
 

@@ -24,7 +24,8 @@ services:
     volumes:
       - .:/app
       - dev-node-modules:/app/node_modules
-    command: sh -c "npm ci && npm run dev"
+      - dev-vendor:/app/vendor
+    command: sh -c "npm ci && npx vite build --ssr && npm run dev"
     ports:
       - "5175:5175"
     environment:
@@ -32,6 +33,21 @@ services:
       - CHOKIDAR_INTERVAL=500
     networks:
       - NabzeSalamat
+
+  ssr:
+    image: node:20-alpine
+    working_dir: /app
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - dev-node-modules:/app/node_modules
+    command: sh -c "until [ -f bootstrap/ssr/ssr.js ]; do echo 'waiting for SSR bundle...'; sleep 3; done; node bootstrap/ssr/ssr.js"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - NabzeSalamat
+    depends_on:
+      - node
 
   scheduler:
     image: nabzesalamatblog-app:latest

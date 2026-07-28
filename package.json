@@ -3,8 +3,10 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "tsc && vite build",
-        "dev": "vite"
+        "build": "tsc && vite build && vite build --ssr",
+        "build:ssr": "vite build --ssr",
+        "dev": "vite",
+        "ssr": "node bootstrap/ssr/ssr.js"
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",
@@ -36,6 +38,7 @@
         "quill": "^2.0.3",
         "react-apexcharts": "^2.1.0",
         "react-hot-toast": "^2.6.0",
-        "recharts": "^3.10.0"
+        "recharts": "^3.10.0",
+        "ziggy-js": "^2.6.3"
     }
 }

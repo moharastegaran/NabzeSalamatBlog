@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Head } from '@inertiajs/react';
 import momentJalaali from 'moment-jalaali';
 import BlogLayout from '@/Layouts/BlogLayout';
+import SeoHead from '@/Components/SeoHead';
 
 import farvardinPdf  from '../../../images/healthsteps/گاه شمار سلامت- فروردین.pdf?url';
 import ordibeheshtPdf from '../../../images/healthsteps/گاه شمار سلامت- اردیبهشت.pdf?url';
@@ -77,7 +77,11 @@ export default function HealthTimeline() {
 
     return (
         <BlogLayout>
-            <Head title="گاه‌شمار سلامت | نبض سلامت" />
+            <SeoHead
+                title="گاه‌شمار سلامت"
+                description="گاه‌شمار ماهانه سلامت نبض سلامت؛ مناسبت‌ها و رویدادهای حوزه سلامت."
+                url="/health-timeline"
+            />
 
             {/* Hero */}
             <div className="relative bg-gray-900 overflow-hidden">

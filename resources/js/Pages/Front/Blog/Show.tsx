@@ -1,10 +1,13 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import BlogLayout from '@/Layouts/BlogLayout';
 import AdBannerSlot from '@/Components/AdBannerSlot';
 import MostReadWidget from '@/Components/MostReadWidget';
+import SeoHead from '@/Components/SeoHead';
+import SocialFollowWidget from '@/Components/SocialFollowWidget';
 import type { AdBanner, BlogComment, BlogPost, BlogTag } from '@/types/models';
+import type { PageProps } from '@/types';
 
 interface Props {
     post: BlogPost & { approved_comments: BlogComment[] };
@@ -41,7 +44,7 @@ function RecentCard({ post }: { post: BlogPost }) {
         >
             <div className="w-16 h-12 shrink-0 overflow-hidden bg-gray-100">
                 {post.featured_image
-                    ? <img src={`/storage/${post.featured_image}`} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    ? <img src={`/storage/${post.featured_image}`} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                     : <div className="w-full h-full bg-gray-200" />
                 }
             </div>
@@ -372,9 +375,56 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
 
     useReadingTimeBeacon(viewToken);
 
+    const { app } = usePage<PageProps>().props;
+    const description = post.excerpt
+        || post.subtitle
+        || undefined;
+    const category = post.category ?? post.categories?.[0] ?? null;
+    const pageUrl = `${app.url}/blog/${post.slug}`;
+    const imageUrl = post.featured_image
+        ? `${app.url}/storage/${post.featured_image}`
+        : undefined;
+
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'NewsArticle',
+        headline: post.title,
+        description: description ?? post.title,
+        image: imageUrl ? [imageUrl] : undefined,
+        datePublished: post.published_at ?? undefined,
+        dateModified: post.updated_at ?? post.published_at ?? undefined,
+        author: post.author
+            ? { '@type': 'Person', name: post.author.name }
+            : undefined,
+        publisher: {
+            '@type': 'Organization',
+            name: app.name,
+            logo: {
+                '@type': 'ImageObject',
+                url: `${app.url}/favicon-32x32.png`,
+            },
+        },
+        mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': pageUrl,
+        },
+        articleSection: category?.name,
+        inLanguage: 'fa-IR',
+    };
+
     return (
         <BlogLayout>
-            <Head title={`${post.title} | وبلاگ`} />
+            <SeoHead
+                title={post.title}
+                description={description}
+                image={post.featured_image}
+                url={`/blog/${post.slug}`}
+                type="article"
+                publishedTime={post.published_at}
+                modifiedTime={post.updated_at ?? post.published_at}
+                author={post.author?.name}
+                jsonLd={jsonLd}
+            />
 
             <div className="mx-auto max-w-7xl px-4 pb-8 py-6 sm:px-6 lg:px-8">
 
@@ -664,35 +714,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                         {/* Social */}
                         <div className="bg-white p-4 shadow-sm">
                             <SideboxHeader title="ما را دنبال کنید" />
-                            <div className="flex justify-around pt-1">
-                                {([
-                                    {
-                                        label: 'تلگرام', href: '#', color: 'hover:bg-[#229ED9]',
-                                        icon: <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>,
-                                    },
-                                    {
-                                        label: 'اینستاگرام', href: '#', color: 'hover:bg-[#E1306C]',
-                                        icon: <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>,
-                                    },
-                                    {
-                                        label: 'ایکس', href: '#', color: 'hover:bg-gray-900',
-                                        icon: <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>,
-                                    },
-                                ] as const).map(s => (
-                                    <a
-                                        key={s.label}
-                                        href={s.href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex flex-col items-center gap-1.5 group"
-                                    >
-                                        <div className={`w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:text-white transition-colors duration-200 ${s.color}`}>
-                                            {s.icon}
-                                        </div>
-                                        <span className="text-[11px] text-gray-500 group-hover:text-[#F24F00] transition-colors">{s.label}</span>
-                                    </a>
-                                ))}
-                            </div>
+                            <SocialFollowWidget variant="circles" />
                         </div>
 
                     </aside>

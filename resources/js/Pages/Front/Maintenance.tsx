@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import logoSrc from '../../../images/logo.png';
 
 const css = `
@@ -21,7 +21,12 @@ const css = `
 export default function Maintenance() {
     return (
         <>
-            <Head title="بروزرسانی سایت — نبض سلامت" />
+            <SeoHead
+                title="بروزرسانی سایت"
+                description="سایت نبض سلامت در حال بروزرسانی است. لطفاً کمی بعد مراجعه کنید."
+                url="/maintenance"
+                noindex
+            />
             <style dangerouslySetInnerHTML={{ __html: css }} />
 
             <div className="min-h-screen bg-[#041906] flex flex-col items-center justify-center px-4 py-12" dir="rtl">
