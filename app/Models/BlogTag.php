@@ -12,7 +12,25 @@ class BlogTag extends Model
 
     protected static function booted(): void
     {
-        static::creating(fn ($m) => $m->slug ??= Str::slug($m->name));
+        static::creating(function (self $m) {
+            if ($m->slug) {
+                return;
+            }
+
+            $base = Str::slug($m->name);
+            if ($base === '') {
+                $base = 'tag-' . substr(md5($m->name), 0, 10);
+            }
+
+            $slug = $base;
+            $i = 2;
+            while (static::where('slug', $slug)->exists()) {
+                $slug = "{$base}-{$i}";
+                $i++;
+            }
+
+            $m->slug = $slug;
+        });
     }
 
     public function posts(): BelongsToMany

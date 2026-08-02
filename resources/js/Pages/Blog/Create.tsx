@@ -1,8 +1,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, usePage } from '@inertiajs/react';
-import WysiwygEditor from '@/Components/WysiwygEditor';
+import RichTextEditor from '@/Components/RichTextEditor';
 import AssetPicker from '@/Components/AssetPicker';
 import CategoryMultiSelect from '@/Components/CategoryMultiSelect';
+import TagMultiSelect from '@/Components/TagMultiSelect';
 import type { Asset, BlogCategory, BlogTag } from '@/types/models';
 import type { PageProps } from '@/types';
 import { useState } from 'react';
@@ -29,6 +30,7 @@ interface FormData {
 export default function BlogCreate({ categories, tags }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canUpload = auth.user?.roles?.includes('admin') ?? false;
+    const canCreateTags = auth.user?.permissions?.includes('tags.create') ?? false;
 
     const [form, setForm] = useState<FormData>({
         title: '',
@@ -44,15 +46,6 @@ export default function BlogCreate({ categories, tags }: Props) {
     const [errors, setErrors]       = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
     const [pickerOpen, setPickerOpen] = useState(false);
-
-    const toggleTag = (id: number) => {
-        setForm(prev => ({
-            ...prev,
-            tag_ids: prev.tag_ids.includes(id)
-                ? prev.tag_ids.filter(x => x !== id)
-                : [...prev.tag_ids, id],
-        }));
-    };
 
     const handleAssetSelect = (asset: Asset) => {
         setForm(p => ({ ...p, featured_image: asset.path }));
@@ -87,6 +80,18 @@ export default function BlogCreate({ categories, tags }: Props) {
                 <div className="mx-auto max-w-3xl sm:px-6 lg:px-8">
                     <form onSubmit={submit} className="space-y-6 bg-white rounded-xl shadow-sm p-6">
 
+                        {/* Subtitle */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">روتیتر</label>
+                            <textarea
+                                value={form.subtitle}
+                                onChange={e => setForm(p => ({ ...p, subtitle: e.target.value }))}
+                                rows={2}
+                                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            />
+                            {errors.subtitle && <p className="mt-1 text-xs text-red-600">{errors.subtitle}</p>}
+                        </div>
+
                         {/* Title */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">عنوان <span className="text-red-500">*</span></label>
@@ -97,18 +102,6 @@ export default function BlogCreate({ categories, tags }: Props) {
                                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             />
                             {errors.title && <p className="mt-1 text-xs text-red-600">{errors.title}</p>}
-                        </div>
-
-                        {/* Subtitle */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">زیرعنوان</label>
-                            <textarea
-                                value={form.subtitle}
-                                onChange={e => setForm(p => ({ ...p, subtitle: e.target.value }))}
-                                rows={2}
-                                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                            />
-                            {errors.subtitle && <p className="mt-1 text-xs text-red-600">{errors.subtitle}</p>}
                         </div>
 
                         {/* Excerpt */}
@@ -126,7 +119,7 @@ export default function BlogCreate({ categories, tags }: Props) {
                         {/* Body */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">محتوا <span className="text-red-500">*</span></label>
-                            <WysiwygEditor value={form.body} onChange={html => setForm(p => ({ ...p, body: html }))} minHeight={200} />
+                            <RichTextEditor value={form.body} onChange={html => setForm(p => ({ ...p, body: html }))} minHeight={360} />
                             {errors.body && <p className="mt-1 text-xs text-red-600">{errors.body}</p>}
                         </div>
 
@@ -217,27 +210,16 @@ export default function BlogCreate({ categories, tags }: Props) {
                         </div>
 
                         {/* Tags */}
-                        {tags.length > 0 && (
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">برچسب‌ها</label>
-                                <div className="flex flex-wrap gap-2">
-                                    {tags.map(tag => (
-                                        <button
-                                            key={tag.id}
-                                            type="button"
-                                            onClick={() => toggleTag(tag.id)}
-                                            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                                                form.tag_ids.includes(tag.id)
-                                                    ? 'bg-indigo-600 text-white'
-                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            }`}
-                                        >
-                                            {tag.name}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">برچسب‌ها</label>
+                            <TagMultiSelect
+                                tags={tags}
+                                selected={form.tag_ids}
+                                onChange={ids => setForm(p => ({ ...p, tag_ids: ids }))}
+                                canCreate={canCreateTags}
+                                error={errors.tag_ids}
+                            />
+                        </div>
 
                         <div className="flex justify-end gap-3 pt-2">
                             <a href={route('blog.index')} className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">

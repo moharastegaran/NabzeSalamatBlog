@@ -6,7 +6,7 @@ import AdBannerSlot from '@/Components/AdBannerSlot';
 import MostReadWidget from '@/Components/MostReadWidget';
 import SeoHead from '@/Components/SeoHead';
 import SocialFollowWidget from '@/Components/SocialFollowWidget';
-import type { AdBanner, BlogComment, BlogPost, BlogTag } from '@/types/models';
+import type { AdBanner, BlogComment, BlogPost, BlogTag, PostFieldValue, PostMedia } from '@/types/models';
 import type { PageProps } from '@/types';
 
 interface Props {
@@ -23,6 +23,172 @@ function formatDate(iso: string) {
     const date = d.toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' });
     const time = d.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
     return `${date} — ${time}`;
+}
+
+function formatFieldValue(fv: PostFieldValue): string {
+    const raw = fv.value?.trim() ?? '';
+    if (!raw) return '';
+
+    const type = fv.definition?.field_type;
+    if (type === 'date') {
+        const d = new Date(raw);
+        return Number.isNaN(d.getTime())
+            ? raw
+            : d.toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    if (type === 'number') {
+        const n = Number(raw);
+        return Number.isFinite(n) ? n.toLocaleString('fa-IR') : raw;
+    }
+    if (type === 'select') {
+        const choice = fv.definition?.options?.choices?.find(c => c.value === raw);
+        return choice?.label ?? raw;
+    }
+    return raw;
+}
+
+function mediaSrc(media: PostMedia): string {
+    return media.disk === 'public' ? `/storage/${media.path}` : media.url;
+}
+
+function parseYouTubeId(url: string): string | null {
+    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|v\/))([^?&\s]+)/);
+    return m?.[1] ?? null;
+}
+
+function PostMediaSection({
+    media,
+    videoUrl,
+    poster,
+    title,
+}: {
+    media?: PostMedia[];
+    videoUrl?: string | null;
+    poster?: string | null;
+    title: string;
+}) {
+    const videos = (media ?? []).filter(m => m.collection_name === 'video');
+    const audios = (media ?? []).filter(m => m.collection_name === 'audio');
+    const externalVideo = videoUrl?.trim() || null;
+
+    if (videos.length === 0 && audios.length === 0 && !externalVideo) return null;
+
+    const posterSrc = poster ? `/storage/${poster}` : undefined;
+
+    return (
+        <div className="mt-10 space-y-6">
+            {(videos.length > 0 || externalVideo) && (
+                <div className="border border-gray-200 bg-gray-50/80 overflow-hidden">
+                    <div className="flex items-center gap-2 border-b border-gray-200 bg-white px-4 py-3">
+                        <span className="inline-block h-3 w-3 bg-[#F24F00]" />
+                        <h2 className="text-sm font-black text-gray-900">ویدیو</h2>
+                    </div>
+                    <div className="space-y-4 p-4">
+                        {externalVideo && (() => {
+                            const ytId = parseYouTubeId(externalVideo);
+                            return (
+                                <div className="aspect-video overflow-hidden bg-black">
+                                    {ytId ? (
+                                        <iframe
+                                            src={`https://www.youtube.com/embed/${ytId}?rel=0`}
+                                            className="h-full w-full"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowFullScreen
+                                            title={title}
+                                        />
+                                    ) : (
+                                        <video
+                                            src={externalVideo}
+                                            controls
+                                            poster={posterSrc}
+                                            className="h-full w-full object-contain bg-black"
+                                        >
+                                            مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
+                                        </video>
+                                    )}
+                                </div>
+                            );
+                        })()}
+                        {videos.map(item => (
+                            <div key={item.id} className="space-y-2">
+                                <div className="aspect-video overflow-hidden bg-black">
+                                    <video
+                                        src={mediaSrc(item)}
+                                        controls
+                                        preload="metadata"
+                                        poster={posterSrc}
+                                        className="h-full w-full object-contain bg-black"
+                                    >
+                                        مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
+                                    </video>
+                                </div>
+                                {(item.name || item.file_name) && (
+                                    <p className="text-xs text-gray-500 truncate">
+                                        {item.name || item.file_name}
+                                        {item.human_readable_size ? ` · ${item.human_readable_size}` : ''}
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {audios.length > 0 && (
+                <div className="border border-gray-200 bg-gray-50/80 overflow-hidden">
+                    <div className="flex items-center gap-2 border-b border-gray-200 bg-white px-4 py-3">
+                        <span className="inline-block h-3 w-3 bg-[#F24F00]" />
+                        <h2 className="text-sm font-black text-gray-900">فایل صوتی</h2>
+                    </div>
+                    <ul className="divide-y divide-gray-200">
+                        {audios.map(item => (
+                            <li key={item.id} className="px-4 py-3 space-y-2">
+                                <div className="flex items-center justify-between gap-3 text-xs text-gray-500">
+                                    <span className="font-medium text-gray-700 truncate">
+                                        {item.name || item.file_name}
+                                    </span>
+                                    {item.human_readable_size && (
+                                        <span className="shrink-0">{item.human_readable_size}</span>
+                                    )}
+                                </div>
+                                <audio
+                                    controls
+                                    preload="metadata"
+                                    src={mediaSrc(item)}
+                                    className="w-full"
+                                >
+                                    مرورگر شما از پخش صوت پشتیبانی نمی‌کند.
+                                </audio>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function PostFieldValues({ values }: { values?: PostFieldValue[] }) {
+    const items = (values ?? []).filter(fv => fv.value?.trim() && fv.definition);
+
+    if (items.length === 0) return null;
+
+    return (
+        <div className="mt-10 border border-gray-200 bg-gray-50/80">
+            <div className="flex items-center gap-2 border-b border-gray-200 bg-white px-4 py-3">
+                <span className="inline-block h-3 w-3 bg-[#F24F00]" />
+                <h2 className="text-sm font-black text-gray-900">اطلاعات تکمیلی</h2>
+            </div>
+            <dl className="divide-y divide-gray-200">
+                {items.map(fv => (
+                    <div key={fv.id} className="grid grid-cols-1 gap-1 px-4 py-3 sm:grid-cols-[minmax(8rem,12rem)_1fr] sm:gap-4">
+                        <dt className="text-sm font-semibold text-gray-600">{fv.definition?.label}</dt>
+                        <dd className="text-sm leading-relaxed text-gray-900 whitespace-pre-wrap">{formatFieldValue(fv)}</dd>
+                    </div>
+                ))}
+            </dl>
+        </div>
+    );
 }
 
 // ── Sidebar header (matches Category.tsx) ─────────────────────────────────────
@@ -541,6 +707,15 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                             )}
                             <div dangerouslySetInnerHTML={{ __html: post.body }} />
                         </div>
+
+                        <PostMediaSection
+                            media={post.media}
+                            videoUrl={post.video_url}
+                            poster={post.featured_image}
+                            title={post.title}
+                        />
+
+                        <PostFieldValues values={post.field_values} />
 
                         {/* Short link */}
                         {post.short_link && (

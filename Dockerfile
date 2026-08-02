@@ -99,5 +99,6 @@ CMD ["node", "bootstrap/ssr/ssr.js"]
 # Stage 6: nginx with static files baked in (prod only)
 FROM nginx:alpine AS nginx
 COPY --from=app /var/www/html/public /var/www/html/public
-COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY docker/nginx/snippets/ /etc/nginx/snippets/
+COPY docker/nginx/prod.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80

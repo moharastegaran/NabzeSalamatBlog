@@ -109,7 +109,7 @@ export interface PostFieldValue {
     blog_post_id: number;
     category_field_definition_id: number;
     value: string | null;
-    definition?: Pick<CategoryFieldDefinition, 'id' | 'field_key' | 'field_type' | 'label' | 'options'>;
+    definition?: Pick<CategoryFieldDefinition, 'id' | 'field_key' | 'field_type' | 'label' | 'options' | 'sort_order'>;
 }
 
 export type GalleryEvent = 'seminar' | 'exhibition';
@@ -168,14 +168,10 @@ export interface Ticket {
     messages_count?: number;
 }
 
-export interface BreakingNews {
+export interface BreakingNewsItem {
     id: number;
     title: string;
     url: string | null;
-    is_active: boolean;
-    active_from: string | null; // 'YYYY-MM-DD HH:mm' or null
-    active_until: string | null; // 'YYYY-MM-DD HH:mm' or null
-    created_at: string;
 }
 
 export interface PostMedia {

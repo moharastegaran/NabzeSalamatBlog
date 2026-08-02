@@ -1,4 +1,4 @@
-import type { BreakingNews } from './models';
+import type { BreakingNewsItem } from './models';
 
 export interface NavCategory {
     id: number;
@@ -39,5 +39,5 @@ export type PageProps<
     openTickets: number;
     contactUnread: number;
     navCategories: NavCategory[];
-    breakingNews: BreakingNews[];
+    breakingNews: BreakingNewsItem[];
 };

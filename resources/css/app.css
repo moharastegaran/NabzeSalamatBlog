@@ -83,6 +83,97 @@
     .blog-body td { @apply border border-gray-200 px-3 py-2; }
 }
 
+/* ── Rich Text Editor (Quill) ─────────────────────────────────────── */
+.rte-shell {
+    @apply relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition;
+}
+.rte-shell--focused {
+    @apply border-indigo-400 ring-2 ring-indigo-100;
+}
+.rte-shell--fullscreen {
+    @apply fixed inset-3 z-50 flex flex-col rounded-2xl border-indigo-200 shadow-2xl;
+}
+.rte-action-btn {
+    @apply inline-flex items-center gap-1.5 rounded-md border border-gray-200 bg-white px-2 py-0.5 text-[11px] font-medium text-gray-600 transition hover:border-indigo-300 hover:text-indigo-700;
+}
+.rte-footer {
+    @apply flex items-center justify-between border-t border-gray-100 bg-gray-50/80 px-3 py-1.5 text-[11px] text-gray-500;
+}
+.rte-shell--fullscreen .rte-editor {
+    @apply flex min-h-0 flex-1 flex-col;
+}
+.rte-shell--fullscreen .ql-container {
+    @apply flex-1 overflow-y-auto;
+}
+
+.rte-shell .ql-toolbar.ql-snow {
+    @apply sticky top-0 z-[1] flex flex-wrap items-center gap-0.5 border-0 border-b border-gray-100 bg-gradient-to-b from-gray-50 to-white px-2 py-2;
+}
+.rte-shell .ql-toolbar.ql-snow .ql-formats {
+    @apply ml-1 mr-0 border-l border-gray-200 pl-2;
+}
+.rte-shell .ql-toolbar.ql-snow .ql-formats:first-child {
+    @apply border-l-0 pl-0;
+}
+.rte-shell .ql-toolbar.ql-snow button,
+.rte-shell .ql-toolbar.ql-snow .ql-picker-label {
+    @apply rounded-md transition;
+}
+.rte-shell .ql-toolbar.ql-snow button:hover,
+.rte-shell .ql-toolbar.ql-snow .ql-picker-label:hover {
+    @apply bg-indigo-50;
+}
+.rte-shell .ql-toolbar.ql-snow button.ql-active,
+.rte-shell .ql-toolbar.ql-snow .ql-picker-label.ql-active {
+    @apply bg-indigo-100 text-indigo-700;
+}
+.rte-shell .ql-toolbar.ql-snow button:hover .ql-stroke,
+.rte-shell .ql-toolbar.ql-snow .ql-picker-label:hover .ql-stroke,
+.rte-shell .ql-toolbar.ql-snow button.ql-active .ql-stroke,
+.rte-shell .ql-toolbar.ql-snow .ql-picker-label.ql-active .ql-stroke {
+    stroke: #4f46e5;
+}
+.rte-shell .ql-toolbar.ql-snow button:hover .ql-fill,
+.rte-shell .ql-toolbar.ql-snow button.ql-active .ql-fill {
+    fill: #4f46e5;
+}
+.rte-shell .ql-container.ql-snow {
+    @apply border-0 font-[inherit] text-base leading-7 text-gray-700;
+}
+.rte-shell .ql-editor {
+    @apply px-5 py-4 text-right;
+}
+.rte-shell .ql-editor.ql-blank::before {
+    @apply right-5 left-auto text-gray-400 not-italic;
+}
+.rte-shell .ql-editor h1 { @apply mb-3 mt-6 text-3xl font-bold text-gray-900; }
+.rte-shell .ql-editor h2 { @apply mb-3 mt-5 text-2xl font-bold text-gray-900; }
+.rte-shell .ql-editor h3 { @apply mb-2 mt-4 text-xl font-semibold text-gray-800; }
+.rte-shell .ql-editor h4 { @apply mb-2 mt-3 text-lg font-semibold text-gray-800; }
+.rte-shell .ql-editor p  { @apply mb-2 text-justify; }
+.rte-shell .ql-editor a  { @apply text-indigo-600 underline underline-offset-2; }
+.rte-shell .ql-editor blockquote {
+    @apply my-4 border-r-4 border-indigo-300 pr-4 italic text-gray-600;
+}
+.rte-shell .ql-editor ul { @apply mb-4 list-disc space-y-1 pr-6; }
+.rte-shell .ql-editor ol { @apply mb-4 list-decimal space-y-1 pr-6; }
+.rte-shell .ql-editor img { @apply mx-auto my-4 max-w-full rounded-lg; }
+.rte-shell .ql-editor pre.ql-syntax {
+    @apply my-4 overflow-x-auto rounded-xl bg-gray-900 p-4 text-sm text-gray-100;
+}
+.rte-shell .ql-editor .ql-video {
+    @apply my-4 aspect-video w-full max-w-full rounded-xl;
+}
+.rte-shell .ql-snow .ql-tooltip {
+    @apply left-auto right-4 rounded-lg border-gray-200 text-sm shadow-lg;
+}
+.rte-shell .ql-snow .ql-tooltip input[type='text'] {
+    @apply rounded border-gray-300 text-sm;
+}
+.rte-shell .ql-snow .ql-picker.ql-expanded .ql-picker-options {
+    @apply rounded-lg border-gray-200 shadow-lg;
+}
+
 @keyframes carousel-slide-left {
     from { transform: translateX(48px); }
     to   { transform: translateX(0); }

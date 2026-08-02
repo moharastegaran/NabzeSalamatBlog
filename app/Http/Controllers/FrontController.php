@@ -16,7 +16,7 @@ class FrontController extends Controller
     {
         $recent = BlogPost::published()
             ->with('category:id,name,slug')
-            ->select('id', 'title', 'slug', 'excerpt', 'featured_image', 'blog_category_id', 'published_at')
+            ->select('id', 'title', 'subtitle', 'slug', 'excerpt', 'featured_image', 'blog_category_id', 'published_at')
             ->latest('published_at')
             ->take(8)
             ->get();

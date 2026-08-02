@@ -85,6 +85,11 @@ function HeroSlider({ posts }: { posts: BlogPost[] }) {
                                 {cur.category.name}
                             </span>
                         )}
+                        {cur.subtitle && (
+                            <p className="text-gray-200 text-sm lg:text-base font-medium leading-snug line-clamp-2 mb-1.5 max-w-2xl">
+                                {cur.subtitle}
+                            </p>
+                        )}
                         <Link href={route('front.blog.show', cur.slug)}>
                             <h2 className="text-white text-xl lg:text-3xl font-black leading-tight line-clamp-2 mb-2 hover:text-gray-200 transition-colors">
                                 {cur.title}

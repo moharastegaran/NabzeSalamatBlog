@@ -336,10 +336,10 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                                             }`}
                                         >
                                             {item.url ? (
-                                                <a href={item.url} target="_blank" rel="noopener noreferrer"
+                                                <Link href={item.url}
                                                    className="text-gray-200 text-sm hover:text-[#F24F00] transition-colors w-full">
                                                     {item.title}
-                                                </a>
+                                                </Link>
                                             ) : (
                                                 <span className="text-gray-200 text-sm w-full">{item.title}</span>
                                             )}

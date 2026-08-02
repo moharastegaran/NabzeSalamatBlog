@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogTag;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,13 +18,17 @@ class BlogTagController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100', 'unique:blog_tags,name'],
         ]);
 
-        BlogTag::create($validated);
+        $tag = BlogTag::create($validated);
+
+        if ($request->wantsJson()) {
+            return response()->json($tag->only(['id', 'name', 'slug']));
+        }
 
         return back()->with('success', "برچسب \"{$validated['name']}\" افزوده شد.");
     }

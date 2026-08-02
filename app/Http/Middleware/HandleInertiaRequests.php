@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\BlogCategory;
-use App\Models\BreakingNews;
+use App\Models\BlogPost;
 use App\Models\ContactMessage;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
@@ -61,11 +61,21 @@ class HandleInertiaRequests extends Middleware
                     ->where('status', 'open')
                     ->count()
                 : 0,
-            'breakingNews'    => fn () => BreakingNews::where('is_active', true)
-                ->where(fn ($q) => $q->whereNull('active_from')->orWhere('active_from', '<=', now()))
-                ->where(fn ($q) => $q->whereNull('active_until')->orWhere('active_until', '>=', now()))
+            'breakingNews'    => fn () => BlogPost::published()
+                ->whereHas('categories', fn ($q) => $q->where(function ($q) {
+                    $q->where('blog_categories.id', 9)
+                        ->orWhere('blog_categories.slug', 'breaking-news');
+                }))
+                ->orderByDesc('published_at')
                 ->orderByDesc('created_at')
-                ->get(['id', 'title', 'url']),
+                ->limit(20)
+                ->get(['id', 'title', 'slug'])
+                ->map(fn (BlogPost $post) => [
+                    'id'    => $post->id,
+                    'title' => $post->title,
+                    'url'   => route('front.blog.show', $post->slug, absolute: false),
+                ])
+                ->values(),
             'contactUnread'   => fn () => $user && in_array('admin', $user->getRoleNames()->toArray())
                 ? ContactMessage::whereNull('read_at')->count()
                 : 0,

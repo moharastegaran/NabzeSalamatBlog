@@ -227,10 +227,24 @@ class BlogController extends Controller
                 'categories:id,name,slug',
                 'tags:id,name,slug',
                 'approvedComments' => fn ($q) => $q->latest(),
+                'fieldValues' => fn ($q) => $q->with([
+                    'definition:id,field_key,field_type,label,options,sort_order',
+                ]),
+                'media' => fn ($q) => $q
+                    ->whereIn('collection_name', ['audio', 'video'])
+                    ->orderBy('order_column'),
             ])
             ->firstOrFail();
 
         $post->append('time_to_read');
+
+        $post->setRelation(
+            'fieldValues',
+            $post->fieldValues
+                ->filter(fn ($fv) => filled($fv->value) && $fv->definition && $fv->definition->field_type !== 'file')
+                ->sortBy(fn ($fv) => $fv->definition->sort_order ?? 0)
+                ->values()
+        );
 
         $viewToken = $this->viewTracker->track($post->id, $request);
 

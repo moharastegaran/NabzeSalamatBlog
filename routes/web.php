@@ -4,7 +4,6 @@ use App\Http\Controllers\AdBannerController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\AnnouncementController;
-use App\Http\Controllers\BreakingNewsController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\BlogCategoryController;
@@ -87,12 +86,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/ad-banners/{adBanner}',             [AdBannerController::class, 'destroy'])     ->name('ad-banners.destroy');
     });
 
-    // Breaking News (admin only)
+    // Ad Banners (admin only)
     Route::middleware('role:admin')->group(function () {
-        Route::get('/breaking-news',                     [BreakingNewsController::class, 'index'])  ->name('breaking-news.index');
-        Route::post('/breaking-news',                    [BreakingNewsController::class, 'store'])  ->name('breaking-news.store');
-        Route::put('/breaking-news/{breakingNews}',      [BreakingNewsController::class, 'update']) ->name('breaking-news.update');
-        Route::delete('/breaking-news/{breakingNews}',   [BreakingNewsController::class, 'destroy'])->name('breaking-news.destroy');
+        Route::get   ('/ad-banners',                        [AdBannerController::class, 'index'])       ->name('ad-banners.index');
+        Route::get   ('/ad-banners/create',                 [AdBannerController::class, 'create'])      ->name('ad-banners.create');
+        Route::post  ('/ad-banners',                        [AdBannerController::class, 'store'])       ->name('ad-banners.store');
+        Route::get   ('/ad-banners/{adBanner}/edit',        [AdBannerController::class, 'edit'])        ->name('ad-banners.edit');
+        Route::put   ('/ad-banners/{adBanner}',             [AdBannerController::class, 'update'])      ->name('ad-banners.update');
+        Route::patch ('/ad-banners/{adBanner}/toggle',      [AdBannerController::class, 'toggleActive'])->name('ad-banners.toggle');
+        Route::delete('/ad-banners/{adBanner}',             [AdBannerController::class, 'destroy'])     ->name('ad-banners.destroy');
     });
 
     // Role management (admin only)

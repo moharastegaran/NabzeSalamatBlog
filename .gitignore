@@ -24,3 +24,8 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/docker/ssl/*.pem
+/docker/ssl/*.key
+/docker/ssl/*.crt
+!/docker/ssl/.gitkeep
+!/docker/ssl/README.md
