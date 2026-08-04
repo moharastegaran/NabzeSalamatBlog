@@ -110,8 +110,10 @@ class TelegramService
         $response = Http::timeout(15)
             ->asJson()
             ->post($this->apiUrl('sendMessage'), [
-                'chat_id' => $this->channelId,
-                'text'    => $text,
+                'chat_id'                  => $this->channelId,
+                'text'                     => $text,
+                'parse_mode'               => 'Markdown',
+                'disable_web_page_preview' => true,
             ]);
 
         if (! $response->successful() || ! ($response->json('ok') ?? false)) {
@@ -148,9 +150,11 @@ class TelegramService
         $response = Http::timeout(20)
             ->asJson()
             ->post($this->apiUrl('sendPhoto'), [
-                'chat_id' => $this->channelId,
-                'photo'   => $photo,
-                'caption' => $caption,
+                'chat_id'                  => $this->channelId,
+                'photo'                    => $photo,
+                'caption'                  => $caption,
+                'parse_mode'               => 'Markdown',
+                'disable_web_page_preview' => true,
             ]);
 
         if (! $response->successful() || ! ($response->json('ok') ?? false)) {
@@ -180,8 +184,10 @@ class TelegramService
             $response = Http::timeout(30)
                 ->attach('photo', $handle, basename($path))
                 ->post($this->apiUrl('sendPhoto'), [
-                    'chat_id' => $this->channelId,
-                    'caption' => $caption,
+                    'chat_id'                  => $this->channelId,
+                    'caption'                  => $caption,
+                    'parse_mode'               => 'Markdown',
+                    'disable_web_page_preview' => true,
                 ]);
         } finally {
             fclose($handle);

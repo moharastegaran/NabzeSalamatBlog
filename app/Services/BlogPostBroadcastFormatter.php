@@ -10,20 +10,20 @@ class BlogPostBroadcastFormatter
 {
     private const CAPTION_LIMIT = 4096;
 
-    private const FOOTER_SEPARATOR = '┄┅═✧❀❀✧═┅┄                                                                                                                                                                                        ╭━➖➖━⊰🍏⊱━➖➖➖➖➖━╮';
+    private const MAX_PARAGRAPHS = 2;
 
-    private const FOOTER_CLOSER = '╰━━➖➖⊰🍏⊱➖➖➖➖➖━━╯';
+    private const MEDICAL_SEPARATOR = '🧬🧠🫁🫀🦷🦿🩻🔬🌡️🩸💉💊';
 
     public function format(BlogPost $post, int $limit = self::CAPTION_LIMIT): string
     {
-        $contentLines = ['📍'.$post->title];
+        $contentLines = ['📍'.$this->escapeMarkdown($post->title)];
 
         foreach ($this->extractParagraphs($post) as $index => $paragraph) {
             $contentLines[] = '';
-            $contentLines[] = ($index % 2 === 0 ? '🔸' : '').$paragraph;
+            $contentLines[] = ($index % 2 === 0 ? '🔸' : '').$this->escapeMarkdown($paragraph);
         }
 
-        $footerBlock = array_merge([''], $this->footerLines());
+        $footerBlock = array_merge([''], $this->footerLines($post));
 
         while ($contentLines !== []
             && strlen(implode("\n", array_merge($contentLines, $footerBlock))) > $limit) {
@@ -79,6 +79,14 @@ class BlogPostBroadcastFormatter
     /** @return list<string> */
     private function extractParagraphs(BlogPost $post): array
     {
+        $paragraphs = $this->collectParagraphs($post);
+
+        return array_slice($paragraphs, 0, self::MAX_PARAGRAPHS);
+    }
+
+    /** @return list<string> */
+    private function collectParagraphs(BlogPost $post): array
+    {
         $html = $post->body ?? '';
 
         if (filled($html) && preg_match_all('/<p[^>]*>(.*?)<\/p>/is', $html, $matches)) {
@@ -127,18 +135,61 @@ class BlogPostBroadcastFormatter
     }
 
     /** @return list<string> */
-    private function footerLines(): array
+    private function footerLines(BlogPost $post): array
     {
-        return [
-            self::FOOTER_SEPARATOR,
-            '🔗🆔همراه ما باشید👇🏻',
-            config('services.bale.footer_telegram_channel', 'کانال تلگرام رسانه خبری نبض سلامت'),
-            config('services.social.telegram'),
-            config('services.bale.footer_bale_channel', 'کانال بله رسانه خبری نبض سلامت'),
-            config('services.social.bale'),
-            config('services.bale.footer_whatsapp_channel', 'کانال واتس آپ رسانه خبری نبض سلامت'),
-            config('services.social.whatsapp'),
-            self::FOOTER_CLOSER,
-        ];
+        $lines = [];
+
+        $shortUrl = $this->shortPostUrl($post);
+
+        if (filled($shortUrl)) {
+            $lines[] = '📶 '.$this->markdownLink('مشاهده متن کامل خبر', $shortUrl);
+        }
+
+        $lines[] = self::MEDICAL_SEPARATOR;
+        $lines[] = '📡 با '.config('app.name', 'نبض سلامت').' همراه باشید';
+
+        $socialLinks = array_filter([
+            $this->socialMarkdownLink('بله', (string) config('services.social.bale')),
+            $this->socialMarkdownLink('واتساپ', (string) config('services.social.whatsapp')),
+            $this->socialMarkdownLink('تلگرام', (string) config('services.social.telegram')),
+        ]);
+
+        if ($socialLinks !== []) {
+            $lines[] = implode(' | ', $socialLinks);
+        }
+
+        return $lines;
+    }
+
+    private function shortPostUrl(BlogPost $post): ?string
+    {
+        if (! filled($post->short_link)) {
+            return null;
+        }
+
+        return url('/'.$post->short_link);
+    }
+
+    private function socialMarkdownLink(string $label, string $url): ?string
+    {
+        if (! filled($url)) {
+            return null;
+        }
+
+        return $this->markdownLink($label, $url);
+    }
+
+    private function markdownLink(string $label, string $url): string
+    {
+        return '['.$this->escapeMarkdown($label).']('.$url.')';
+    }
+
+    private function escapeMarkdown(string $text): string
+    {
+        return str_replace(
+            ['\\', '_', '*', '[', ']', '`'],
+            ['\\\\', '\\_', '\\*', '\\[', '\\]', '\\`'],
+            $text,
+        );
     }
 }

@@ -55,12 +55,9 @@ return [
     ],
 
     'bale' => [
-        'enabled'                 => env('BALE_ENABLED', false),
-        'bot_token'               => env('BALE_BOT_TOKEN'),
-        'channel_id'              => env('BALE_CHANNEL_ID'),
-        'footer_bale_channel'     => env('BALE_FOOTER_BALE_CHANNEL', 'کانال بله رسانه خبری نبض سلامت'),
-        'footer_telegram_channel' => env('BALE_FOOTER_TELEGRAM_CHANNEL', 'کانال تلگرام رسانه خبری نبض سلامت'),
-        'footer_whatsapp_channel' => env('BALE_FOOTER_WHATSAPP_CHANNEL', 'کانال واتس آپ رسانه خبری نبض سلامت'),
+        'enabled'    => env('BALE_ENABLED', false),
+        'bot_token'  => env('BALE_BOT_TOKEN'),
+        'channel_id' => env('BALE_CHANNEL_ID'),
     ],
 
     /*
