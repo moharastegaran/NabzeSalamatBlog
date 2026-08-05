@@ -92,7 +92,7 @@ class ReportController extends Controller
             <head>
             <meta charset="UTF-8">
             <style>
-                body  { font-family: sans-serif; direction: rtl; font-size: 11px; color: #111827; }
+                body  { font-family: dejavusans; direction: rtl; font-size: 11px; color: #111827; }
                 h2    { font-size: 15px; margin-bottom: 12px; color: #1e1b4b; }
                 table { width: 100%; border-collapse: collapse; }
                 th    { background: #4f46e5; color: #fff; padding: 7px 8px; text-align: right; font-size: 11px; }
@@ -116,7 +116,8 @@ class ReportController extends Controller
             'margin_bottom'  => 15,
             'margin_left'    => 12,
             'margin_right'   => 12,
-            'autoLangToFont' => true,
+            'default_font'   => 'dejavusans',
+            'autoLangToFont' => false,
             'autoArabic'     => true,
             'tempDir'        => storage_path('app/mpdf'),
         ]);
