@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\AboutPageController;
 use App\Http\Controllers\AdBannerController;
+use App\Http\Controllers\AdvertiseModalController;
+use App\Http\Controllers\ContactPageController;
+use App\Http\Controllers\FooterQuickLinksController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\AnnouncementController;
@@ -86,15 +90,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/ad-banners/{adBanner}',             [AdBannerController::class, 'destroy'])     ->name('ad-banners.destroy');
     });
 
-    // Ad Banners (admin only)
+    // About page content (admin only)
     Route::middleware('role:admin')->group(function () {
-        Route::get   ('/ad-banners',                        [AdBannerController::class, 'index'])       ->name('ad-banners.index');
-        Route::get   ('/ad-banners/create',                 [AdBannerController::class, 'create'])      ->name('ad-banners.create');
-        Route::post  ('/ad-banners',                        [AdBannerController::class, 'store'])       ->name('ad-banners.store');
-        Route::get   ('/ad-banners/{adBanner}/edit',        [AdBannerController::class, 'edit'])        ->name('ad-banners.edit');
-        Route::put   ('/ad-banners/{adBanner}',             [AdBannerController::class, 'update'])      ->name('ad-banners.update');
-        Route::patch ('/ad-banners/{adBanner}/toggle',      [AdBannerController::class, 'toggleActive'])->name('ad-banners.toggle');
-        Route::delete('/ad-banners/{adBanner}',             [AdBannerController::class, 'destroy'])     ->name('ad-banners.destroy');
+        Route::get('/about-page', [AboutPageController::class, 'edit'])->name('about-page.edit');
+        Route::put('/about-page', [AboutPageController::class, 'update'])->name('about-page.update');
+    });
+
+    // Advertise modal content (admin only)
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/advertise-modal', [AdvertiseModalController::class, 'edit'])->name('advertise-modal.edit');
+        Route::put('/advertise-modal', [AdvertiseModalController::class, 'update'])->name('advertise-modal.update');
+    });
+
+    // Contact page content (admin only)
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/contact-page', [ContactPageController::class, 'edit'])->name('contact-page.edit');
+        Route::put('/contact-page', [ContactPageController::class, 'update'])->name('contact-page.update');
+    });
+
+    // Footer quick links (admin only)
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/footer-quick-links', [FooterQuickLinksController::class, 'edit'])->name('footer-quick-links.edit');
+        Route::put('/footer-quick-links', [FooterQuickLinksController::class, 'update'])->name('footer-quick-links.update');
     });
 
     // Role management (admin only)

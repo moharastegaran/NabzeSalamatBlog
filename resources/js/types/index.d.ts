@@ -40,4 +40,26 @@ export type PageProps<
     contactUnread: number;
     navCategories: NavCategory[];
     breakingNews: BreakingNewsItem[];
+    advertiseModal: AdvertiseModalContent;
+    footerQuickLinks: FooterQuickLinksContent;
 };
+
+export interface AdvertiseModalContent {
+    title: string;
+    subtitle: string;
+    descriptions: string[];
+    features: string[];
+    hint: string;
+    primary_button: { label: string; url: string };
+    secondary_button: { label: string; url: string | null };
+}
+
+export interface FooterQuickLink {
+    label: string;
+    href: string;
+}
+
+export interface FooterQuickLinksContent {
+    section_title: string;
+    links: FooterQuickLink[];
+}

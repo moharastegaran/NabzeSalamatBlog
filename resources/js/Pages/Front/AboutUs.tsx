@@ -1,30 +1,50 @@
 import { Link } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
 import SeoHead from '@/Components/SeoHead';
+import type { ReactNode } from 'react';
 
 import aboutBG from '../../../images/about-us.jpg';
 import contactBG from '../../../images/contact-us.jpg';
 
-const POLICY_DUTIES = [
-    'تعیین سیاست‌های کلان رسانه',
-    'نظارت بر رعایت اصول حرفه‌ای و اخلاق رسانه‌ای',
-    'کمک به توسعه محتوای تخصصی و اثرگذار',
-    'حمایت از استقلال رسانه و شفافیت اطلاع‌رسانی',
-    'ارائه پیشنهاد برای توسعه خدمات و محصولات رسانه‌ای',
-    'تقویت ارتباط میان جامعه سلامت، سیاست‌گذاران و فعالان صنعت'
-];
+type StatItem = { value: string; label: string };
+type ValueItem = { title: string; desc: string; icon: string };
+type EditorialItem = { step: string; title: string; desc: string };
 
-const STATS = [
-    { value: '۵۰۰+',    label: 'مقاله منتشر شده'    },
-    { value: '۳۰+',     label: 'متخصص همکار'         },
-    { value: '۱۰۰هزار+', label: 'بازدیدکننده ماهانه' },
-    { value: '۵',       label: 'سال سابقه'           },
-];
+export type AboutUsContent = {
+    seo: { title: string; description: string };
+    hero: {
+        badge: string;
+        title: string;
+        subtitle: string;
+        cta_primary: string;
+        cta_secondary: string;
+    };
+    stats: StatItem[];
+    mission: { title: string; paragraphs: string[] };
+    vision: { title: string; paragraphs: string[]; quote?: string };
+    policy: {
+        section_title: string;
+        intro_title: string;
+        paragraphs: string[];
+        duties_title: string;
+        duties: string[];
+    };
+    values: { section_title: string; items: ValueItem[] };
+    editorial: { section_title: string; items: EditorialItem[] };
+    cta: {
+        title: string;
+        subtitle: string;
+        cta_primary: string;
+        cta_secondary: string;
+    };
+};
 
-const VALUES = [
-    {
-        title: 'صداقت علمی',
-        desc:  'تمام محتوای ما بر پایه منابع معتبر و بررسی‌شده توسط متخصصان تهیه می‌شود.',
+interface Props {
+    content: AboutUsContent;
+}
+
+const VALUE_STYLES: Record<string, { accent: string; iconBg: string; iconColor: string; icon: ReactNode }> = {
+    integrity: {
         accent: 'border-[#F24F00]',
         iconBg: 'bg-[#F24F00]/10',
         iconColor: 'text-[#F24F00]',
@@ -34,9 +54,7 @@ const VALUES = [
             </svg>
         ),
     },
-    {
-        title: 'دسترس‌پذیری',
-        desc:  'اطلاعات پزشکی باید برای همه قابل‌فهم و در دسترس باشد، نه فقط متخصصان.',
+    accessibility: {
         accent: 'border-[#075F26]',
         iconBg: 'bg-[#075F26]/10',
         iconColor: 'text-[#075F26]',
@@ -46,9 +64,7 @@ const VALUES = [
             </svg>
         ),
     },
-    {
-        title: 'استقلال',
-        desc:  'محتوای ما از هرگونه تأثیر تجاری و منافع صنعتی مستقل است.',
+    independence: {
         accent: 'border-gray-800',
         iconBg: 'bg-gray-100',
         iconColor: 'text-gray-700',
@@ -58,9 +74,7 @@ const VALUES = [
             </svg>
         ),
     },
-    {
-        title: 'به‌روز بودن',
-        desc:  'پایش مستمر آخرین تحقیقات و به‌روزرسانی محتوا بر اساس یافته‌های جدید.',
+    freshness: {
         accent: 'border-indigo-500',
         iconBg: 'bg-indigo-50',
         iconColor: 'text-indigo-600',
@@ -70,7 +84,7 @@ const VALUES = [
             </svg>
         ),
     },
-];
+};
 
 function SectionTitle({ title }: { title: string }) {
     return (
@@ -81,38 +95,44 @@ function SectionTitle({ title }: { title: string }) {
     );
 }
 
-export default function AboutUs() {
+export default function AboutUs({ content }: Props) {
+    const { seo, hero, stats, mission, vision, policy, values, editorial, cta } = content;
+
     return (
         <BlogLayout>
             <SeoHead
-                title="درباره ما"
-                description="درباره رسانه خبری نبض سلامت؛ رسالت، هیئت سیاست‌گذاری و تعهد حرفه‌ای به اطلاع‌رسانی حوزه سلامت."
+                title={seo.title}
+                description={seo.description}
                 url="/about-us"
             />
 
-            {/* ── Hero ──────────────────────────────────────────── */}
-            <div className="relative bg-gray-900 overflow-hidden"
-            style={{ background: `linear-gradient(to left,rgb(17 24 39 / 0.92), rgb(17 24 39 / 0.75)), url(${aboutBG}) no-repeat left center`, backgroundSize: '100%' }}>
+            <div
+                className="relative bg-gray-900 overflow-hidden"
+                style={{
+                    background: `linear-gradient(to left,rgb(17 24 39 / 0.92), rgb(17 24 39 / 0.75)), url(${aboutBG}) no-repeat left center`,
+                    backgroundSize: '100%',
+                }}
+            >
                 <div className="absolute inset-y-0 right-0 w-1.5 bg-[#F24F00]" />
                 <div className="absolute top-0 inset-x-0 h-0.5 bg-[#F24F00]" />
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#F24F00]/5 rounded-full -translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
                     <span className="inline-block bg-[#F24F00] px-3 py-1 text-xs font-black uppercase tracking-widest text-white mb-5">
-                        نبض سلامت
+                        {hero.badge}
                     </span>
                     <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight mb-4">
-                        درباره ما
+                        {hero.title}
                     </h1>
                     <p className="text-gray-400 text-lg leading-8 max-w-xl mb-8">
-                        نبض سلامت بستری معتبر برای انتشار اطلاعات پزشکی و بهداشتی به زبان فارسی است؛ جایی که علم و زندگی روزمره به هم می‌رسند.
+                        {hero.subtitle}
                     </p>
                     <div className="flex flex-wrap items-center gap-3">
                         <Link
                             href="#about-section--mvp"
                             className="inline-flex items-center gap-2 bg-[#F24F00] px-5 py-2.5 text-sm font-bold text-white hover:opacity-90 transition-opacity"
                         >
-                            ما را بشناسید
+                            {hero.cta_primary}
                             <svg className="h-4 w-4 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                             </svg>
@@ -121,17 +141,16 @@ export default function AboutUs() {
                             href={route('front.blog.index')}
                             className="inline-flex items-center gap-2 border border-gray-600 px-5 py-2.5 text-sm font-bold text-gray-300 hover:border-gray-400 hover:text-white transition-colors"
                         >
-                            مشاهده اخبار
+                            {hero.cta_secondary}
                         </Link>
                     </div>
                 </div>
             </div>
 
-            {/* ── Stats bar ─────────────────────────────────────── */}
             <div className="bg-[#F24F00]">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-x-reverse divide-white/20">
-                        {STATS.map(({ value, label }) => (
+                        {stats.map(({ value, label }) => (
                             <div key={label} className="flex flex-col items-center justify-center py-8 gap-1.5">
                                 <span className="text-3xl font-black text-white tabular-nums">{value}</span>
                                 <span className="text-xs text-white/80 font-medium">{label}</span>
@@ -142,85 +161,61 @@ export default function AboutUs() {
             </div>
 
             <div id="about-section--mvp" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 space-y-20">
-
-                {/* ── Mission + Vision ──────────────────────────── */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                    {/* Mission */}
                     <div className="bg-white shadow-sm border-t-4 border-[#F24F00] p-8">
                         <div className="flex items-center gap-2.5 mb-6">
                             <span className="w-1 h-6 bg-[#F24F00] flex-shrink-0" />
-                            <h2 className="text-lg font-black text-gray-900">ماموریت نبض سلامت</h2>
+                            <h2 className="text-lg font-black text-gray-900">{mission.title}</h2>
                         </div>
                         <div className="space-y-4 text-sm text-gray-600 leading-7">
-                            <p>
-                                نبض سلامت با هدف تولید، انتشار و تحلیل اخبار، گزارش‌ها و محتوای تخصصی حوزه سلامت، دارو، تجهیزات پزشکی و سیاست‌گذاری سلامت فعالیت می‌کند.
-                            </p>
-                            <p>
-                                ماموریت ما ایجاد پلی میان فعالان نظام سلامت، مدیران، سیاست‌گذاران، دانشگاهیان، شرکت‌های دارویی، داروسازان، پزشکان و سایر ذی‌نفعان این حوزه است تا اطلاعات دقیق، معتبر و به‌روز در اختیار مخاطبان قرار گیرد.
-                            </p>
-                            <p>
-                                ما تلاش می‌کنیم با رویکردی حرفه‌ای، مستقل و مبتنی بر شفافیت، به مرجع قابل اعتماد اخبار و تحلیل‌های حوزه سلامت کشور تبدیل شویم.
-                            </p>
+                            {mission.paragraphs.map((paragraph, i) => (
+                                <p key={i}>{paragraph}</p>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Vision */}
                     <div className="bg-white shadow-sm border-t-4 border-[#075F26] p-8">
                         <div className="flex items-center gap-2.5 mb-6">
                             <span className="w-1 h-6 bg-[#075F26] flex-shrink-0" />
-                            <h2 className="text-lg font-black text-gray-900">چشم‌انداز ما</h2>
+                            <h2 className="text-lg font-black text-gray-900">{vision.title}</h2>
                         </div>
                         <div className="space-y-4 text-sm text-gray-600 leading-7">
-                            <p>
-                                نبض سلامت در افق پیش‌رو، خود را رسانه‌ای مرجع، معتبر و اثرگذار در حوزه دارو و سلامت کشور می‌داند؛ رسانه‌ای که با تولید محتوای تخصصی، تحلیل‌های عمیق، گفت‌وگوهای حرفه‌ای و روایت‌های دقیق، نقش مؤثری در ارتقای آگاهی، شفافیت و توسعه نظام سلامت ایفا می‌کند.
-                            </p>
-                            <p>
-                                ما تصور می‌کنیم جامعه‌ای که در آن هر فرد به دانش سلامتی معتبر، قابل‌فهم و به‌روز دسترسی دارد، جامعه‌ای سالم‌تر، توانمندتر و با کیفیت زندگی بهتر خواهد بود.
-                            </p>
+                            {vision.paragraphs.map((paragraph, i) => (
+                                <p key={i}>{paragraph}</p>
+                            ))}
                         </div>
-                        {/* decorative quote */}
-                        <div className="mt-8 border-r-2 border-[#075F26] pr-4">
-                            <p className="text-xs text-gray-400 italic leading-6">
-                                هدف ما تبدیل شدن به یکی از مراجع اصلی اطلاع‌رسانی و تحلیل برای مدیران، متخصصان، سیاست‌گذاران، فعالان صنعت دارو و جامعه سلامت ایران است.
-                            </p>
-                        </div>
+                        {vision.quote && (
+                            <div className="mt-8 border-r-2 border-[#075F26] pr-4">
+                                <p className="text-xs text-gray-400 italic leading-6">{vision.quote}</p>
+                            </div>
+                        )}
                     </div>
-
                 </div>
 
-                {/* ── Policy Council ────────────────────────────── */}
                 <section>
-                    <SectionTitle title="شورای سیاست‌گذاری" />
+                    <SectionTitle title={policy.section_title} />
 
                     <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 items-start">
-
-                        {/* Description */}
                         <div className="bg-white shadow-sm p-8">
-                            <h3 className="text-sm font-black text-gray-900 mb-5 pb-3 border-b border-gray-100">معرفی شورا</h3>
+                            <h3 className="text-sm font-black text-gray-900 mb-5 pb-3 border-b border-gray-100">
+                                {policy.intro_title}
+                            </h3>
                             <div className="space-y-4 text-sm text-gray-600 leading-7">
-                                <p>
-                                    شورای سیاست‌گذاری نبض سلامت با هدف تعیین راهبردهای کلان رسانه، حفظ استقلال حرفه‌ای، ارتقای کیفیت محتوای تخصصی و پاسخگویی به نیازهای مخاطبان حوزه سلامت تشکیل شده است.
-                                </p>
-                                <p>
-                                    این شورا با بهره‌گیری از دیدگاه‌های صاحب‌نظران، مدیران، متخصصان حوزه سلامت، داروسازی، پزشکی و رسانه، مسیر توسعه و اولویت‌های محتوایی نبض سلامت را تعیین می‌کند.
-                                </p>
-                                <p>
-                                    وظایف شورای سیاست گذاری به شرح عبارتند از:
-                                </p>
+                                {policy.paragraphs.map((paragraph, i) => (
+                                    <p key={i}>{paragraph}</p>
+                                ))}
                             </div>
                         </div>
 
-                        {/* Duties */}
                         <div className="bg-white shadow-sm p-6">
                             <h3 className="text-sm font-black text-gray-900 mb-5 pb-3 border-b border-gray-100 flex items-center gap-2">
                                 <span className="flex h-5 w-5 items-center justify-center bg-[#F24F00] text-white text-[10px] font-black flex-shrink-0">
-                                    {POLICY_DUTIES.length}
+                                    {policy.duties.length}
                                 </span>
-                                وظایف شورا
+                                {policy.duties_title}
                             </h3>
                             <ol className="space-y-4">
-                                {POLICY_DUTIES.map((duty, i) => (
+                                {policy.duties.map((duty, i) => (
                                     <li key={i} className="flex items-start gap-3 text-sm text-gray-600 leading-7">
                                         <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center bg-[#F24F00]/10 text-[#F24F00] text-xs font-black mt-0.5">
                                             {(i + 1).toLocaleString('fa-IR')}
@@ -230,48 +225,32 @@ export default function AboutUs() {
                                 ))}
                             </ol>
                         </div>
-
                     </div>
                 </section>
 
-                {/* ── Values ────────────────────────────────────── */}
                 <section>
-                    <SectionTitle title="ارزش‌های ما" />
+                    <SectionTitle title={values.section_title} />
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                        {VALUES.map(v => (
-                            <div key={v.title} className={`bg-white shadow-sm p-6 border-t-4 ${v.accent}`}>
-                                <div className={`w-10 h-10 flex items-center justify-center mb-4 ${v.iconBg} ${v.iconColor}`}>
-                                    {v.icon}
+                        {values.items.map(v => {
+                            const style = VALUE_STYLES[v.icon] ?? VALUE_STYLES.integrity;
+                            return (
+                                <div key={v.title} className={`bg-white shadow-sm p-6 border-t-4 ${style.accent}`}>
+                                    <div className={`w-10 h-10 flex items-center justify-center mb-4 ${style.iconBg} ${style.iconColor}`}>
+                                        {style.icon}
+                                    </div>
+                                    <h3 className="text-sm font-black text-gray-900 mb-2">{v.title}</h3>
+                                    <p className="text-xs text-gray-500 leading-6">{v.desc}</p>
                                 </div>
-                                <h3 className="text-sm font-black text-gray-900 mb-2">{v.title}</h3>
-                                <p className="text-xs text-gray-500 leading-6">{v.desc}</p>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </section>
 
-                {/* ── Editorial principles ──────────────────────── */}
                 <section>
-                    <SectionTitle title="اصول تحریریه" />
+                    <SectionTitle title={editorial.section_title} />
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                        {[
-                            {
-                                step: '۰۱',
-                                title: 'تحقیق و منابع',
-                                desc: 'هر مقاله بر اساس مطالعات علمی معتبر و منابع بین‌المللی تهیه می‌شود.',
-                            },
-                            {
-                                step: '۰۲',
-                                title: 'بازبینی متخصص',
-                                desc: 'محتوا پیش از انتشار توسط یک یا چند متخصص حوزه مربوطه بررسی می‌شود.',
-                            },
-                            {
-                                step: '۰۳',
-                                title: 'انتشار و به‌روزرسانی',
-                                desc: 'پس از انتشار، اخبار به‌صورت دوره‌ای بازبینی و با یافته‌های جدید به‌روز می‌شوند.',
-                            },
-                        ].map(item => (
-                            <div key={item.step} className="bg-white shadow-sm p-6 flex gap-4">
+                        {editorial.items.map(item => (
+                            <div key={`${item.step}-${item.title}`} className="bg-white shadow-sm p-6 flex gap-4">
                                 <span className="text-4xl font-black text-gray-100 leading-none flex-shrink-0 select-none">
                                     {item.step}
                                 </span>
@@ -284,21 +263,26 @@ export default function AboutUs() {
                     </div>
                 </section>
 
-                {/* ── CTA ───────────────────────────────────────── */}
-                <section className="bg-gray-900 p-10 sm:p-14 text-center relative overflow-hidden bg-cover" style={{ background : `url(${contactBG}), radial-gradient(rgb(17 24 39 / 0.92), rgb(17 24 39 / 0.75))`, backgroundRepeat: 'no-repeat'}}>
+                <section
+                    className="bg-gray-900 p-10 sm:p-14 text-center relative overflow-hidden bg-cover"
+                    style={{
+                        background: `url(${contactBG}), radial-gradient(rgb(17 24 39 / 0.92), rgb(17 24 39 / 0.75))`,
+                        backgroundRepeat: 'no-repeat',
+                    }}
+                >
                     <div className="absolute top-0 inset-x-0 h-0.5 bg-[#F24F00]" />
                     <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#F24F00]/5 rounded-full -translate-x-1/2 translate-y-1/2 pointer-events-none" />
                     <div className="relative">
-                        <h2 className="text-2xl font-black text-white mb-3">به جامعه نبض سلامت بپیوندید</h2>
+                        <h2 className="text-2xl font-black text-white mb-3">{cta.title}</h2>
                         <p className="text-gray-400 text-sm mb-8 max-w-md mx-auto leading-7">
-                            هر هفته جدیدترین مقالات سلامت را در کنار راهنماهای کاربردی دریافت کنید.
+                            {cta.subtitle}
                         </p>
                         <div className="flex flex-wrap justify-center gap-3">
                             <Link
                                 href={route('front.blog.index')}
                                 className="inline-flex items-center gap-2 bg-[#F24F00] px-6 py-3 text-sm font-bold text-white hover:opacity-90 transition-opacity"
                             >
-                                مشاهده اخبار
+                                {cta.cta_primary}
                                 <svg className="h-4 w-4 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                                 </svg>
@@ -307,12 +291,11 @@ export default function AboutUs() {
                                 href={route('front.contact')}
                                 className="inline-flex items-center gap-2 border border-gray-600 px-6 py-3 text-sm font-bold text-gray-300 hover:border-gray-400 hover:text-white transition-colors"
                             >
-                                تماس با ما
+                                {cta.cta_secondary}
                             </Link>
                         </div>
                     </div>
                 </section>
-
             </div>
         </BlogLayout>
     );

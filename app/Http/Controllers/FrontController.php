@@ -110,15 +110,21 @@ class FrontController extends Controller
 
     public function aboutUs(): Response
     {
+        $page = \App\Models\PageContent::forSlug('about-us');
+
         return Inertia::render('Front/AboutUs', [
             'cartCount' => $this->cartCount(),
+            'content'   => $page->content ?: \App\Models\PageContent::aboutUsDefaults(),
         ]);
     }
 
     public function contact(): Response
     {
+        $page = \App\Models\PageContent::forSlug('contact');
+
         return Inertia::render('Front/Contact', [
             'cartCount' => $this->cartCount(),
+            'content'   => $page->content ?: \App\Models\PageContent::contactDefaults(),
         ]);
     }
 

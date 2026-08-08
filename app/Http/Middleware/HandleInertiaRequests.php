@@ -84,6 +84,16 @@ class HandleInertiaRequests extends Middleware
                 ->select('id', 'name', 'slug', 'icon', 'thumbnail')
                 ->orderBy('id')
                 ->get(),
+            'advertiseModal'  => function () {
+                $page = \App\Models\PageContent::forSlug('advertise-modal');
+
+                return $page->content ?: \App\Models\PageContent::advertiseModalDefaults();
+            },
+            'footerQuickLinks' => function () {
+                $page = \App\Models\PageContent::forSlug('footer-quick-links');
+
+                return $page->content ?: \App\Models\PageContent::footerQuickLinksDefaults();
+            },
         ];
     }
 }
