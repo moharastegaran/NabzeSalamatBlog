@@ -42,6 +42,7 @@ export type PageProps<
     breakingNews: BreakingNewsItem[];
     advertiseModal: AdvertiseModalContent;
     footerQuickLinks: FooterQuickLinksContent;
+    contactInfos: ContactInfoItem[];
 };
 
 export interface AdvertiseModalContent {
@@ -62,4 +63,15 @@ export interface FooterQuickLink {
 export interface FooterQuickLinksContent {
     section_title: string;
     links: FooterQuickLink[];
+}
+
+export type ContactInfoType = 'email' | 'whatsapp' | 'phone' | 'address';
+export type ContactInfoIcon = 'building' | 'phone' | 'whatsapp' | 'email';
+
+export interface ContactInfoItem {
+    type: ContactInfoType;
+    label: string;
+    value: string;
+    description?: string | null;
+    icon?: ContactInfoIcon | null;
 }

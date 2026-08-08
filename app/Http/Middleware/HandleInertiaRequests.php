@@ -94,6 +94,12 @@ class HandleInertiaRequests extends Middleware
 
                 return $page->content ?: \App\Models\PageContent::footerQuickLinksDefaults();
             },
+            'contactInfos' => function () {
+                $page = \App\Models\PageContent::forSlug('contact');
+                $content = $page->content ?: \App\Models\PageContent::contactDefaults();
+
+                return $content['contact_infos'] ?? \App\Models\PageContent::contactDefaults()['contact_infos'];
+            },
         ];
     }
 }
