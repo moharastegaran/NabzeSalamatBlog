@@ -151,7 +151,7 @@ export default function BlogCategoriesIndex({ categories }: Props) {
                                             className="h-4 w-4 rounded border-gray-300 accent-indigo-600"
                                         />
                                     </th>
-                                    {['نام', 'آیکون', 'توضیحات', 'اخبار', ''].map(h => (
+                                    {['نام', 'آیکون', 'توضیحات', 'بله', 'اخبار', ''].map(h => (
                                         <th key={h} className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
@@ -185,6 +185,15 @@ export default function BlogCategoriesIndex({ categories }: Props) {
                                         </td>
                                         <td className="px-4 py-3 text-sm text-gray-500 max-w-[180px] truncate" title={cat.description ?? ''}>
                                             {cat.description ?? '—'}
+                                        </td>
+                                        <td className="px-4 py-3 text-sm text-center">
+                                            {cat.broadcast_to_bale ? (
+                                                <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                                                    فعال
+                                                </span>
+                                            ) : (
+                                                <span className="text-gray-300">—</span>
+                                            )}
                                         </td>
                                         <td className="px-4 py-3 text-sm text-center">
                                             {(cat.posts_count ?? 0) > 0 ? (
@@ -239,7 +248,7 @@ export default function BlogCategoriesIndex({ categories }: Props) {
                                 ))}
                                 {categories.length === 0 && (
                                     <tr>
-                                        <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-400">دسته‌بندی‌ای وجود ندارد.</td>
+                                        <td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-400">دسته‌بندی‌ای وجود ندارد.</td>
                                     </tr>
                                 )}
                             </tbody>

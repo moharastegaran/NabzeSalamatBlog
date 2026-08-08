@@ -50,6 +50,7 @@ export interface BlogCategory {
     parent_id?: number;
     icon?: string | null;
     thumbnail?: string | null;
+    broadcast_to_bale?: boolean;
     parent?: BlogCategory;
     children?: BlogCategory[];
     posts_count?: number;

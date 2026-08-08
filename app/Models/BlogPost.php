@@ -38,10 +38,29 @@ class BlogPost extends Model
 
     protected static function booted(): void
     {
-        static::creating(function ($m) {
-            $m->slug       ??= Str::slug($m->title);
+        static::creating(function (self $m) {
+            $m->slug       = static::generateUniqueSlug($m->slug ?: $m->title);
             $m->short_link ??= static::generateShortLink();
         });
+    }
+
+    protected static function generateUniqueSlug(string $source): string
+    {
+        $base = Str::slug($source);
+
+        if ($base === '') {
+            $base = 'post-'.substr(md5($source), 0, 10);
+        }
+
+        $slug = $base;
+        $i    = 2;
+
+        while (static::where('slug', $slug)->exists()) {
+            $slug = "{$base}-{$i}";
+            $i++;
+        }
+
+        return $slug;
     }
 
     protected static function generateShortLink(): string

@@ -9,7 +9,6 @@ use App\Models\PostMedia;
 use App\Services\BlogPostPublisher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -72,7 +71,6 @@ class BlogPostController extends Controller
         $post = BlogPost::create([
             ...$validated,
             'author_id'    => auth()->id(),
-            'slug'         => Str::slug($validated['title']),
             'status'       => $status === 'published' ? 'draft' : $status,
             'publish_at'   => $status === 'scheduled' ? ($validated['publish_at'] ?? null) : null,
             'published_at' => null,

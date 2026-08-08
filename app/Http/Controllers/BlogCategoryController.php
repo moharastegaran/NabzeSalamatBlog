@@ -28,13 +28,16 @@ class BlogCategoryController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name'        => ['required', 'string', 'max:255'],
-            'slug'        => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', 'unique:blog_categories,slug'],
-            'description' => ['nullable', 'string', 'max:500'],
-            'parent_id'   => ['nullable', 'exists:blog_categories,id'],
-            'icon'        => ['nullable', 'string', 'max:500'],
-            'thumbnail'   => ['nullable', 'string', 'max:500'],
+            'name'              => ['required', 'string', 'max:255'],
+            'slug'              => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', 'unique:blog_categories,slug'],
+            'description'       => ['nullable', 'string', 'max:500'],
+            'parent_id'         => ['nullable', 'exists:blog_categories,id'],
+            'icon'              => ['nullable', 'string', 'max:500'],
+            'thumbnail'         => ['nullable', 'string', 'max:500'],
+            'broadcast_to_bale' => ['sometimes', 'boolean'],
         ]);
+
+        $validated['broadcast_to_bale'] = $request->boolean('broadcast_to_bale');
 
         BlogCategory::create($validated);
 
@@ -58,13 +61,16 @@ class BlogCategoryController extends Controller
     public function update(Request $request, BlogCategory $blogCategory): RedirectResponse
     {
         $validated = $request->validate([
-            'name'        => ['required', 'string', 'max:255'],
-            'slug'        => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('blog_categories', 'slug')->ignore($blogCategory->id)],
-            'description' => ['nullable', 'string', 'max:500'],
-            'parent_id'   => ['nullable', 'exists:blog_categories,id'],
-            'icon'        => ['nullable', 'string', 'max:500'],
-            'thumbnail'   => ['nullable', 'string', 'max:500'],
+            'name'              => ['required', 'string', 'max:255'],
+            'slug'              => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('blog_categories', 'slug')->ignore($blogCategory->id)],
+            'description'       => ['nullable', 'string', 'max:500'],
+            'parent_id'         => ['nullable', 'exists:blog_categories,id'],
+            'icon'              => ['nullable', 'string', 'max:500'],
+            'thumbnail'         => ['nullable', 'string', 'max:500'],
+            'broadcast_to_bale' => ['sometimes', 'boolean'],
         ]);
+
+        $validated['broadcast_to_bale'] = $request->boolean('broadcast_to_bale');
 
         $blogCategory->update($validated);
 

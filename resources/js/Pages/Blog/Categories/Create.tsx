@@ -42,7 +42,7 @@ export default function BlogCategoryCreate({ parents }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canUpload = auth.user?.roles?.includes('admin') ?? false;
 
-    const [form, setForm] = useState({ name: '', slug: '', description: '', parent_id: null as number | null, icon: '', thumbnail: '' });
+    const [form, setForm] = useState({ name: '', slug: '', description: '', parent_id: null as number | null, icon: '', thumbnail: '', broadcast_to_bale: false });
     const [errors, setErrors]           = useState<Record<string, string>>({});
     const [processing, setProcessing]   = useState(false);
     const [pickerOpen, setPickerOpen]   = useState<'icon' | 'thumbnail' | null>(null);
@@ -75,12 +75,13 @@ export default function BlogCategoryCreate({ parents }: Props) {
         e.preventDefault();
         setProcessing(true);
         router.post(route('blog.categories.store'), {
-            name:        form.name,
-            slug:        form.slug,
-            description: form.description,
-            parent_id:   form.parent_id,
-            icon:        form.icon || null,
-            thumbnail:   form.thumbnail || null,
+            name:              form.name,
+            slug:              form.slug,
+            description:       form.description,
+            parent_id:         form.parent_id,
+            icon:              form.icon || null,
+            thumbnail:         form.thumbnail || null,
+            broadcast_to_bale: form.broadcast_to_bale,
         }, {
             onError:   errs => { setErrors(errs); setProcessing(false); },
             onSuccess: () => setProcessing(false),
@@ -155,6 +156,24 @@ export default function BlogCategoryCreate({ parents }: Props) {
                                 className={inputClass}
                             />
                             {errors.description && <p className="mt-1 text-xs text-red-600">{errors.description}</p>}
+                        </div>
+
+                        <div className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                            <input
+                                type="checkbox"
+                                id="broadcast_to_bale"
+                                checked={form.broadcast_to_bale}
+                                onChange={e => setForm(p => ({ ...p, broadcast_to_bale: e.target.checked }))}
+                                className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-indigo-600"
+                            />
+                            <div>
+                                <label htmlFor="broadcast_to_bale" className="block text-sm font-medium text-gray-800">
+                                    انتشار در بله
+                                </label>
+                                <p className="mt-0.5 text-xs text-gray-500">
+                                    اگر فعال باشد، اخبار منتشرشده این دسته‌بندی به کانال بله ارسال می‌شوند.
+                                </p>
+                            </div>
                         </div>
 
                         {/* Icon */}

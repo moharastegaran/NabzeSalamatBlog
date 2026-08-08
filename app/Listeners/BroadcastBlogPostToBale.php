@@ -26,6 +26,14 @@ class BroadcastBlogPostToBale implements ShouldQueue
             return;
         }
 
+        $shouldBroadcast = $post->categories()
+            ->where('broadcast_to_bale', true)
+            ->exists();
+
+        if (! $shouldBroadcast) {
+            return;
+        }
+
         $message = $this->formatter->format($post);
         $photo   = $this->formatter->resolveFeaturedImagePath($post)
             ?? $this->formatter->resolveFeaturedImageUrl($post);

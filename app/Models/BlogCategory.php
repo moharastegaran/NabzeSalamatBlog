@@ -10,7 +10,14 @@ use Illuminate\Support\Str;
 
 class BlogCategory extends Model
 {
-    protected $fillable = ['name', 'slug', 'description', 'parent_id', 'icon', 'thumbnail'];
+    protected $fillable = ['name', 'slug', 'description', 'parent_id', 'icon', 'thumbnail', 'broadcast_to_bale'];
+
+    protected function casts(): array
+    {
+        return [
+            'broadcast_to_bale' => 'boolean',
+        ];
+    }
 
     protected static function booted(): void
     {
