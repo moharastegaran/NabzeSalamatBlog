@@ -755,6 +755,57 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                             </div>
                         )}
 
+                        {/* Related posts */}
+                        {related.length > 0 && (
+                            <section className="mt-14">
+                                <h2 className="mb-6 flex items-center gap-2 text-base font-black text-gray-900">
+                                    <span className="inline-block w-3 h-3 bg-[#F24F00]" />
+                                    خبرهای مرتبط
+                                </h2>
+                                <div className="flex flex-col gap-6">
+                                    {related.map(p => (
+                                        <Link
+                                            key={p.id}
+                                            href={route('front.blog.show', p.slug)}
+                                            className="group flex flex-row bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-200"
+                                        >
+                                            <div className="w-28 shrink-0 aspect-square overflow-hidden bg-gray-100">
+                                                {p.featured_image ? (
+                                                    <img
+                                                        src={`/storage/${p.featured_image}`}
+                                                        alt={p.title}
+                                                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                        loading="lazy"
+                                                    />
+                                                ) : (
+                                                    <div className="flex h-full w-full items-center justify-center text-gray-200">
+                                                        <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex min-w-0 flex-1 flex-col justify-center gap-2 p-4 sm:p-5">
+                                                {p.subtitle && (
+                                                    <p className="text-xs font-medium text-[#F24F00] line-clamp-1">
+                                                        {p.subtitle}
+                                                    </p>
+                                                )}
+                                                <h3 className="text-base font-bold text-gray-900 group-hover:text-[#F24F00] transition-colors leading-snug line-clamp-2">
+                                                    {p.title}
+                                                </h3>
+                                                {p.excerpt && (
+                                                    <p className="text-sm text-gray-600 leading-7 line-clamp-3">
+                                                        {p.excerpt}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
                         {/* Comments */}
                         <div id="post-comments" className="mt-14 scroll-mt-6">
                             <h2 className="mb-6 flex items-center gap-2 text-base font-black text-gray-900">
@@ -789,45 +840,6 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                                 <CommentForm postId={post.id} />
                             </div>
                         </div>
-
-                        {/* Related posts */}
-                        {related.length > 0 && (
-                            <section className="mt-14">
-                                <h2 className="mb-5 flex items-center gap-2 text-base font-black text-gray-900">
-                                    <span className="inline-block w-3 h-3 bg-[#F24F00]" />
-                                    خبرهای مرتبط
-                                </h2>
-                                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                    {related.map(p => (
-                                        <Link
-                                            key={p.id}
-                                            href={route('front.blog.show', p.slug)}
-                                            className="group flex flex-col bg-white shadow-sm hover:shadow-md transition-shadow"
-                                        >
-                                            <div className="aspect-video w-full overflow-hidden bg-gray-100">
-                                                {p.featured_image ? (
-                                                    <img src={`/storage/${p.featured_image}`} alt={p.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                                                ) : (
-                                                    <div className="flex h-full w-full items-center justify-center text-gray-200">
-                                                        <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                        </svg>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="flex flex-1 flex-col gap-1.5 p-3">
-                                                <h3 className="line-clamp-2 text-sm font-semibold text-gray-800 group-hover:text-[#F24F00] transition-colors leading-snug">
-                                                    {p.title}
-                                                </h3>
-                                                {p.published_at && (
-                                                    <span className="text-xs text-gray-400">{formatDate(p.published_at)}</span>
-                                                )}
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
                     </article>
 
                     {/* Left sidebar */}

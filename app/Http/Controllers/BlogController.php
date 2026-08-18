@@ -253,8 +253,8 @@ class BlogController extends Controller
             ->where('blog_category_id', $post->blog_category_id)
             ->with('author:id,name')
             ->latest('published_at')
-            ->limit(6)
-            ->get(['id', 'title', 'slug', 'excerpt', 'featured_image', 'published_at', 'author_id', 'blog_category_id']);
+            ->limit(3)
+            ->get(['id', 'title', 'subtitle', 'slug', 'excerpt', 'featured_image', 'published_at', 'author_id', 'blog_category_id']);
 
         $recentPosts = BlogPost::published()
             ->where('id', '!=', $post->id)
