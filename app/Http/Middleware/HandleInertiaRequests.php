@@ -85,20 +85,32 @@ class HandleInertiaRequests extends Middleware
                 ->orderBy('id')
                 ->get(),
             'advertiseModal'  => function () {
-                $page = \App\Models\PageContent::forSlug('advertise-modal');
+                try {
+                    $page = \App\Models\PageContent::forSlug('advertise-modal');
 
-                return $page->content ?: \App\Models\PageContent::advertiseModalDefaults();
+                    return $page->content ?: \App\Models\PageContent::advertiseModalDefaults();
+                } catch (\Throwable) {
+                    return \App\Models\PageContent::advertiseModalDefaults();
+                }
             },
             'footerQuickLinks' => function () {
-                $page = \App\Models\PageContent::forSlug('footer-quick-links');
+                try {
+                    $page = \App\Models\PageContent::forSlug('footer-quick-links');
 
-                return $page->content ?: \App\Models\PageContent::footerQuickLinksDefaults();
+                    return $page->content ?: \App\Models\PageContent::footerQuickLinksDefaults();
+                } catch (\Throwable) {
+                    return \App\Models\PageContent::footerQuickLinksDefaults();
+                }
             },
             'contactInfos' => function () {
-                $page = \App\Models\PageContent::forSlug('contact');
-                $content = $page->content ?: \App\Models\PageContent::contactDefaults();
+                try {
+                    $page = \App\Models\PageContent::forSlug('contact');
+                    $content = $page->content ?: \App\Models\PageContent::contactDefaults();
 
-                return $content['contact_infos'] ?? \App\Models\PageContent::contactDefaults()['contact_infos'];
+                    return $content['contact_infos'] ?? \App\Models\PageContent::contactDefaults()['contact_infos'];
+                } catch (\Throwable) {
+                    return \App\Models\PageContent::contactDefaults()['contact_infos'];
+                }
             },
         ];
     }

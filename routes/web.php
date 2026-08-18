@@ -25,13 +25,8 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\FrontController;
-use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-
-// SEO
-Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
-Route::get('/robots.txt',  [SitemapController::class, 'robots'])->name('robots');
 
 // Maintenance page (exempt from maintenance middleware — avoids redirect loop)
 Route::get('/maintenance', [MaintenanceController::class, 'show'])->name('front.maintenance');

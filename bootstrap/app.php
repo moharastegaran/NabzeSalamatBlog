@@ -5,8 +5,10 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,6 +16,15 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function () {
+            // No web/session/Inertia middleware — Google/CDN must get clean XML/TXT.
+            Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])
+                ->name('sitemap');
+            Route::get('/sitemap.txt', [\App\Http\Controllers\SitemapController::class, 'text'])
+                ->name('sitemap.text');
+            Route::get('/robots.txt', [\App\Http\Controllers\SitemapController::class, 'robots'])
+                ->name('robots');
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(
@@ -46,6 +57,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->respond(function (Response $response, Throwable $e, Request $request) {
             if ($request->expectsJson()) {
+                return $response;
+            }
+
+            // Keep crawler endpoints as plain responses (never wrap in Inertia HTML)
+            if ($request->is('sitemap.xml', 'sitemap.txt', 'robots.txt')) {
                 return $response;
             }
 
