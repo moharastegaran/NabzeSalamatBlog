@@ -11,8 +11,29 @@ RUN npx vite build && npx vite build --ssr
 # Stage 2: shared PHP base (extensions only — no Composer)
 FROM php:8.2-fpm-alpine AS php-base
 
-# dl-cdn.alpinelinux.org is often unreachable from Docker Desktop DNS
-RUN sed -i 's|dl-cdn.alpinelinux.org|mirrors.edge.kernel.org|g' /etc/apk/repositories
+# Prefer mirrors reachable from Iran / restricted DNS (dl-cdn & kernel.org often fail)
+RUN set -eux; \
+    ALPINE_VER="$(cut -d. -f1,2 /etc/alpine-release)"; \
+    ok=0; \
+    for mirror in \
+        "https://mirror.arvancloud.ir/alpine" \
+        "https://mirrors.aliyun.com/alpine" \
+        "https://mirrors.huaweicloud.com/alpine" \
+        "https://mirrors.edge.kernel.org/alpine" \
+        "https://dl-cdn.alpinelinux.org/alpine" \
+    ; do \
+        printf '%s\n' \
+            "${mirror}/v${ALPINE_VER}/main" \
+            "${mirror}/v${ALPINE_VER}/community" \
+            > /etc/apk/repositories; \
+        if apk update --no-cache; then \
+            echo "Using Alpine mirror: ${mirror}"; \
+            ok=1; \
+            break; \
+        fi; \
+        echo "Mirror failed: ${mirror}"; \
+    done; \
+    test "$ok" -eq 1
 
 # Runtime shared libs are detected after compile; build toolchain is purged
 RUN apk add --no-cache --virtual .build-deps \
@@ -39,7 +60,9 @@ RUN apk add --no-cache --virtual .build-deps \
         xml \
         opcache \
     && mkdir /tmp/phpredis \
-    && wget -qO- https://github.com/phpredis/phpredis/archive/refs/tags/6.1.0.tar.gz \
+    && (wget -qO- https://github.com/phpredis/phpredis/archive/refs/tags/6.1.0.tar.gz \
+        || wget -qO- https://ghproxy.com/https://github.com/phpredis/phpredis/archive/refs/tags/6.1.0.tar.gz \
+        || wget -qO- https://mirror.ghproxy.com/https://github.com/phpredis/phpredis/archive/refs/tags/6.1.0.tar.gz) \
         | tar xz -C /tmp/phpredis --strip-components=1 \
     && cd /tmp/phpredis \
     && phpize \
