@@ -363,7 +363,16 @@ export default function BlogEdit({ post, categories, tags, postMedia, fieldDefin
                         {/* Body */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">محتوا <span className="text-red-500">*</span></label>
-                            <RichTextEditor value={form.body} onChange={html => setForm(p => ({ ...p, body: html }))} minHeight={360} />
+                            <RichTextEditor
+                                value={form.body}
+                                onChange={html => setForm(p => ({ ...p, body: html }))}
+                                placeholder="متن مقاله را بنویسید…"
+                                minHeight={360}
+                                dir="rtl"
+                                imageResize
+                                showStats
+                                showFullscreen
+                            />
                             {errors.body && <p className="mt-1 text-xs text-red-600">{errors.body}</p>}
                         </div>
 

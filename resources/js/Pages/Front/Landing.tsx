@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
 import SeoHead from '@/Components/SeoHead';
@@ -19,7 +19,7 @@ interface Props {
     adBanners: AdBanner[];
 }
 
-// ── Shared ────────────────────────────────────────────────────────────────────
+// -- Shared --------------------------------------------------------------------
 function SectionHeader({ title, href }: { title: string; href?: string }) {
     return (
         <div className="flex items-center justify-between mb-4 pb-2.5 border-b-2 border-[#F24F00]">
@@ -29,7 +29,7 @@ function SectionHeader({ title, href }: { title: string; href?: string }) {
             </h2>
             {href && (
                 <Link href={href} className="text-xs font-semibold text-[#F24F00] hover:text-[#075F26] flex items-center gap-1 transition-colors">
-                    بیشتر
+                    ?????
                     <svg className="w-3 h-3 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
@@ -41,14 +41,14 @@ function SectionHeader({ title, href }: { title: string; href?: string }) {
 
 function fmtDate(iso: string) {
     const d = new Date(iso);
-    return d.toLocaleDateString('fa-IR') + ' — ' + d.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleDateString('fa-IR') + ' � ' + d.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
 }
 
 function fmtDateOnly(iso: string) {
     return new Date(iso).toLocaleDateString('fa-IR');
 }
 
-// ── Hero slider ───────────────────────────────────────────────────────────────
+// -- Hero slider ---------------------------------------------------------------
 function HeroSlider({ posts }: { posts: BlogPost[] }) {
     const [active, setActive] = useState(0);
 
@@ -130,7 +130,7 @@ function HeroSlider({ posts }: { posts: BlogPost[] }) {
             <button
                 onClick={() => setActive(i => (i - 1 + posts.length) % posts.length)}
                 className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 bg-black/40 hover:bg-[#F24F00] text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all"
-                aria-label="قبلی"
+                aria-label="????"
             >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -139,7 +139,7 @@ function HeroSlider({ posts }: { posts: BlogPost[] }) {
             <button
                 onClick={() => setActive(i => (i + 1) % posts.length)}
                 className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 bg-black/40 hover:bg-[#F24F00] text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all"
-                aria-label="بعدی"
+                aria-label="????"
             >
                 <svg className="w-4 h-4 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -149,7 +149,7 @@ function HeroSlider({ posts }: { posts: BlogPost[] }) {
     );
 }
 
-// ── Hero sidebar item ─────────────────────────────────────────────────────────
+// -- Hero sidebar item ---------------------------------------------------------
 function HeroSideItem({ post }: { post: BlogPost }) {
     return (
         <Link
@@ -188,8 +188,8 @@ function HealthTimelinePromoCard() {
                 </svg>
             </div>
             <div className="flex-1 min-w-0">
-                <span className="block text-sm font-black text-white">گاه‌شمار سلامت</span>
-                <span className="block text-xs text-white/70 mt-0.5 leading-4">مناسبت‌های سلامت در ۱۲ ماه سال</span>
+                <span className="block text-sm font-black text-white">???????? ?????</span>
+                <span className="block text-xs text-white/70 mt-0.5 leading-4">?????????? ????? ?? ?? ??? ???</span>
             </div>
             <svg className="w-4 h-4 flex-shrink-0 text-white/60 group-hover:text-white -scale-x-100 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -198,7 +198,7 @@ function HealthTimelinePromoCard() {
     );
 }
 
-// ── Article card ──────────────────────────────────────────────────────────────
+// -- Article card --------------------------------------------------------------
 function ArticleCard({ post }: { post: BlogPost }) {
     return (
         <Link href={route('front.blog.show', post.slug)} className="group block bg-white hover:shadow-md transition-shadow duration-200">
@@ -225,7 +225,7 @@ function ArticleCard({ post }: { post: BlogPost }) {
     );
 }
 
-// ── Category cards ────────────────────────────────────────────────────────────
+// -- Category cards ------------------------------------------------------------
 const BRAND_GRADIENTS: [string, string][] = [
     ['#F24F00', '#7A2700'],
     ['#075F26', '#023B18'],
@@ -264,7 +264,7 @@ function CategoryStrip({ categories }: { categories: NavCategory[] }) {
                             />
                         )}
 
-                        {/* Brand color overlay — tints image with brand palette */}
+                        {/* Brand color overlay � tints image with brand palette */}
                         <div
                             className="absolute inset-0 transition-opacity duration-300 group-hover:opacity-75"
                             style={{ background: `linear-gradient(to bottom, ${c1}55, ${c2}dd)` }}
@@ -273,7 +273,7 @@ function CategoryStrip({ categories }: { categories: NavCategory[] }) {
                         {/* Content */}
                         <div className="absolute inset-0 flex flex-col items-center justify-between p-3">
 
-                            {/* Icon — frosted glass circle */}
+                            {/* Icon � frosted glass circle */}
                             <div className="mt-2 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white/20 ring-2 ring-white/35 flex items-center justify-center backdrop-blur-sm group-hover:bg-white/30 transition-colors duration-300">
                                 {cat.icon ? (
                                     <img src={`/storage/${cat.icon}`} alt="" className="w-6 h-6 object-contain brightness-0 invert" />
@@ -297,7 +297,7 @@ function CategoryStrip({ categories }: { categories: NavCategory[] }) {
     );
 }
 
-// ── Trending list item ────────────────────────────────────────────────────────
+// -- Trending list item --------------------------------------------------------
 function TrendItem({ post, rank }: { post: BlogPost; rank: number }) {
     return (
         <Link href={route('front.blog.show', post.slug)} className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0 group">
@@ -323,13 +323,13 @@ function TrendItem({ post, rank }: { post: BlogPost; rank: number }) {
     );
 }
 
-// ── Tabbed posts ──────────────────────────────────────────────────────────────
+// -- Tabbed posts --------------------------------------------------------------
 type TabKey = 'trending' | 'recent' | 'analyze';
 
 const TABS: { key: TabKey; label: string }[] = [
-    { key: 'trending', label: 'پربازدیدترین' },
-    { key: 'recent',   label: 'جدیدترین'     },
-    { key: 'analyze',  label: 'تحلیل‌ها'      },
+    { key: 'trending', label: '????????????' },
+    { key: 'recent',   label: '????????'     },
+    { key: 'analyze',  label: '????????'      },
 ];
 
 function TabbedPosts({ trending, recent, analyze }: { trending: BlogPost[]; recent: BlogPost[]; analyze: BlogPost[] }) {
@@ -366,14 +366,14 @@ function TabbedPosts({ trending, recent, analyze }: { trending: BlogPost[]; rece
             <div className={`flex-1 overflow-y-auto transition-opacity duration-150 px-1 ${fading ? 'opacity-0' : 'opacity-100'}`}>
                 {posts[activeTab].length > 0
                     ? posts[activeTab].map((post, i) => <TrendItem key={post.id} post={post} rank={i + 1} />)
-                    : <p className="text-center text-sm text-gray-400 py-10">مطلبی یافت نشد</p>
+                    : <p className="text-center text-sm text-gray-400 py-10">????? ???? ???</p>
                 }
             </div>
         </div>
     );
 }
 
-// ── Video section ─────────────────────────────────────────────────────────────
+// -- Video section -------------------------------------------------------------
 function parseYouTubeId(url: string): string | null {
     const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|v\/))([^?&\s]+)/);
     return m?.[1] ?? null;
@@ -441,7 +441,7 @@ function VideoCard({ post, active, onClick }: { post: BlogPost; active: boolean;
                     </div>
                 </div>
                 {post.video_url && (
-                    <span className="absolute top-1 right-1 bg-black/60 px-1 py-0.5 text-[9px] font-bold text-white">ویدیو</span>
+                    <span className="absolute top-1 right-1 bg-black/60 px-1 py-0.5 text-[9px] font-bold text-white">?????</span>
                 )}
             </div>
             <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
@@ -460,14 +460,14 @@ function VideoSection({ posts }: { posts: BlogPost[] }) {
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 bg-white">
-            {/* Video list — col-span-1, right in RTL */}
+            {/* Video list � col-span-1, right in RTL */}
             <div className="border-l border-gray-100 lg:max-h-[380px] lg:overflow-y-auto divide-y divide-gray-100">
                 {posts.map((post, i) => (
                     <VideoCard key={post.id} post={post} active={i === activeIdx} onClick={() => setActiveIdx(i)} />
                 ))}
             </div>
 
-            {/* Player — col-span-2, left in RTL */}
+            {/* Player � col-span-2, left in RTL */}
             <div className="lg:col-span-2 flex flex-col order-first lg:order-none">
                 <div className="aspect-video bg-black">
                     <VideoPlayer post={active} />
@@ -498,7 +498,7 @@ function VideoSection({ posts }: { posts: BlogPost[] }) {
     );
 }
 
-// ── Audio card ────────────────────────────────────────────────────────────────
+// -- Audio card ----------------------------------------------------------------
 function BlogAudioCard({ post }: { post: BlogPost }) {
     const audioRef = useRef<HTMLAudioElement>(null);
     const [playing, setPlaying]   = useState(false);
@@ -583,7 +583,7 @@ function BlogAudioCard({ post }: { post: BlogPost }) {
                     <button
                         onClick={toggle}
                         className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200"
-                        aria-label={playing ? 'توقف' : 'پخش'}
+                        aria-label={playing ? '????' : '???'}
                     >
                         <div className="w-12 h-12 rounded-full bg-[#F24F00]/90 flex items-center justify-center shadow-lg">
                             {playing
@@ -626,7 +626,7 @@ function BlogAudioCard({ post }: { post: BlogPost }) {
                         </div>
                     )}
                     {audioError && (
-                        <p className="text-[10px] text-red-500 mb-2 text-center">بارگذاری فایل صوتی ناموفق بود</p>
+                        <p className="text-[10px] text-red-500 mb-2 text-center">???????? ???? ???? ?????? ???</p>
                     )}
                     <div className="flex items-end gap-3">
                         {/* Scrubber + times */}
@@ -648,7 +648,7 @@ function BlogAudioCard({ post }: { post: BlogPost }) {
                             onClick={toggle}
                             disabled={!audioSrc}
                             className="flex-shrink-0 w-9 h-9 rounded-full bg-[#F24F00] hover:bg-[#075F26] disabled:bg-gray-300 text-white flex items-center justify-center transition-colors shadow-sm"
-                            aria-label={playing ? 'توقف' : 'پخش'}
+                            aria-label={playing ? '????' : '???'}
                         >
                             {playing
                                 ? <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
@@ -663,7 +663,7 @@ function BlogAudioCard({ post }: { post: BlogPost }) {
     );
 }
 
-// ── Event post card ───────────────────────────────────────────────────────────
+// -- Event post card -----------------------------------------------------------
 function EventPostCard({ post }: { post: BlogPost }) {
     const fieldValues = post.field_values ?? [];
     const dateFVs  = fieldValues.filter((fv): fv is PostFieldValue & { value: string } =>
@@ -702,7 +702,7 @@ function EventPostCard({ post }: { post: BlogPost }) {
                         </svg>
                         {dateFVs.map((fv, i) => (
                             <React.Fragment key={fv.id}>
-                                {i > 0 && <span className="text-gray-300">—</span>}
+                                {i > 0 && <span className="text-gray-300">�</span>}
                                 <span>{fmtDateOnly(fv.value)}</span>
                             </React.Fragment>
                         ))}
@@ -746,7 +746,7 @@ function EventPostCardCompact({ post }: { post: BlogPost }) {
     const cat = post.categories?.at(-1) ?? post.category;
 
     const dateText = dateFVs.length > 0
-        ? dateFVs.map(fv => fmtDateOnly(fv.value)).join(' — ')
+        ? dateFVs.map(fv => fmtDateOnly(fv.value)).join(' � ')
         : post.published_at
             ? fmtDateOnly(post.published_at)
             : null;
@@ -758,7 +758,7 @@ function EventPostCardCompact({ post }: { post: BlogPost }) {
             href={route('front.blog.show', post.slug)}
             className="group flex items-center gap-4 py-3.5 px-2 border-t border-b border-gray-100 bg-white/50 hover:bg-gray-50/80 transition-colors h-full"
         >
-            {/* Text block — first in DOM → right side in RTL */}
+            {/* Text block � first in DOM ? right side in RTL */}
             <div className="h-full flex flex-col justify-between flex-1 min-w-0">
                 {cat && (
                     <span className="block text-[11px] text-gray-400 mb-1">{cat.name}</span>
@@ -780,12 +780,12 @@ function EventPostCardCompact({ post }: { post: BlogPost }) {
                 </h3>
                 {metaParts.length > 0 && (
                     <p className="mt-1 text-xs text-gray-500 truncate">
-                        {metaParts.join(' · ')}
+                        {metaParts.join(' � ')}
                     </p>
                 )}
             </div>
 
-            {/* Square thumbnail — second in DOM → left side in RTL */}
+            {/* Square thumbnail � second in DOM ? left side in RTL */}
             <div className="flex-shrink-0 w-[72px] h-[72px] sm:w-20 sm:h-20 overflow-hidden bg-gray-100">
                 {post.featured_image
                     ? <img src={`/storage/${post.featured_image}`} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -796,7 +796,7 @@ function EventPostCardCompact({ post }: { post: BlogPost }) {
     );
 }
 
-// ── Collapsible tag cloud ─────────────────────────────────────────────────────
+// -- Collapsible tag cloud -----------------------------------------------------
 const TAGS_COLLAPSE_PX = 128; // ~3 rows on mobile
 
 function CollapsibleTags({ tags }: { tags: BlogTag[] }) {
@@ -860,7 +860,7 @@ function CollapsibleTags({ tags }: { tags: BlogTag[] }) {
                     onClick={() => setExpanded(e => !e)}
                     className="mt-2 flex items-center gap-1 text-xs font-bold text-[#F24F00] hover:text-[#075F26] transition-colors"
                 >
-                    {expanded ? 'نمایش کمتر' : 'نمایش بیشتر'}
+                    {expanded ? '????? ????' : '????? ?????'}
                     <svg
                         className={`w-3.5 h-3.5 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
@@ -873,7 +873,7 @@ function CollapsibleTags({ tags }: { tags: BlogTag[] }) {
     );
 }
 
-// ── Events carousel ───────────────────────────────────────────────────────────
+// -- Events carousel -----------------------------------------------------------
 type EventCardVariant = 'default' | 'compact';
 
 function EventsCarousel({ posts, variant = 'default' }: { posts: BlogPost[]; variant?: EventCardVariant }) {
@@ -927,7 +927,7 @@ function EventsCarousel({ posts, variant = 'default' }: { posts: BlogPost[]; var
                 <button
                     onClick={() => setIndex(i => i - 1)}
                     className="absolute right-0 top-[45%] -translate-y-1/2 z-10 w-9 h-9 bg-white shadow-md hover:bg-[#F24F00] hover:text-white text-gray-700 flex items-center justify-center transition-all opacity-0 group-hover/carousel:opacity-100"
-                    aria-label="قبلی"
+                    aria-label="????"
                 >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -939,7 +939,7 @@ function EventsCarousel({ posts, variant = 'default' }: { posts: BlogPost[]; var
                 <button
                     onClick={() => setIndex(i => i + 1)}
                     className="absolute left-0 top-[45%] -translate-y-1/2 z-10 w-9 h-9 bg-white shadow-md hover:bg-[#F24F00] hover:text-white text-gray-700 flex items-center justify-center transition-all opacity-0 group-hover/carousel:opacity-100"
-                    aria-label="بعدی"
+                    aria-label="????"
                 >
                     <svg className="w-4 h-4 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -950,7 +950,7 @@ function EventsCarousel({ posts, variant = 'default' }: { posts: BlogPost[]; var
     );
 }
 
-// ── Roundtable carousel ───────────────────────────────────────────────────────
+// -- Roundtable carousel -------------------------------------------------------
 function RoundtableCarousel({ posts }: { posts: BlogPost[] }) {
     const [idx, setIdx] = useState(0);
     const max = Math.max(0, posts.length - 1);
@@ -975,8 +975,8 @@ function RoundtableCarousel({ posts }: { posts: BlogPost[] }) {
                                     {/* Text */}
                                     <div className="p-6 sm:p-8 flex flex-col justify-center">
                                         <div className="flex items-center gap-2 mb-3">
-                                            <span className="text-[11px] font-black text-gray-700">میزگرد نبض سلامت</span>
-                                            <span className="text-gray-300">•</span>
+                                            <span className="text-[11px] font-black text-gray-700">?????? ??? ?????</span>
+                                            <span className="text-gray-300">�</span>
                                             <span className="text-[11px] font-semibold text-gray-500">
                                                 {post.published_at ? fmtDateOnly(post.published_at) : ''}
                                             </span>
@@ -991,7 +991,7 @@ function RoundtableCarousel({ posts }: { posts: BlogPost[] }) {
                                         )}
                                         <div className="mt-6">
                                             <span className="inline-flex items-center gap-2 bg-[#F24F00] px-5 py-2.5 text-sm font-bold text-white group-hover:opacity-95 transition-opacity">
-                                                مشاهده جزئیات خبر
+                                                ?????? ?????? ???
                                                 <svg className="w-4 h-4 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                                                 </svg>
@@ -1028,7 +1028,7 @@ function RoundtableCarousel({ posts }: { posts: BlogPost[] }) {
                             type="button"
                             onClick={() => setIdx(i)}
                             className={`rounded-sm transition-all duration-300 ${i === safe ? 'w-5 h-1.5 bg-[#F24F00]' : 'w-1.5 h-1.5 bg-gray-300 hover:bg-gray-400'}`}
-                            aria-label={`اسلاید ${i + 1}`}
+                            aria-label={`?????? ${i + 1}`}
                         />
                     ))}
                 </div>
@@ -1040,7 +1040,7 @@ function RoundtableCarousel({ posts }: { posts: BlogPost[] }) {
                     type="button"
                     onClick={() => setIdx((v) => Math.max(0, v - 1))}
                     className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white shadow-md hover:bg-[#F24F00] hover:text-white text-gray-700 flex items-center justify-center transition-all"
-                    aria-label="قبلی"
+                    aria-label="????"
                 >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -1052,7 +1052,7 @@ function RoundtableCarousel({ posts }: { posts: BlogPost[] }) {
                     type="button"
                     onClick={() => setIdx((v) => Math.min(max, v + 1))}
                     className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white shadow-md hover:bg-[#F24F00] hover:text-white text-gray-700 flex items-center justify-center transition-all"
-                    aria-label="بعدی"
+                    aria-label="????"
                 >
                     <svg className="w-4 h-4 -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -1063,7 +1063,7 @@ function RoundtableCarousel({ posts }: { posts: BlogPost[] }) {
     );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// -- Page ----------------------------------------------------------------------
 export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, recentPosts, analyzePosts, tags, videoPosts, audioPosts, eventPosts, roundtablePosts, adBanners }: Props) {
     const { navCategories } = usePage<PageProps>().props;
     const [adsState, setAdsState] = useState<'visible' | 'fading' | 'hidden'>('visible');
@@ -1075,26 +1075,26 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
     return (
         <BlogLayout>
             <SeoHead
-                title="نبض سلامت"
-                description="نبض سلامت؛ رسانه خبری تخصصی حوزه سلامت، پزشکی و سبک زندگی سالم."
+                title="??? ?????"
+                description="??? ?????? ????? ???? ????? ???? ?????? ????? ? ??? ????? ????."
                 url="/"
             />
-            <h1 className="sr-only">نبض سلامت — رسانه خبری سلامت</h1>
+            <h1 className="sr-only">??? ????? � ????? ???? ?????</h1>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-7">
 
-                {/* ── Section 1: Hero ──────────────────────────────────────── */}
+                {/* -- Section 1: Hero ---------------------------------------- */}
                 <section className="grid grid-cols-1 lg:grid-cols-3 gap-0 shadow-sm overflow-hidden">
 
-                    {/* Slider — 2 cols */}
+                    {/* Slider � 2 cols */}
                     <div className="lg:col-span-2 h-[280px] sm:h-[400px] lg:h-[480px]">
                         <HeroSlider posts={sliderPosts} />
                     </div>
 
-                    {/* Sidebar — 1 col */}
+                    {/* Sidebar � 1 col */}
                     <div className="bg-white flex flex-col px-4 py-2.5">
                         <div className="flex-shrink-0">
-                            <SectionHeader title="پیشنهادی" />
+                            <SectionHeader title="????????" />
                         </div>
                         <div className="flex flex-col divide-y divide-gray-100 overflow-hidden min-h-0">
                             {suggestionPosts.length > 0
@@ -1115,16 +1115,16 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
 
                 </section>
 
-                {/* ── Section 2: Category strip ────────────────────────────── */}
+                {/* -- Section 2: Category strip ------------------------------ */}
                 <section>
-                    <SectionHeader title="دسته‌بندی‌ها" href={route('front.blog.index')} />
+                    <SectionHeader title="????????????" href={route('front.blog.index')} />
                     <CategoryStrip categories={navCategories} />
                 </section>
 
-                {/* ── Section 3: Latest news grid ───────────────────────────── */}
+                {/* -- Section 3: Latest news grid ----------------------------- */}
                 {recentPosts.length > 0 && (
                     <section>
-                        <SectionHeader title="آخرین اخبار" href={route('front.blog.index')} />
+                        <SectionHeader title="????? ?????" href={route('front.blog.index')} />
                         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                             {recentPosts.slice(0, 4).map(post => (
                                 <ArticleCard key={post.id} post={post} />
@@ -1133,7 +1133,7 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                     </section>
                 )}
 
-                {/* ── Section 3.5: Ad Banners ─────────────────────────────── */}
+                {/* -- Section 3.5: Ad Banners ------------------------------- */}
                 {adBanners.length > 0 && adsState !== 'hidden' && (
                     <section
                         className={`transition-opacity duration-500 ${adsState === 'fading' ? 'opacity-0' : 'opacity-100'}`}
@@ -1143,7 +1143,7 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                             <button
                                 type="button"
                                 onClick={dismissAds}
-                                title="بستن تبلیغات"
+                                title="???? ???????"
                                 className="absolute -top-3.5 left-0 flex h-7 w-7 items-center justify-center rounded-full border border-dashed border-gray-300 bg-white text-gray-400 hover:border-gray-400 hover:text-gray-600 transition-colors"
                             >
                                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -1185,12 +1185,12 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                     </section>
                 )}
 
-                {/* ── Section 4: Trending + Audio ──────────────────────────── */}
+                {/* -- Section 4: Trending + Audio ---------------------------- */}
                 <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    {/* Trending — 1 col */}
+                    {/* Trending � 1 col */}
                     <div className="flex flex-col">
-                        <SectionHeader title="پربازدیدترین" />
+                        <SectionHeader title="????????????" />
                         <div className="flex-1 bg-white min-h-0">
                             <TabbedPosts
                                 trending={trendingPosts}
@@ -1200,10 +1200,10 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                         </div>
                     </div>
 
-                    {/* Audio posts — 2 cols */}
+                    {/* Audio posts � 2 cols */}
                     {audioPosts.length > 0 && (
                         <div className="lg:col-span-2 flex flex-col">
-                            <SectionHeader title="نبض صدا" href={route('front.blog.category', 'nabze-seda')} />
+                            <SectionHeader title="??? ???" href={route('front.blog.category', 'nabze-seda')} />
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
                                 {audioPosts.map(post => (
                                     <BlogAudioCard key={post.id} post={post} />
@@ -1214,34 +1214,34 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
 
                 </section>
 
-                {/* ── Section 4b: Videos (full width) ──────────────────────── */}
+                {/* -- Section 4b: Videos (full width) ------------------------ */}
                 {videoPosts.length > 0 && (
                     <section>
-                        <SectionHeader title="ویدیوها" />
+                        <SectionHeader title="???????" />
                         <VideoSection posts={videoPosts} />
                     </section>
                 )}
 
-                {/* ── Section 5: Events ────────────────────────────────────── */}
+                {/* -- Section 5: Events -------------------------------------- */}
                 {eventPosts.length > 0 && (
                     <section>
-                        <SectionHeader title="رویدادها" href={route('front.blog.category', 'event')} />
+                        <SectionHeader title="????????" href={route('front.blog.category', 'event')} />
                         <EventsCarousel posts={eventPosts} variant="compact" />
                     </section>
                 )}
 
-                {/* ── Section 6: Tags / Topics ─────────────────────────────── */}
+                {/* -- Section 6: Tags / Topics ------------------------------- */}
                 {tags.length > 0 && (
                     <section>
-                        <SectionHeader title="موضوعات" />
+                        <SectionHeader title="???????" />
                         <CollapsibleTags tags={tags} />
                     </section>
                 )}
 
-                {/* ── Section 7: میز گرد سلامت ─────────────────────────────── */}
+                {/* -- Section 7: ??? ??? ????? ------------------------------- */}
                 {roundtablePosts.length > 0 && (
                     <section>
-                        <SectionHeader title="میز گرد سلامت" />
+                        <SectionHeader title="??? ??? ?????" />
                         <RoundtableCarousel posts={roundtablePosts} />
                     </section>
                 )}
