@@ -82,6 +82,8 @@ return [
         'bot_token'      => env('TELEGRAM_BOT_TOKEN'),
         'channel_id'     => env('TELEGRAM_CHANNEL_ID'),
         'footer_channel' => env('TELEGRAM_FOOTER_CHANNEL', 'کانال تلگرام رسانه خبری نبض سلامت'),
+        // Outbound proxy for Iranian VPS (e.g. socks5://host:port or http://host:port)
+        'http_proxy'     => env('TELEGRAM_HTTP_PROXY'),
     ],
 
 ];

@@ -27,7 +27,7 @@ services:
       - dev-vendor:/app/vendor
     command: sh -c "npm ci && npx vite build --ssr && npm run dev"
     ports:
-      - "5175:5175"
+      - "5210:5175"
     environment:
       - CHOKIDAR_USEPOLLING=1
       - CHOKIDAR_INTERVAL=500

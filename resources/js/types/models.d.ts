@@ -96,7 +96,11 @@ export interface BlogPost {
     updated_at: string;
     author?: Pick<User, 'id' | 'name'>;
     category?: Pick<BlogCategory, 'id' | 'name' | 'slug'>;
-    categories?: Pick<BlogCategory, 'id' | 'name' | 'slug'>[];
+    categories?: Array<
+        Pick<BlogCategory, 'id' | 'name' | 'slug' | 'parent_id'> & {
+            parent?: Pick<BlogCategory, 'id' | 'name' | 'slug'> | null;
+        }
+    >;
     tags?: BlogTag[];
     media?: PostMedia[];
     field_values?: PostFieldValue[];

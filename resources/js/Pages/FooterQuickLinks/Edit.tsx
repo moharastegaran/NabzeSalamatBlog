@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
 import { FormEvent, useState } from 'react';
-import type { FooterQuickLinksContent } from '@/types';
+import type { FooterQuickLink, FooterQuickLinksContent } from '@/types';
 
 interface Props {
     page: {
@@ -15,10 +15,26 @@ const inputClass =
 const labelClass = 'block text-sm font-medium text-gray-700 mb-1';
 const sectionClass = 'space-y-4 bg-white rounded-xl shadow-sm p-6';
 
+function moveLink(links: FooterQuickLink[], from: number, to: number): FooterQuickLink[] {
+    if (to < 0 || to >= links.length || from === to) return links;
+    const next = [...links];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
+    return next;
+}
+
 export default function FooterQuickLinksEdit({ page }: Props) {
     const [title, setTitle] = useState(page.title);
     const [content, setContent] = useState<FooterQuickLinksContent>(page.content);
     const [processing, setProcessing] = useState(false);
+
+    const updateLink = (index: number, patch: Partial<FooterQuickLink>) => {
+        setContent(c => {
+            const links = [...c.links];
+            links[index] = { ...links[index], ...patch };
+            return { ...c, links };
+        });
+    };
 
     const submit = (e: FormEvent) => {
         e.preventDefault();
@@ -27,6 +43,7 @@ export default function FooterQuickLinksEdit({ page }: Props) {
             title,
             content: {
                 section_title: content.section_title,
+                // Array order is the display / sort order
                 links: content.links.map(l => ({ label: l.label, href: l.href })),
             },
         }, {
@@ -58,61 +75,94 @@ export default function FooterQuickLinksEdit({ page }: Props) {
                     </div>
 
                     <div className={sectionClass}>
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-base font-bold text-gray-900">لینک‌ها</h3>
+                        <div className="flex items-center justify-between gap-3">
+                            <div>
+                                <h3 className="text-base font-bold text-gray-900">لینک‌ها</h3>
+                                <p className="mt-1 text-xs text-gray-500">
+                                    ترتیب نمایش در فوتر همان ترتیب این لیست است. با دکمه‌های بالا / پایین جابه‌جا کنید.
+                                </p>
+                            </div>
                             <button
                                 type="button"
                                 onClick={() => setContent(c => ({ ...c, links: [...c.links, { label: '', href: '' }] }))}
-                                className="text-xs font-medium text-indigo-600 hover:text-indigo-500"
+                                className="shrink-0 text-xs font-medium text-indigo-600 hover:text-indigo-500"
                             >
                                 + افزودن لینک
                             </button>
                         </div>
-                        <p className="text-xs text-gray-500">هر مورد شامل برچسب و آدرس مقصد (href) است.</p>
 
-                        {content.links.map((link, i) => (
-                            <div key={i} className="rounded-lg border border-gray-200 p-4 space-y-3">
-                                <div>
-                                    <label className={labelClass}>برچسب *</label>
-                                    <input
-                                        type="text"
-                                        value={link.label}
-                                        onChange={e => {
-                                            const links = [...content.links];
-                                            links[i] = { ...links[i], label: e.target.value };
-                                            setContent(c => ({ ...c, links }));
-                                        }}
-                                        className={inputClass}
-                                    />
+                        <div className="space-y-3">
+                            {content.links.map((link, i) => (
+                                <div key={i} className="rounded-lg border border-gray-200 p-4">
+                                    <div className="mb-3 flex items-center justify-between gap-3">
+                                        <div className="flex items-center gap-2">
+                                            <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-md bg-gray-100 px-2 text-xs font-bold text-gray-600">
+                                                {i + 1}
+                                            </span>
+                                            <span className="text-xs text-gray-400">ترتیب نمایش</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <button
+                                                type="button"
+                                                title="انتقال به بالا"
+                                                disabled={i === 0}
+                                                onClick={() => setContent(c => ({ ...c, links: moveLink(c.links, i, i - 1) }))}
+                                                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-35"
+                                            >
+                                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                title="انتقال به پایین"
+                                                disabled={i === content.links.length - 1}
+                                                onClick={() => setContent(c => ({ ...c, links: moveLink(c.links, i, i + 1) }))}
+                                                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-35"
+                                            >
+                                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setContent(c => ({
+                                                    ...c,
+                                                    links: c.links.filter((_, idx) => idx !== i),
+                                                }))}
+                                                disabled={content.links.length <= 1}
+                                                className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 disabled:opacity-40"
+                                            >
+                                                حذف
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid gap-3 sm:grid-cols-2">
+                                        <div>
+                                            <label className={labelClass}>برچسب *</label>
+                                            <input
+                                                type="text"
+                                                value={link.label}
+                                                onChange={e => updateLink(i, { label: e.target.value })}
+                                                className={inputClass}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className={labelClass}>آدرس مقصد *</label>
+                                            <input
+                                                type="text"
+                                                dir="ltr"
+                                                value={link.href}
+                                                onChange={e => updateLink(i, { href: e.target.value })}
+                                                className={inputClass}
+                                                placeholder="https://example.com"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className={labelClass}>آدرس مقصد *</label>
-                                    <input
-                                        type="text"
-                                        dir="ltr"
-                                        value={link.href}
-                                        onChange={e => {
-                                            const links = [...content.links];
-                                            links[i] = { ...links[i], href: e.target.value };
-                                            setContent(c => ({ ...c, links }));
-                                        }}
-                                        className={inputClass}
-                                        placeholder="https://example.com"
-                                    />
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => setContent(c => ({
-                                        ...c,
-                                        links: c.links.filter((_, idx) => idx !== i),
-                                    }))}
-                                    disabled={content.links.length <= 1}
-                                    className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 disabled:opacity-40"
-                                >
-                                    حذف
-                                </button>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
 
                     <div className="flex justify-end gap-3 pb-8">

@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -15,11 +18,16 @@ class TelegramService
 
     private bool $enabled;
 
+    private ?string $httpProxy;
+
     public function __construct()
     {
         $this->token     = config('services.telegram.bot_token');
         $this->channelId = config('services.telegram.channel_id');
         $this->enabled   = (bool) config('services.telegram.enabled', false);
+        $this->httpProxy = filled(config('services.telegram.http_proxy'))
+            ? (string) config('services.telegram.http_proxy')
+            : null;
     }
 
     public function isConfigured(): bool
@@ -33,12 +41,13 @@ class TelegramService
             return null;
         }
 
-        $response = Http::timeout(15)->get($this->apiUrl('getMe'));
+        $response = $this->request(fn () => $this->client(15)->get($this->apiUrl('getMe')), 'getMe');
 
-        if (! $response->successful() || ! ($response->json('ok') ?? false)) {
+        if (! $response || ! $response->successful() || ! ($response->json('ok') ?? false)) {
             Log::error('Telegram getMe failed', [
-                'status' => $response->status(),
-                'body'   => $response->body(),
+                'status' => $response?->status(),
+                'body'   => $response?->body(),
+                'proxy'  => filled($this->httpProxy),
             ]);
 
             return null;
@@ -53,15 +62,18 @@ class TelegramService
             return null;
         }
 
-        $response = Http::timeout(15)->get($this->apiUrl('getChat'), [
-            'chat_id' => $this->channelId,
-        ]);
+        $response = $this->request(
+            fn () => $this->client(15)->get($this->apiUrl('getChat'), [
+                'chat_id' => $this->channelId,
+            ]),
+            'getChat',
+        );
 
-        if (! $response->successful() || ! ($response->json('ok') ?? false)) {
+        if (! $response || ! $response->successful() || ! ($response->json('ok') ?? false)) {
             Log::warning('Telegram getChat failed', [
                 'chat_id' => $this->channelId,
-                'status'  => $response->status(),
-                'body'    => $response->body(),
+                'status'  => $response?->status(),
+                'body'    => $response?->body(),
             ]);
 
             return null;
@@ -107,19 +119,22 @@ class TelegramService
             return false;
         }
 
-        $response = Http::timeout(15)
-            ->asJson()
-            ->post($this->apiUrl('sendMessage'), [
-                'chat_id'                  => $this->channelId,
-                'text'                     => $text,
-                'parse_mode'               => 'Markdown',
-                'disable_web_page_preview' => true,
-            ]);
+        $response = $this->request(
+            fn () => $this->client(15)
+                ->asJson()
+                ->post($this->apiUrl('sendMessage'), [
+                    'chat_id'                  => $this->channelId,
+                    'text'                     => $text,
+                    'parse_mode'               => 'Markdown',
+                    'disable_web_page_preview' => true,
+                ]),
+            'sendMessage',
+        );
 
-        if (! $response->successful() || ! ($response->json('ok') ?? false)) {
+        if (! $response || ! $response->successful() || ! ($response->json('ok') ?? false)) {
             Log::error('Telegram sendMessage failed', [
-                'status' => $response->status(),
-                'body'   => $response->body(),
+                'status' => $response?->status(),
+                'body'   => $response?->body(),
             ]);
 
             return false;
@@ -147,21 +162,24 @@ class TelegramService
             return $this->sendPhotoUpload($photo, $caption);
         }
 
-        $response = Http::timeout(20)
-            ->asJson()
-            ->post($this->apiUrl('sendPhoto'), [
-                'chat_id'                  => $this->channelId,
-                'photo'                    => $photo,
-                'caption'                  => $caption,
-                'parse_mode'               => 'Markdown',
-                'disable_web_page_preview' => true,
-            ]);
+        $response = $this->request(
+            fn () => $this->client(20)
+                ->asJson()
+                ->post($this->apiUrl('sendPhoto'), [
+                    'chat_id'                  => $this->channelId,
+                    'photo'                    => $photo,
+                    'caption'                  => $caption,
+                    'parse_mode'               => 'Markdown',
+                    'disable_web_page_preview' => true,
+                ]),
+            'sendPhoto',
+        );
 
-        if (! $response->successful() || ! ($response->json('ok') ?? false)) {
+        if (! $response || ! $response->successful() || ! ($response->json('ok') ?? false)) {
             Log::warning('Telegram sendPhoto failed', [
                 'photo'  => $photo,
-                'status' => $response->status(),
-                'body'   => $response->body(),
+                'status' => $response?->status(),
+                'body'   => $response?->body(),
             ]);
 
             return false;
@@ -181,29 +199,62 @@ class TelegramService
         }
 
         try {
-            $response = Http::timeout(30)
-                ->attach('photo', $handle, basename($path))
-                ->post($this->apiUrl('sendPhoto'), [
-                    'chat_id'                  => $this->channelId,
-                    'caption'                  => $caption,
-                    'parse_mode'               => 'Markdown',
-                    'disable_web_page_preview' => true,
-                ]);
+            $response = $this->request(
+                fn () => $this->client(30)
+                    ->attach('photo', $handle, basename($path))
+                    ->post($this->apiUrl('sendPhoto'), [
+                        'chat_id'                  => $this->channelId,
+                        'caption'                  => $caption,
+                        'parse_mode'               => 'Markdown',
+                        'disable_web_page_preview' => true,
+                    ]),
+                'sendPhotoUpload',
+            );
         } finally {
             fclose($handle);
         }
 
-        if (! $response->successful() || ! ($response->json('ok') ?? false)) {
+        if (! $response || ! $response->successful() || ! ($response->json('ok') ?? false)) {
             Log::warning('Telegram sendPhoto upload failed', [
                 'path'   => $path,
-                'status' => $response->status(),
-                'body'   => $response->body(),
+                'status' => $response?->status(),
+                'body'   => $response?->body(),
             ]);
 
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * @param  callable(): Response  $callback
+     */
+    private function request(callable $callback, string $method): ?Response
+    {
+        try {
+            return $callback();
+        } catch (ConnectionException $e) {
+            Log::error("Telegram {$method} connection failed", [
+                'message' => $e->getMessage(),
+                'proxy'   => $this->httpProxy ? preg_replace('#://([^@]+@)?#', '://', $this->httpProxy) : null,
+            ]);
+
+            return null;
+        }
+    }
+
+    private function client(int $timeoutSeconds): PendingRequest
+    {
+        $request = Http::timeout($timeoutSeconds)->connectTimeout(10);
+
+        if (filled($this->httpProxy)) {
+            $request = $request->withOptions([
+                'proxy' => $this->httpProxy,
+            ]);
+        }
+
+        return $request;
     }
 
     private function apiUrl(string $method): string

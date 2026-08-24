@@ -27,6 +27,8 @@ export default defineConfig({
         },
         hmr: {
             host: 'localhost',
+            // Host-mapped port (Windows Hyper-V often blocks 5175)
+            clientPort: 5210,
             port: 5175,
         },
     },

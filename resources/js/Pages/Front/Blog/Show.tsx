@@ -614,9 +614,24 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                                 <span>/</span>
                                 <Link href={route('front.blog.index')} className="hover:text-gray-600 transition-colors">وبلاگ</Link>
                                 {(() => {
-                                    const cat = post.category ?? post.categories?.[0] ?? null;
-                                    return cat && (
+                                    const cats = post.categories ?? [];
+                                    const cat = (cats.length > 0 ? cats[cats.length - 1] : null)
+                                        ?? post.category
+                                        ?? null;
+                                    if (!cat) return null;
+
+                                    const parent = 'parent' in cat ? cat.parent : null;
+
+                                    return (
                                         <>
+                                            {parent && (
+                                                <>
+                                                    <span>/</span>
+                                                    <Link href={route('front.blog.category', parent.slug)} className="hover:text-gray-600 transition-colors">
+                                                        {parent.name}
+                                                    </Link>
+                                                </>
+                                            )}
                                             <span>/</span>
                                             <Link href={route('front.blog.category', cat.slug)} className="hover:text-gray-600 transition-colors">
                                                 {cat.name}

@@ -413,8 +413,8 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                                 {footerQuickLinks?.section_title ?? 'دسترسی سریع'}
                             </h4>
                             <ul className="grid grid-cols-2 gap-x-4 gap-y-2 lg:grid-cols-[3fr_2fr] items-start align-top">
-                                {(footerQuickLinks?.links ?? []).map(({ label, href }) => (
-                                    <li key={`${label}-${href}`}>
+                                {(footerQuickLinks?.links ?? []).map(({ label, href }, index) => (
+                                    <li key={`${index}-${href}`}>
                                         <a href={href} target="_blank" rel="noreferrer"
                                            className="text-sm text-gray-400 hover:text-[#F24F00] transition-colors flex items-center gap-2">
                                             <span className="w-1 h-1 bg-[#F24F00] flex-shrink-0" />
@@ -422,13 +422,13 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                                         </a>
                                     </li>
                                 ))}
-                                <li>
+                                {/* <li>
                                     <button onClick={() => setAdModalOpen(true)}
                                             className="text-sm text-gray-400 hover:text-[#F24F00] transition-colors flex items-center gap-2">
                                         <span className="w-1 h-1 bg-[#F24F00] flex-shrink-0" />
                                         ثبت آگهی در نبض سلامت
                                     </button>
-                                </li>
+                                </li> */}
                             </ul>
                         </div>
 

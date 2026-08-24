@@ -19,12 +19,19 @@ class TestTelegramConnection extends Command
             return self::FAILURE;
         }
 
+        $proxy = config('services.telegram.http_proxy');
+        if (filled($proxy)) {
+            $this->line('Using TELEGRAM_HTTP_PROXY: '.$proxy);
+        } else {
+            $this->warn('TELEGRAM_HTTP_PROXY is empty — direct connection to api.telegram.org.');
+        }
+
         $this->info('Checking bot token (getMe)...');
 
         $bot = $telegram->getMe();
 
         if (! $bot) {
-            $this->error('getMe failed — check TELEGRAM_BOT_TOKEN and network access.');
+            $this->error('getMe failed — check TELEGRAM_BOT_TOKEN, TELEGRAM_HTTP_PROXY, and network access.');
 
             return self::FAILURE;
         }
