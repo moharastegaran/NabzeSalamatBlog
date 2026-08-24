@@ -546,6 +546,13 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
         || post.subtitle
         || undefined;
     const category = post.category ?? post.categories?.[0] ?? null;
+    const cats = post.categories ?? [];
+    const primaryCategory = (cats.length > 0 ? cats[cats.length - 1] : null) ?? post.category ?? null;
+    const parentCategory = primaryCategory && 'parent' in primaryCategory ? primaryCategory.parent ?? null : null;
+    const sidebarCategories = [
+        ...(parentCategory ? [parentCategory] : []),
+        ...(primaryCategory ? [primaryCategory] : []),
+    ];
     const pageUrl = `${app.url}/blog/${post.slug}`;
     const imageUrl = post.featured_image
         ? `${app.url}/storage/${post.featured_image}`
@@ -613,32 +620,22 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                                 <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
                                 <span>/</span>
                                 <Link href={route('front.blog.index')} className="hover:text-gray-600 transition-colors">وبلاگ</Link>
-                                {(() => {
-                                    const cats = post.categories ?? [];
-                                    const cat = (cats.length > 0 ? cats[cats.length - 1] : null)
-                                        ?? post.category
-                                        ?? null;
-                                    if (!cat) return null;
-
-                                    const parent = 'parent' in cat ? cat.parent : null;
-
-                                    return (
-                                        <>
-                                            {parent && (
-                                                <>
-                                                    <span>/</span>
-                                                    <Link href={route('front.blog.category', parent.slug)} className="hover:text-gray-600 transition-colors">
-                                                        {parent.name}
-                                                    </Link>
-                                                </>
-                                            )}
-                                            <span>/</span>
-                                            <Link href={route('front.blog.category', cat.slug)} className="hover:text-gray-600 transition-colors">
-                                                {cat.name}
-                                            </Link>
-                                        </>
-                                    );
-                                })()}
+                                {primaryCategory && (
+                                    <>
+                                        {parentCategory && (
+                                            <>
+                                                <span>/</span>
+                                                <Link href={route('front.blog.category', parentCategory.slug)} className="hover:text-gray-600 transition-colors">
+                                                    {parentCategory.name}
+                                                </Link>
+                                            </>
+                                        )}
+                                        <span>/</span>
+                                        <Link href={route('front.blog.category', primaryCategory.slug)} className="hover:text-gray-600 transition-colors">
+                                            {primaryCategory.name}
+                                        </Link>
+                                    </>
+                                )}
                             </nav>
 
                             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-1.5 text-xs text-gray-600">
@@ -893,18 +890,23 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                         )}
 
                         {/* Category */}
-                        {post.category && (
+                        {sidebarCategories.length > 0 && (
                             <div className="bg-white p-4 shadow-sm">
                                 <SideboxHeader title="دسته‌بندی" />
-                                <Link
-                                    href={route('front.blog.category', post.category.slug)}
-                                    className="flex items-center justify-between py-1.5 text-sm text-gray-700 hover:text-[#F24F00] transition-colors group"
-                                >
-                                    <span>{post.category.name}</span>
-                                    <svg className="h-3.5 w-3.5 text-gray-300 group-hover:text-[#F24F00] transition-colors -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </Link>
+                                <div className="space-y-0.5">
+                                    {sidebarCategories.map((cat) => (
+                                        <Link
+                                            key={cat.id}
+                                            href={route('front.blog.category', cat.slug)}
+                                            className="flex items-center justify-between py-1.5 text-sm text-gray-700 hover:text-[#F24F00] transition-colors group"
+                                        >
+                                            <span>{cat.name}</span>
+                                            <svg className="h-3.5 w-3.5 text-gray-300 group-hover:text-[#F24F00] transition-colors -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
                         )}
 
