@@ -774,14 +774,14 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                                     <span className="inline-block w-3 h-3 bg-[#F24F00]" />
                                     خبرهای مرتبط
                                 </h2>
-                                <div className="flex flex-col gap-6">
+                                <div className="flex flex-col gap-4">
                                     {related.map(p => (
                                         <Link
                                             key={p.id}
                                             href={route('front.blog.show', p.slug)}
                                             className="group flex flex-row bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-200"
                                         >
-                                            <div className="w-28 shrink-0 aspect-square overflow-hidden bg-gray-100">
+                                            <div className="w-28 h-24 shrink-0 aspect-square overflow-hidden bg-gray-100">
                                                 {p.featured_image ? (
                                                     <img
                                                         src={`/storage/${p.featured_image}`}
@@ -797,7 +797,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                                                     </div>
                                                 )}
                                             </div>
-                                            <div className="flex min-w-0 flex-1 flex-col justify-center gap-2 p-4 sm:p-5">
+                                            <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 p-2 sm:p-3">
                                                 {p.subtitle && (
                                                     <p className="text-xs font-medium text-[#F24F00] line-clamp-1">
                                                         {p.subtitle}
@@ -807,7 +807,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                                                     {p.title}
                                                 </h3>
                                                 {p.excerpt && (
-                                                    <p className="text-sm text-gray-600 leading-7 line-clamp-3">
+                                                    <p className="text-sm text-gray-600 leading-7 line-clamp-1">
                                                         {p.excerpt}
                                                     </p>
                                                 )}
