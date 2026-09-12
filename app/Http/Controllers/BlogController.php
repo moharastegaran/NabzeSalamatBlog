@@ -249,42 +249,44 @@ class BlogController extends Controller
 
         $viewToken = $this->viewTracker->track($post->id, $request);
 
-        // Related: last assigned category first, then fill from its parent if needed.
-        $lastCategory = $post->categories->last();
-        $lastCategoryId = $lastCategory?->id ?? $post->blog_category_id;
-        $parentCategoryId = $lastCategory?->parent_id
-            ?? ($lastCategoryId
-                ? BlogCategory::query()->whereKey($lastCategoryId)->value('parent_id')
-                : null);
-
+        // Related posts:
+        // 1) last M2M category that has a parent → fill from parent if < 3
+        // 2) else last root M2M category (parent null) → return as-is (even if < 3)
         $relatedColumns = ['id', 'title', 'subtitle', 'slug', 'excerpt', 'featured_image', 'published_at', 'author_id', 'blog_category_id'];
 
-        $related = collect();
+        $fetchRelated = function (?int $categoryId, int $limit, array $excludeIds = []) use ($relatedColumns) {
+            if (! $categoryId || $limit < 1) {
+                return collect();
+            }
 
-        if ($lastCategoryId) {
-            $related = BlogPost::published()
-                ->where('id', '!=', $post->id)
-                ->whereHas('categories', fn ($q) => $q->where('blog_categories.id', $lastCategoryId))
-                ->with('author:id,name')
-                ->latest('published_at')
-                ->limit(3)
-                ->get($relatedColumns);
-        }
-
-        $needed = 3 - $related->count();
-
-        if ($needed > 0 && $parentCategoryId) {
-            $excludeIds = $related->pluck('id')->push($post->id)->all();
-
-            $fromParent = BlogPost::published()
+            return BlogPost::published()
                 ->whereNotIn('id', $excludeIds)
-                ->whereHas('categories', fn ($q) => $q->where('blog_categories.id', $parentCategoryId))
+                ->whereHas('categories', fn ($q) => $q->where('blog_categories.id', $categoryId))
                 ->with('author:id,name')
                 ->latest('published_at')
-                ->limit($needed)
+                ->limit($limit)
                 ->get($relatedColumns);
+        };
 
-            $related = $related->concat($fromParent)->values();
+        $childCategory = $post->categories
+            ->filter(fn ($c) => filled($c->parent_id))
+            ->last();
+
+        if ($childCategory) {
+            $related = $fetchRelated($childCategory->id, 3, [$post->id]);
+            $needed = 3 - $related->count();
+
+            if ($needed > 0) {
+                $excludeIds = $related->pluck('id')->push($post->id)->all();
+                $fromParent = $fetchRelated((int) $childCategory->parent_id, $needed, $excludeIds);
+                $related = $related->concat($fromParent)->values();
+            }
+        } else {
+            $rootCategory = $post->categories
+                ->filter(fn ($c) => blank($c->parent_id))
+                ->last();
+
+            $related = $fetchRelated($rootCategory?->id, 3, [$post->id]);
         }
 
         $recentPosts = BlogPost::published()
