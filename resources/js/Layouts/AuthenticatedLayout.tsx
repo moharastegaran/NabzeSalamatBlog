@@ -213,6 +213,7 @@ function SidebarNav({
     canAssets,
     canViewReports,
     canBlog, blogOpen, setBlogOpen,
+    blogContentOpen, setBlogContentOpen,
     openTickets,
     shopMaintenance,
     ticketsOpen, setTicketsOpen,
@@ -233,6 +234,8 @@ function SidebarNav({
     canBlog: boolean;
     blogOpen: boolean;
     setBlogOpen: (v: boolean) => void;
+    blogContentOpen: boolean;
+    setBlogContentOpen: (v: boolean) => void;
     openTickets: number;
     shopMaintenance: boolean;
     ticketsOpen: boolean;
@@ -409,64 +412,59 @@ function SidebarNav({
                 )}
 
                 {canAdmin && (
-                    <NavItem
-                        href={route('about-page.edit')}
-                        active={!!route().current('about-page.*')}
-                        icon={<IconAboutPage />}
-                        collapsed={collapsed}
-                    >
-                        صفحه درباره ما
-                    </NavItem>
-                )}
+                    <div>
+                        <button
+                            type="button"
+                            onClick={() => collapsed ? expandAndOpen(setBlogContentOpen) : setBlogContentOpen(!blogContentOpen)}
+                            title={collapsed ? 'محتوای صفحات' : undefined}
+                            className={`relative flex w-full items-center overflow-hidden rounded-lg py-2.5 text-sm font-medium transition-colors ${
+                                collapsed ? 'justify-center px-2' : 'justify-between px-3'
+                            } ${
+                                route().current('about-page.*') || route().current('advertise-modal.*') || route().current('contact-page.*') || route().current('footer-brand.*') || route().current('footer-quick-links.*')
+                                    ? 'bg-[#075F26]/10 text-[#075F26]'
+                                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                            }`}
+                        >
+                            {!collapsed && (route().current('about-page.*') || route().current('advertise-modal.*') || route().current('contact-page.*') || route().current('footer-brand.*') || route().current('footer-quick-links.*')) && (
+                                <span className="absolute inset-y-0 left-0 w-0.5 rounded-r-sm bg-[#075F26]/80" />
+                            )}
+                            <span className={`flex items-center ${collapsed ? '' : 'gap-3'}`}>
+                                <IconAboutPage />
+                                {!collapsed && 'محتوای وبلاگ'}
+                            </span>
+                            {!collapsed && <IconChevron open={blogContentOpen} />}
+                        </button>
 
-                {canAdmin && (
-                    <NavItem
-                        href={route('advertise-modal.edit')}
-                        active={!!route().current('advertise-modal.*')}
-                        icon={<IconAdBanners />}
-                        collapsed={collapsed}
-                    >
-                        مودال آگهی
-                    </NavItem>
-                )}
-
-                {canAdmin && (
-                    <NavItem
-                        href={route('contact-page.edit')}
-                        active={!!route().current('contact-page.*')}
-                        icon={<IconContactMessages />}
-                        collapsed={collapsed}
-                    >
-                        صفحه تماس
-                    </NavItem>
-                )}
-
-                {canAdmin && (
-                    <NavItem
-                        href={route('footer-brand.edit')}
-                        active={!!route().current('footer-brand.*')}
-                        icon={<IconAboutPage />}
-                        collapsed={collapsed}
-                    >
-                        معرفی فوتر
-                    </NavItem>
-                )}
-
-                {canAdmin && (
-                    <NavItem
-                        href={route('footer-quick-links.edit')}
-                        active={!!route().current('footer-quick-links.*')}
-                        icon={<IconAboutPage />}
-                        collapsed={collapsed}
-                    >
-                        دسترسی سریع فوتر
-                    </NavItem>
+                        {!collapsed && (
+                            <div className={`grid transition-all duration-200 ease-in-out ${blogContentOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                                <div className="overflow-hidden">
+                                    <div className="mt-1 ml-5 mr-3 space-y-0.5 border-l border-gray-200 pl-3">
+                                        <SubNavItem href={route('about-page.edit')} active={!!route().current('about-page.*')}>
+                                            صفحه درباره ما
+                                        </SubNavItem>
+                                        <SubNavItem href={route('contact-page.edit')} active={!!route().current('contact-page.*')}>
+                                            صفحه تماس با ما
+                                        </SubNavItem>
+                                        <SubNavItem href={route('advertise-modal.edit')} active={!!route().current('advertise-modal.*')}>
+                                            مودال آگهی
+                                        </SubNavItem>
+                                        <SubNavItem href={route('footer-brand.edit')} active={!!route().current('footer-brand.*')}>
+                                            متن معرفی فوتر
+                                        </SubNavItem>
+                                        <SubNavItem href={route('footer-quick-links.edit')} active={!!route().current('footer-quick-links.*')}>
+                                            لینک‌های دسترسی سریع فوتر
+                                        </SubNavItem>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 )}
 
                 {canAdmin && (
                     <Link
                         href={route('contact-messages.index')}
-                        title={collapsed ? 'پیام‌های تماس' : undefined}
+                        title={collapsed ? 'پیام‌های فرم تماس' : undefined}
                         className={`relative flex items-center overflow-hidden rounded-lg py-2.5 text-sm font-medium transition-colors ${
                             collapsed ? 'justify-center px-2' : 'justify-between px-3'
                         } ${
@@ -487,7 +485,7 @@ function SidebarNav({
                                     </span>
                                 )}
                             </span>
-                            {!collapsed && 'پیام‌های تماس'}
+                            {!collapsed && 'پیام‌های فرم تماس'}
                         </span>
                         {!collapsed && contactUnread > 0 && (
                             <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
@@ -508,19 +506,8 @@ function SidebarNav({
                 {/*    </NavItem>*/}
                 {/*)}*/}
 
-                {canAdmin && (
-                    <NavItem
-                        href={route('roles.index')}
-                        active={!!route().current('roles.*')}
-                        icon={<IconRoles />}
-                        collapsed={collapsed}
-                    >
-                        مدیریت نقش‌ها
-                    </NavItem>
-                )}
-
-                {/* Users group */}
-                {canViewUsers && (
+                   {/* Users group */}
+                   {canViewUsers && (
                     <div>
                         <button
                             type="button"
@@ -565,7 +552,19 @@ function SidebarNav({
                     </div>
                 )}
 
-                {canViewReports && (
+
+                {canAdmin && (
+                    <NavItem
+                        href={route('roles.index')}
+                        active={!!route().current('roles.*')}
+                        icon={<IconRoles />}
+                        collapsed={collapsed}
+                    >
+                        مدیریت نقش‌ها
+                    </NavItem>
+                )}
+
+                {/* {canViewReports && (
                     <NavItem
                         href={route('reports.index')}
                         active={!!route().current('reports.*')}
@@ -574,7 +573,7 @@ function SidebarNav({
                     >
                         گزارش گیری
                     </NavItem>
-                )}
+                )} */}
 
                 {/* Maintenance toggle — admin only */}
                 {canAdmin && (
@@ -604,25 +603,7 @@ function SidebarNav({
                         )}
                     </button>
                 )}
-            </div>
-
-            {/* Credit card withdrawal shortcut — only for sales_retail/sales_manager with is_withdrawal enabled */}
-            {canWithdrawal && (
-                <div className="shrink-0 border-t border-gray-200 px-3 py-3">
-                    <Link
-                        href={route('front.landing')}
-                        title={collapsed ? 'برداشت اعتبار کارت' : undefined}
-                        className={`flex items-center rounded-lg py-2.5 text-sm font-medium text-indigo-600 hover:bg-gray-100 hover:text-indigo-700 transition-colors ${
-                            collapsed ? 'justify-center px-2' : 'gap-3 px-3'
-                        }`}
-                    >
-                        <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                        </svg>
-                        {!collapsed && 'برداشت اعتبار کارت'}
-                    </Link>
-                </div>
-            )}
+            </div>        
 
             {/* Collapse toggle */}
             <div className="hidden lg:block shrink-0 border-t border-gray-200 px-3 py-3">
@@ -797,6 +778,13 @@ export default function Authenticated({
 
     const [usersOpen, setUsersOpen]     = useState(!!route().current('users.*'));
     const [blogOpen, setBlogOpen]       = useState(!!route().current('blog.*') || !!route().current('analytics.blog'));
+    const [blogContentOpen, setBlogContentOpen] = useState(
+        !!route().current('about-page.*')
+        || !!route().current('advertise-modal.*')
+        || !!route().current('contact-page.*')
+        || !!route().current('footer-brand.*')
+        || !!route().current('footer-quick-links.*'),
+    );
     const [ticketsOpen, setTicketsOpen] = useState(!!route().current('tickets.*'));
 
     const [unreadCount, setUnreadCount] = useState(0);
@@ -887,6 +875,8 @@ export default function Authenticated({
                     canBlog={canBlog}
                     blogOpen={blogOpen}
                     setBlogOpen={setBlogOpen}
+                    blogContentOpen={blogContentOpen}
+                    setBlogContentOpen={setBlogContentOpen}
                     openTickets={openTickets ?? 0}
                     shopMaintenance={shopMaintenance}
                     ticketsOpen={ticketsOpen}

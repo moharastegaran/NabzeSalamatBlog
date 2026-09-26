@@ -150,7 +150,9 @@ class BlogPostBroadcastFormatter
 
         $socialLinks = array_filter([
             $this->socialMarkdownLink('بله', (string) config('services.social.bale')),
+            $this->socialMarkdownLink('تلگرام', (string) config('services.social.telegram')),
             $this->socialMarkdownLink('واتساپ', (string) config('services.social.whatsapp')),
+            $this->socialMarkdownLink('اینستاگرام', (string) config('services.social.instagram')),
             $this->socialMarkdownLink('وبسایت', (string) config('app.url')),
         ]);
 

@@ -70,8 +70,8 @@ export interface FooterBrandContent {
     html: string;
 }
 
-export type ContactInfoType = 'email' | 'whatsapp' | 'phone' | 'address';
-export type ContactInfoIcon = 'building' | 'phone' | 'whatsapp' | 'email';
+export type ContactInfoType = 'email' | 'whatsapp' | 'phone' | 'address' | 'telegram';
+export type ContactInfoIcon = 'building' | 'phone' | 'whatsapp' | 'email' | 'telegram';
 
 export interface ContactInfoItem {
     type: ContactInfoType;

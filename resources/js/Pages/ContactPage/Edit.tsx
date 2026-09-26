@@ -2,8 +2,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
 import { FormEvent, useState } from 'react';
 
-type ContactInfoType = 'email' | 'whatsapp' | 'phone' | 'address';
-type ContactIcon = 'building' | 'phone' | 'whatsapp' | 'email';
+type ContactInfoType = 'email' | 'whatsapp' | 'phone' | 'address' | 'telegram';
+type ContactIcon = 'building' | 'phone' | 'whatsapp' | 'email' | 'telegram';
 
 type ContactInfo = {
     type: ContactInfoType;
@@ -35,6 +35,7 @@ const TYPES: { value: ContactInfoType; label: string }[] = [
     { value: 'address', label: 'آدرس' },
     { value: 'phone', label: 'تلفن' },
     { value: 'whatsapp', label: 'واتساپ' },
+    { value: 'telegram', label: 'تلگرام' },
     { value: 'email', label: 'ایمیل' },
 ];
 
@@ -42,6 +43,7 @@ const ICONS: { value: ContactIcon; label: string }[] = [
     { value: 'building', label: 'ساختمان' },
     { value: 'phone', label: 'تلفن' },
     { value: 'whatsapp', label: 'واتساپ' },
+    { value: 'telegram', label: 'تلگرام' },
     { value: 'email', label: 'ایمیل' },
 ];
 
@@ -178,7 +180,7 @@ export default function ContactPageEdit({ page }: Props) {
                                     label="مقدار *"
                                     value={info.value}
                                     onChange={v => updateInfo(i, { value: v })}
-                                    dir={info.type === 'email' || info.type === 'phone' || info.type === 'whatsapp' ? 'ltr' : undefined}
+                                    dir={info.type === 'email' || info.type === 'phone' || info.type === 'whatsapp' || info.type === 'telegram' ? 'ltr' : undefined}
                                 />
                                 <Field
                                     label="توضیح (اختیاری)"
@@ -282,6 +284,7 @@ function matchIcon(type: ContactInfoType): ContactIcon {
         case 'address': return 'building';
         case 'phone': return 'phone';
         case 'whatsapp': return 'whatsapp';
+        case 'telegram': return 'telegram';
         case 'email': return 'email';
     }
 }

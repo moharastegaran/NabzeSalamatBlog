@@ -49,9 +49,10 @@ return [
     ],
 
     'social' => [
-        'telegram' => env('SOCIAL_TELEGRAM_URL', 'https://t.me/NabzSalamatMedia'),
-        'bale'     => env('SOCIAL_BALE_URL', 'https://ble.ir/nabze_salamat'),
-        'whatsapp' => env('SOCIAL_WHATSAPP_URL', 'https://chat.whatsapp.com/EiBcCxmF5TFAWahncFGRkS?s=sw&p=a&ilr=1&amv=3'),
+        'telegram'  => env('SOCIAL_TELEGRAM_URL', 'https://t.me/NabzSalamatMedia'),
+        'bale'      => env('SOCIAL_BALE_URL', 'https://ble.ir/nabze_salamat'),
+        'whatsapp'  => env('SOCIAL_WHATSAPP_URL', 'https://chat.whatsapp.com/EiBcCxmF5TFAWahncFGRkS?s=sw&p=a&ilr=1&amv=3'),
+        'instagram' => env('SOCIAL_INSTAGRAM_URL', 'https://www.instagram.com/Nabzsalamat.news'),
     ],
 
     'bale' => [
