@@ -42,6 +42,7 @@ export type PageProps<
     breakingNews: BreakingNewsItem[];
     advertiseModal: AdvertiseModalContent;
     footerQuickLinks: FooterQuickLinksContent;
+    footerBrand: FooterBrandContent;
     contactInfos: ContactInfoItem[];
 };
 
@@ -63,6 +64,10 @@ export interface FooterQuickLink {
 export interface FooterQuickLinksContent {
     section_title: string;
     links: FooterQuickLink[];
+}
+
+export interface FooterBrandContent {
+    html: string;
 }
 
 export type ContactInfoType = 'email' | 'whatsapp' | 'phone' | 'address';

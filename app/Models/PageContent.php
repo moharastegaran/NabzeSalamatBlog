@@ -37,6 +37,7 @@ class PageContent extends Model
             'advertise-modal'  => 'مودال آگهی',
             'contact'          => 'تماس با ما',
             'footer-quick-links' => 'دسترسی سریع فوتر',
+            'footer-brand'       => 'معرفی فوتر',
             default            => $slug,
         };
     }
@@ -49,8 +50,17 @@ class PageContent extends Model
             'advertise-modal'    => static::advertiseModalDefaults(),
             'contact'            => static::contactDefaults(),
             'footer-quick-links' => static::footerQuickLinksDefaults(),
+            'footer-brand'       => static::footerBrandDefaults(),
             default              => [],
         };
+    }
+
+    /** @return array<string, mixed> */
+    public static function footerBrandDefaults(): array
+    {
+        return [
+            'html' => '<p>نبض سلامت، تپش آگاهی و امید در مسیر سلامت جامعه است.<br>با ما همراه باشید تا تازه‌ترین اخبار، تحلیل‌ها و محتوای تخصصی در حوزه سلامت و دارو را دنبال کنید.</p>',
+        ];
     }
 
     /** @return array<string, mixed> */

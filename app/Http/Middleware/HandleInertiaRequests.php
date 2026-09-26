@@ -102,6 +102,15 @@ class HandleInertiaRequests extends Middleware
                     return \App\Models\PageContent::footerQuickLinksDefaults();
                 }
             },
+            'footerBrand' => function () {
+                try {
+                    $page = \App\Models\PageContent::forSlug('footer-brand');
+
+                    return $page->content ?: \App\Models\PageContent::footerBrandDefaults();
+                } catch (\Throwable) {
+                    return \App\Models\PageContent::footerBrandDefaults();
+                }
+            },
             'contactInfos' => function () {
                 try {
                     $page = \App\Models\PageContent::forSlug('contact');

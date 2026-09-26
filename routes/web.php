@@ -4,6 +4,7 @@ use App\Http\Controllers\AboutPageController;
 use App\Http\Controllers\AdBannerController;
 use App\Http\Controllers\AdvertiseModalController;
 use App\Http\Controllers\ContactPageController;
+use App\Http\Controllers\FooterBrandController;
 use App\Http\Controllers\FooterQuickLinksController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContactMessageController;
@@ -101,6 +102,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::get('/contact-page', [ContactPageController::class, 'edit'])->name('contact-page.edit');
         Route::put('/contact-page', [ContactPageController::class, 'update'])->name('contact-page.update');
+    });
+
+    // Footer brand blurb (admin only)
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/footer-brand', [FooterBrandController::class, 'edit'])->name('footer-brand.edit');
+        Route::put('/footer-brand', [FooterBrandController::class, 'update'])->name('footer-brand.update');
     });
 
     // Footer quick links (admin only)

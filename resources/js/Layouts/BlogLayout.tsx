@@ -7,7 +7,7 @@ import { SOCIAL_LINKS } from '@/constants/socials';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function BlogLayout({ children }: PropsWithChildren) {
-    const { auth, navCategories, breakingNews, footerQuickLinks, contactInfos } = usePage<PageProps>().props;
+    const { auth, navCategories, breakingNews, footerQuickLinks, footerBrand, contactInfos } = usePage<PageProps>().props;
     const { url }  = usePage();
     const pathname = url.split('?')[0];
     const isActive = (path: string) =>
@@ -367,11 +367,13 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                             <Link href={route('front.landing')}>
                                 <ApplicationLogo className="object-contain w-auto brightness-0 invert opacity-80" />
                             </Link>
-                            <p className="text-sm leading-6 text-gray-400">
-                                نبض سلامت، تپش آگاهی و امید در مسیر سلامت جامه است.
-                                <br />
-                                با ما همراه باشید تا تازه‌ترین اخبار، تحلیل‌ها و محتوای تخصصی در حوزه سلامت و دارو را دنبال کنید.
-                            </p>
+                            <div
+                                className="text-sm leading-6 text-gray-400 [&_p]:m-0 [&_p+p]:mt-2 [&_a]:text-[#F24F00] hover:[&_a]:underline [&_strong]:font-semibold [&_em]:italic"
+                                dangerouslySetInnerHTML={{
+                                    __html: footerBrand?.html
+                                        || 'نبض سلامت، تپش آگاهی و امید در مسیر سلامت جامعه است.<br />با ما همراه باشید تا تازه‌ترین اخبار، تحلیل‌ها و محتوای تخصصی در حوزه سلامت و دارو را دنبال کنید.',
+                                }}
+                            />
                             <div className="flex items-center gap-2 mt-1">
                                 {SOCIAL_LINKS.map((social) => {
                                     const Icon = social.icon;

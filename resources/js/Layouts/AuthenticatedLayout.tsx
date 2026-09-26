@@ -443,6 +443,17 @@ function SidebarNav({
 
                 {canAdmin && (
                     <NavItem
+                        href={route('footer-brand.edit')}
+                        active={!!route().current('footer-brand.*')}
+                        icon={<IconAboutPage />}
+                        collapsed={collapsed}
+                    >
+                        معرفی فوتر
+                    </NavItem>
+                )}
+
+                {canAdmin && (
+                    <NavItem
                         href={route('footer-quick-links.edit')}
                         active={!!route().current('footer-quick-links.*')}
                         icon={<IconAboutPage />}

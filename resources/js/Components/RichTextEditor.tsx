@@ -27,6 +27,14 @@ const FULL_TOOLBAR = [
     ['clean'],
 ] as const;
 
+const SIMPLE_TOOLBAR = [
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    [{ align: '' }, { align: 'center' }, { align: 'right' }],
+    ['link'],
+    ['clean'],
+] as const;
+
 export interface RichTextEditorProps {
     value: string;
     onChange: (html: string) => void;
@@ -45,6 +53,8 @@ export interface RichTextEditorProps {
     showFullscreen?: boolean;
     /** Enable click-to-resize images (default true) */
     imageResize?: boolean;
+    /** Full article toolbar, or a compact set for short blurbs (default full) */
+    toolbar?: 'full' | 'simple';
     onFocus?: () => void;
     onBlur?: () => void;
 }
@@ -68,6 +78,7 @@ export default function RichTextEditor({
     showStats = true,
     showFullscreen = true,
     imageResize = true,
+    toolbar = 'full',
     onFocus,
     onBlur,
 }: RichTextEditorProps) {
@@ -96,14 +107,15 @@ export default function RichTextEditor({
         if (id) editorEl.id = id;
         wrapper.appendChild(editorEl);
 
+        const useSimple = toolbar === 'simple';
         const quill = new Quill(editorEl, {
             theme: 'snow',
             placeholder,
             readOnly: locked,
             modules: {
                 toolbar: {
-                    container: [...FULL_TOOLBAR],
-                    handlers: {
+                    container: [...(useSimple ? SIMPLE_TOOLBAR : FULL_TOOLBAR)],
+                    handlers: useSimple ? {} : {
                         image() {
                             if (locked) return;
                             const url = window.prompt('آدرس تصویر را وارد کنید:');
