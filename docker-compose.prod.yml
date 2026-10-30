@@ -11,6 +11,9 @@ services:
       - ./.env.prod:/var/www/html/.env:ro
     networks:
       - NabzeSalamat
+    # Reach host v2rayA local proxy for Telegram Bot API (TELEGRAM_HTTP_PROXY)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       mysql:
         condition: service_healthy
@@ -148,6 +151,9 @@ services:
       - ./.env.prod:/var/www/html/.env:ro
     networks:
       - NabzeSalamat
+    # Reach host v2rayA local proxy for Telegram Bot API (TELEGRAM_HTTP_PROXY)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       mysql:
         condition: service_healthy
