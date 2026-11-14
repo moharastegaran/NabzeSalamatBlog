@@ -227,7 +227,7 @@ class BlogController extends Controller
         $post = BlogPost::published()
             ->where('slug', $slug)
             ->with([
-                'author:id,name',
+                'author:id,name,profile_image',
                 'category:id,name,slug',
                 'categories:id,name,slug,parent_id',
                 'categories.parent:id,name,slug',

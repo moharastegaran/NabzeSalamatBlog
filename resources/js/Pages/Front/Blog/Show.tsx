@@ -599,11 +599,9 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                 jsonLd={jsonLd}
             />
 
-            <div className="mx-auto max-w-7xl px-4 pb-8 py-6 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
 
-                {/* Breadcrumb */}
-
-                {/* 3-column: RTL → col1=right(44px action) | col2=middle(article) | col3=left(sidebar) */}
+                {/* 3-column: RTL → col1=right(action) | col2=middle(article) | col3=left(sidebar) */}
                 <div className="grid grid-cols-1 lg:grid-cols-[50px_1fr_325px] gap-8 items-start">
 
                     {/* Thin right action sidebar */}
@@ -612,166 +610,184 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                     </div>
 
                     {/* Main article */}
-                    <article className="min-w-0">
+                    <article className="min-w-0 space-y-8">
 
-                        <div className="flex flex-col lg:flex-row lg:justify-between items-center border-b border-gray-200 py-2 lg:py-5 mb-3 lg:mb-0 gap-2 ">
-
-                            <nav className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
-                                <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
-                                <span>/</span>
-                                <Link href={route('front.blog.index')} className="hover:text-gray-600 transition-colors">وبلاگ</Link>
-                                {primaryCategory && (
-                                    <>
-                                        {parentCategory && (
-                                            <>
-                                                <span>/</span>
-                                                <Link href={route('front.blog.category', parentCategory.slug)} className="hover:text-gray-600 transition-colors">
-                                                    {parentCategory.name}
-                                                </Link>
-                                            </>
-                                        )}
-                                        <span>/</span>
-                                        <Link href={route('front.blog.category', primaryCategory.slug)} className="hover:text-gray-600 transition-colors">
-                                            {primaryCategory.name}
-                                        </Link>
-                                    </>
-                                )}
-                            </nav>
-
-                            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-1.5 text-xs text-gray-600">
-                                {post.author && (
-                                    <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                                </svg>
-                                          <Link href={route('front.blog.author', post.author.id)} className="hover:text-[#F24F00] transition-colors">
-                                              {post.author.name}
-                                          </Link>
-                            </span>
-                                )}
-                                {date && (
-                                    <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
-                                </svg>
-                                        {date}
-                            </span>
-                                )}
-                                {post.time_to_read && (
-                                    <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                        {post.time_to_read.toLocaleString('fa-IR')} دقیقه مطالعه
-                            </span>
-                                )}
-                                {post.views > 0 && (
-                                    <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                        {post.views.toLocaleString('fa-IR')} بازدید
-                            </span>
-                                )}
-                                {comments.length > 0 && (
-                                    <span className="flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
-                                </svg>
-                                        {comments.length} نظر
-                            </span>
-                                )}
-                            </div>
-                        </div>
-
-                          {/* Post title block */}
-                          <div className="flex flex-col justify-center gap-2 my-8 h-full">
-                              {post.subtitle && (
-                                  <div className="inline-flex items-start gap-2 bg-transparent">
-                                      <span className="w-1.5 h-1.5 bg-[#F24F00] shrink-0 mt-1" />
-                                      <p className="text-sm font-semibold text-[#F24F00] leading-snug text-center lg:text-right">{post.subtitle}</p>
-                                  </div>
-                              )}
-                              <h1 className="text-xl font-bold text-gray-900 lg:text-2xl lg:leading-snug text-center lg:text-right">{post.title}</h1>
-                              {/* Lead / Excerpt */}
-                              {post.excerpt && (
-                                 <blockquote className="border-r-4 border-[#F24F00] bg-[#F24F00]/5 px-3 py-2 text-sm font-medium leading-relaxed text-gray-800 not-italic">
-                                     {post.excerpt}
-                                 </blockquote>
-                              )}
-                      </div>
-
-
-                        {/* Mobile share bar */}
-                        <MobileShareBar commentCount={comments.length} />
-
-                        {/* Body — featured image beside content on desktop, above on mobile */}
-                        <div className="blog-body flow-root">
-                            {post.featured_image && (
-                                <div className="w-full lg:w-1/2 lg:float-start overflow-hidden max-h-[300px] lg:max-h-[420px] mb-5 lg:mb-4 lg:me-6">
-                                    <img
-                                        src={`/storage/${post.featured_image}`}
-                                        alt={post.title}
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                            )}
-                            <div dangerouslySetInnerHTML={{ __html: post.body }} />
-                        </div>
-
-                        <PostMediaSection
-                            media={post.media}
-                            videoUrl={post.video_url}
-                            poster={post.featured_image}
-                            title={post.title}
-                        />
-
-                        <PostFieldValues values={post.field_values} />
-
-                        {/* Short link */}
-                        {post.short_link && (
-                            <div className="mt-8 flex items-center gap-3 border border-gray-200 bg-gray-50 px-4 py-3 w-full lg:w-2/3">
-                                <svg className="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
-                                </svg>
-                                <span className="text-xs text-gray-400 flex-shrink-0 font-medium">لینک کوتاه:</span>
-                                <span className="font-mono text-sm text-gray-700 flex-1 select-all truncate">
-                                    {typeof window !== 'undefined' ? window.location.origin : ''}/{post.short_link}
-                                </span>
-                                <button
-                                    onClick={copyShortLink}
-                                    title={copiedShort ? 'کپی شد!' : 'کپی لینک کوتاه'}
-                                    className={`flex-shrink-0 flex items-center gap-1.5 text-xs px-2.5 py-1 transition-colors ${
-                                        copiedShort
-                                            ? 'text-[#075F26] bg-green-50'
-                                            : 'hover:text-gray-500 text-[#F24F00] bg-[#F24F00]/5'
-                                    }`}
-                                >
-                                    {copiedShort ? (
+                        <div className="article-shell article-shell-accent overflow-hidden">
+                            {/* Meta / breadcrumb strip */}
+                            <div className="border-b border-gray-100 bg-gradient-to-l from-[#F24F00]/[0.06] to-transparent px-4 py-3 sm:px-6">
+                                <nav className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
+                                    <Link href="/" className="hover:text-gray-700 transition-colors">خانه</Link>
+                                    <span className="text-gray-300">/</span>
+                                    <Link href={route('front.blog.index')} className="hover:text-gray-700 transition-colors">وبلاگ</Link>
+                                    {primaryCategory && (
                                         <>
-                                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                            <span dir="rtl">کپی شد</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
-                                            </svg>
-                                            <span dir="rtl">کپی</span>
+                                            {parentCategory && (
+                                                <>
+                                                    <span className="text-gray-300">/</span>
+                                                    <Link href={route('front.blog.category', parentCategory.slug)} className="hover:text-[#F24F00] transition-colors">
+                                                        {parentCategory.name}
+                                                    </Link>
+                                                </>
+                                            )}
+                                            <span className="text-gray-300">/</span>
+                                            <Link href={route('front.blog.category', primaryCategory.slug)} className="font-medium text-[#F24F00] hover:opacity-80 transition-opacity">
+                                                {primaryCategory.name}
+                                            </Link>
                                         </>
                                     )}
-                                </button>
+                                </nav>
                             </div>
-                        )}
+
+                            <div className="px-4 pt-6 sm:px-6 sm:pt-8">
+                                {/* Title block */}
+                                <header className="space-y-3">
+                                    {post.subtitle && (
+                                        <div className="inline-flex items-start gap-2">
+                                            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 bg-[#F24F00]" />
+                                            <p className="text-sm font-semibold text-[#F24F00] leading-snug">{post.subtitle}</p>
+                                        </div>
+                                    )}
+                                    <h1 className="text-2xl font-black text-gray-900 leading-snug sm:text-[1.75rem] lg:leading-[1.35]">
+                                        {post.title}
+                                    </h1>
+                                    {post.excerpt && (
+                                        <p className="border-r-4 border-[#F24F00] bg-[#F24F00]/5 px-4 py-3 text-[0.95rem] font-medium leading-8 text-gray-800">
+                                            {post.excerpt}
+                                        </p>
+                                    )}
+                                </header>
+
+                                {/* Byline */}
+                                <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-gray-100 py-3.5 text-xs text-gray-600">
+                                    {post.author && (
+                                        <Link
+                                            href={route('front.blog.author', post.author.id)}
+                                            className="inline-flex items-center gap-2 font-semibold text-gray-800 hover:text-[#F24F00] transition-colors"
+                                        >
+                                            {post.author.profile_image ? (
+                                                <img
+                                                    src={`/storage/${post.author.profile_image}`}
+                                                    alt=""
+                                                    className="h-8 w-8 rounded-full object-cover ring-2 ring-[#F24F00]/25"
+                                                />
+                                            ) : (
+                                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#042F10] text-xs font-black text-white">
+                                                    {post.author.name.charAt(0)}
+                                                </span>
+                                            )}
+                                            {post.author.name}
+                                        </Link>
+                                    )}
+                                    {date && (
+                                        <span className="inline-flex items-center gap-1">
+                                            <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+                                            </svg>
+                                            {date}
+                                        </span>
+                                    )}
+                                    {post.time_to_read && (
+                                        <span className="inline-flex items-center gap-1">
+                                            <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            {post.time_to_read.toLocaleString('fa-IR')} دقیقه مطالعه
+                                        </span>
+                                    )}
+                                    {post.views > 0 && (
+                                        <span className="inline-flex items-center gap-1">
+                                            <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            {post.views.toLocaleString('fa-IR')} بازدید
+                                        </span>
+                                    )}
+                                    {comments.length > 0 && (
+                                        <span className="inline-flex items-center gap-1">
+                                            <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                                            </svg>
+                                            {comments.length} نظر
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="mt-4 lg:hidden">
+                                    <MobileShareBar commentCount={comments.length} />
+                                </div>
+                            </div>
+
+                            {/* Body — featured image half-width on desktop, full on mobile */}
+                            <div className="px-4 py-7 sm:px-6 sm:py-8">
+                                <div className="blog-body flow-root">
+                                    {post.featured_image && (
+                                        <div className="mb-5 w-full overflow-hidden bg-gray-100 max-h-[300px] lg:float-start lg:mb-4 lg:me-6 lg:w-1/2 lg:max-h-[420px]">
+                                            <div className="h-1 w-full bg-[#F24F00]" />
+                                            <img
+                                                src={`/storage/${post.featured_image}`}
+                                                alt={post.title}
+                                                className="h-full w-full object-cover"
+                                            />
+                                            <div className="h-1 w-full bg-[#F24F00]" />
+                                        </div>
+                                    )}
+                                    <div dangerouslySetInnerHTML={{ __html: post.body }} />
+                                </div>
+
+                                <PostMediaSection
+                                    media={post.media}
+                                    videoUrl={post.video_url}
+                                    poster={post.featured_image}
+                                    title={post.title}
+                                />
+
+                                <PostFieldValues values={post.field_values} />
+
+                                {post.short_link && (
+                                    <div className="mt-8 flex items-center gap-3 border border-gray-200 bg-gray-50 px-4 py-3">
+                                        <svg className="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                        </svg>
+                                        <span className="text-xs text-gray-400 flex-shrink-0 font-medium">لینک کوتاه:</span>
+                                        <span className="font-mono text-sm text-gray-700 flex-1 select-all truncate">
+                                            {typeof window !== 'undefined' ? window.location.origin : ''}/{post.short_link}
+                                        </span>
+                                        <button
+                                            onClick={copyShortLink}
+                                            title={copiedShort ? 'کپی شد!' : 'کپی لینک کوتاه'}
+                                            className={`flex-shrink-0 flex items-center gap-1.5 text-xs px-2.5 py-1 transition-colors ${
+                                                copiedShort
+                                                    ? 'text-[#075F26] bg-green-50'
+                                                    : 'hover:text-gray-500 text-[#F24F00] bg-[#F24F00]/5'
+                                            }`}
+                                        >
+                                            {copiedShort ? (
+                                                <>
+                                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    <span dir="rtl">کپی شد</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                                                    </svg>
+                                                    <span dir="rtl">کپی</span>
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
                         {/* Related posts */}
                         {related.length > 0 && (
-                            <section className="mt-14">
-                                <h2 className="mb-6 flex items-center gap-2 text-base font-black text-gray-900">
-                                    <span className="inline-block w-3 h-3 bg-[#F24F00]" />
+                            <section className="article-shell overflow-hidden p-4 sm:p-6">
+                                <h2 className="mb-5 flex items-center gap-2 text-base font-black text-gray-900">
+                                    <span className="inline-block h-3 w-1.5 bg-[#F24F00]" />
                                     خبرهای مرتبط
                                 </h2>
                                 <div className="flex flex-col gap-4">
@@ -819,9 +835,9 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                         )}
 
                         {/* Comments */}
-                        <div id="post-comments" className="mt-14 scroll-mt-6">
-                            <h2 className="mb-6 flex items-center gap-2 text-base font-black text-gray-900">
-                                <span className="inline-block w-3 h-3 bg-[#F24F00]" />
+                        <div id="post-comments" className="article-shell scroll-mt-6 overflow-hidden p-4 sm:p-6">
+                            <h2 className="mb-5 flex items-center gap-2 text-base font-black text-gray-900">
+                                <span className="inline-block h-3 w-1.5 bg-[#F24F00]" />
                                 نظرات
                                 {comments.length > 0 && (
                                     <span className="text-sm font-normal text-gray-400">({comments.length})</span>
@@ -829,9 +845,9 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                             </h2>
 
                             {comments.length > 0 && (
-                                <div className="mb-8 space-y-4">
+                                <div className="mb-6 space-y-3">
                                     {comments.map(comment => (
-                                        <div key={comment.id} className="bg-white p-5 shadow-sm">
+                                        <div key={comment.id} className="border border-gray-100 bg-gray-50/70 p-4">
                                             <div className="mb-2 flex items-center justify-between gap-3">
                                                 <span className="font-bold text-gray-800 text-sm">{comment.name}</span>
                                                 <span className="text-xs text-gray-400">
@@ -844,9 +860,9 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                                 </div>
                             )}
 
-                            <div className="bg-white p-6 shadow-sm">
+                            <div className="border border-gray-100 bg-white p-5">
                                 <h3 className="mb-5 flex items-center gap-2 text-sm font-black text-gray-800">
-                                    <span className="inline-block w-2.5 h-2.5 bg-[#F24F00]" />
+                                    <span className="inline-block h-2.5 w-2.5 bg-[#F24F00]" />
                                     ثبت نظر
                                 </h3>
                                 <CommentForm postId={post.id} />

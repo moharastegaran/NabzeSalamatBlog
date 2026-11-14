@@ -96,7 +96,7 @@ export interface BlogPost {
     time_to_read?: number;
     created_at: string;
     updated_at: string;
-    author?: Pick<User, 'id' | 'name'>;
+    author?: Pick<User, 'id' | 'name' | 'profile_image'>;
     category?: Pick<BlogCategory, 'id' | 'name' | 'slug'>;
     categories?: Array<
         Pick<BlogCategory, 'id' | 'name' | 'slug' | 'parent_id'> & {
