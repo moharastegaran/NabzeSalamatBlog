@@ -7,7 +7,7 @@ use App\Models\BlogPost;
 
 class BlogPostPublisher
 {
-    public function publish(BlogPost $post): void
+    public function publish(BlogPost $post, bool $broadcastToBale = true): void
     {
         if ($post->status === 'published') {
             return;
@@ -19,6 +19,6 @@ class BlogPostPublisher
             'publish_at'   => null,
         ])->save();
 
-        BlogPostPublished::dispatch($post);
+        BlogPostPublished::dispatch($post, $broadcastToBale);
     }
 }

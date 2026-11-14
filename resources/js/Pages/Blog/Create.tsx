@@ -6,12 +6,12 @@ import CategoryMultiSelect from '@/Components/CategoryMultiSelect';
 import TagMultiSelect from '@/Components/TagMultiSelect';
 import type { Asset, BlogCategory, BlogTag } from '@/types/models';
 import type { PageProps } from '@/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PersianDateTimePicker from '@/Components/PersianDateTimePicker';
 import { localDateTimeStr } from '@/utils/date';
 
 interface Props {
-    categories: Pick<BlogCategory, 'id' | 'name' | 'parent_id'>[];
+    categories: Pick<BlogCategory, 'id' | 'name' | 'parent_id' | 'broadcast_to_bale'>[];
     tags: Pick<BlogTag, 'id' | 'name'>[];
 }
 
@@ -27,8 +27,14 @@ interface FormData {
     featured_image: string | null;
 }
 
+interface BalePreviewState {
+    postId: number;
+    title: string;
+    message: string;
+}
+
 export default function BlogCreate({ categories, tags }: Props) {
-    const { auth } = usePage<PageProps>().props;
+    const { auth, flash } = usePage<PageProps>().props;
     const canUpload = auth.user?.roles?.includes('admin') ?? false;
     const canCreateTags = auth.user?.permissions?.includes('tags.create') ?? false;
 
@@ -46,6 +52,27 @@ export default function BlogCreate({ categories, tags }: Props) {
     const [errors, setErrors]       = useState<Record<string, string>>({});
     const [processing, setProcessing] = useState(false);
     const [pickerOpen, setPickerOpen] = useState(false);
+    const [balePreview, setBalePreview] = useState<BalePreviewState | null>(null);
+    const [baleMessage, setBaleMessage] = useState('');
+    const [baleSending, setBaleSending] = useState(false);
+    const [baleError, setBaleError] = useState('');
+
+    useEffect(() => {
+        const preview = flash.bale_preview;
+        if (!preview) return;
+
+        setBalePreview({
+            postId: preview.post_id,
+            title: preview.title,
+            message: preview.message,
+        });
+        setBaleMessage(preview.message);
+        setBaleError('');
+    }, [flash.bale_preview]);
+
+    const willDeferBale =
+        form.status === 'published'
+        && form.category_ids.some(id => categories.find(c => c.id === id)?.broadcast_to_bale);
 
     const handleAssetSelect = (asset: Asset) => {
         setForm(p => ({ ...p, featured_image: asset.path }));
@@ -68,7 +95,35 @@ export default function BlogCreate({ categories, tags }: Props) {
         router.post(route('blog.store'), data, {
             forceFormData: true,
             onError:   (errs) => { setErrors(errs); setProcessing(false); },
-            onSuccess: () => setProcessing(false),
+            onFinish:  () => setProcessing(false),
+        });
+    };
+
+    const closeBalePreview = () => {
+        setBalePreview(null);
+        setBaleMessage('');
+        setBaleError('');
+        router.visit(route('blog.index'));
+    };
+
+    const sendBalePreview = () => {
+        if (!balePreview) return;
+
+        const message = baleMessage.trim();
+        if (!message) {
+            setBaleError('متن پیام نمی‌تواند خالی باشد.');
+            return;
+        }
+
+        setBaleSending(true);
+        setBaleError('');
+
+        router.post(route('blog.broadcast-bale', balePreview.postId), { message }, {
+            onError: (errs) => {
+                setBaleError(errs.message || 'ارسال ناموفق بود.');
+                setBaleSending(false);
+            },
+            onFinish: () => setBaleSending(false),
         });
     };
 
@@ -141,6 +196,11 @@ export default function BlogCreate({ categories, tags }: Props) {
                                 onChange={ids => setForm(p => ({ ...p, category_ids: ids }))}
                                 error={errors.category_ids}
                             />
+                            {willDeferBale && (
+                                <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-md px-3 py-2">
+                                    پس از انتشار، پیش‌نمایش پیام بله نمایش داده می‌شود تا قبل از ارسال آن را ویرایش کنید.
+                                </p>
+                            )}
                         </div>
 
                         {/* Status */}
@@ -253,6 +313,61 @@ export default function BlogCreate({ categories, tags }: Props) {
                 accept="image"
                 canUpload={canUpload}
             />
+
+            {balePreview && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/40" onClick={closeBalePreview} />
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="bale-preview-title"
+                        className="relative w-full max-w-xl rounded-xl bg-white shadow-xl"
+                    >
+                        <div className="border-b border-gray-100 px-5 py-4">
+                            <h3 id="bale-preview-title" className="text-base font-bold text-gray-900">
+                                پیش‌نمایش پیام بله
+                            </h3>
+                            <p className="mt-1 text-xs text-gray-500 line-clamp-1">{balePreview.title}</p>
+                        </div>
+
+                        <div className="px-5 py-4 space-y-3">
+                            <label className="block text-sm font-medium text-gray-700">
+                                متن پیام (قابل ویرایش)
+                            </label>
+                            <textarea
+                                value={baleMessage}
+                                onChange={e => setBaleMessage(e.target.value)}
+                                rows={14}
+                                dir="rtl"
+                                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm font-mono leading-6 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            />
+                            <p className="text-xs text-gray-500">
+                                همین متن ویرایش‌شده به کانال بله ارسال می‌شود (نه نسخهٔ اولیهٔ تولیدشده).
+                            </p>
+                            {baleError && <p className="text-xs text-red-600">{baleError}</p>}
+                        </div>
+
+                        <div className="flex justify-end gap-2 border-t border-gray-100 px-5 py-4">
+                            <button
+                                type="button"
+                                onClick={closeBalePreview}
+                                disabled={baleSending}
+                                className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+                            >
+                                رد کردن / بعداً
+                            </button>
+                            <button
+                                type="button"
+                                onClick={sendBalePreview}
+                                disabled={baleSending}
+                                className="rounded-md bg-[#00A693] px-4 py-2 text-sm font-semibold text-white hover:bg-[#008f7e] disabled:opacity-60"
+                            >
+                                {baleSending ? 'در حال ارسال...' : 'تأیید و ارسال به بله'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }

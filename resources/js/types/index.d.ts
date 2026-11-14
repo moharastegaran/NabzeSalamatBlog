@@ -34,6 +34,12 @@ export type PageProps<
     flash: {
         success?: string;
         error?: string;
+        password?: string;
+        bale_preview?: {
+            post_id: number;
+            title: string;
+            message: string;
+        } | null;
     };
     shopMaintenance: boolean;
     openTickets: number;

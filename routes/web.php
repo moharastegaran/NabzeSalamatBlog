@@ -180,6 +180,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/blog-posts/{blog}/edit', [BlogPostController::class, 'edit'])  ->name('blog.edit');
         Route::put('/blog-posts/{blog}',      [BlogPostController::class, 'update'])->name('blog.update');
         Route::delete('/blog-posts/{blog}',   [BlogPostController::class, 'destroy'])->name('blog.destroy');
+        Route::post('/blog-posts/{blog}/broadcast-bale', [BlogPostController::class, 'broadcastBale'])
+            ->name('blog.broadcast-bale');
 
         Route::get('/blog-categories',                        [BlogCategoryController::class, 'index']) ->name('blog.categories.index');
         Route::get('/blog-categories/create',                 [BlogCategoryController::class, 'create'])->name('blog.categories.create');

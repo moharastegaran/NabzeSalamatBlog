@@ -6,6 +6,8 @@ use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogTag;
 use App\Models\PostMedia;
+use App\Services\BaleService;
+use App\Services\BlogPostBroadcastFormatter;
 use App\Services\BlogPostPublisher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -80,10 +82,70 @@ class BlogPostController extends Controller
         $post->categories()->sync($categoryIds);
 
         if ($status === 'published') {
-            app(BlogPostPublisher::class)->publish($post);
+            $post->load('categories');
+
+            // Create flow never auto-sends to Bale — only the preview confirm endpoint does.
+            app(BaleService::class)->markManualBroadcastOnly($post->id);
+            app(BlogPostPublisher::class)->publish($post, broadcastToBale: false);
+
+            $showBalePreview = app(BaleService::class)->isConfigured()
+                && $post->categories->contains(fn (BlogCategory $c) => (bool) $c->broadcast_to_bale);
+
+            if ($showBalePreview) {
+                $post = $post->fresh() ?? $post;
+
+                return redirect()->route('blog.create')->with([
+                    'success' => 'مقاله منتشر شد. پیش‌نمایش پیام بله را بررسی و در صورت نیاز ویرایش کنید.',
+                    'bale_preview' => [
+                        'post_id' => $post->id,
+                        'title'   => $post->title,
+                        'message' => app(BlogPostBroadcastFormatter::class)->format($post),
+                    ],
+                ]);
+            }
         }
 
         return redirect()->route('blog.index')->with('success', 'مقاله با موفقیت ایجاد شد.');
+    }
+
+    public function broadcastBale(Request $request, BlogPost $blog): RedirectResponse
+    {
+        $validated = $request->validate([
+            'message' => ['required', 'string', 'max:4096'],
+        ]);
+
+        $bale = app(BaleService::class);
+
+        if (! $bale->isConfigured()) {
+            return back()->with('error', 'ارسال به بله پیکربندی نشده است.');
+        }
+
+        $blog->load('categories');
+
+        if ($blog->status !== 'published') {
+            return back()->with('error', 'فقط مقالات منتشرشده را می‌توان به بله ارسال کرد.');
+        }
+
+        if (! $blog->categories->contains(fn (BlogCategory $c) => (bool) $c->broadcast_to_bale)) {
+            return back()->with('error', 'هیچ دسته‌بندی با ارسال به بله برای این مقاله فعال نیست.');
+        }
+
+        $formatter = app(BlogPostBroadcastFormatter::class);
+        $message   = $validated['message'];
+        $photo     = $formatter->resolveFeaturedImagePath($blog)
+            ?? $formatter->resolveFeaturedImageUrl($blog);
+
+        $sent = filled($photo) && $bale->sendPhoto($photo, $message)
+            ? true
+            : $bale->sendMessage($message);
+
+        $bale->clearManualBroadcastOnly($blog->id);
+
+        if (! $sent) {
+            return back()->with('error', 'ارسال به بله ناموفق بود. جزئیات در لاگ ثبت شد.');
+        }
+
+        return redirect()->route('blog.index')->with('success', 'پیام بله با موفقیت ارسال شد.');
     }
 
     public function edit(BlogPost $blog): Response
@@ -178,7 +240,7 @@ class BlogPostController extends Controller
     private function formData(): array
     {
         return [
-            'categories' => BlogCategory::orderBy('name')->get(['id', 'name', 'parent_id']),
+            'categories' => BlogCategory::orderBy('name')->get(['id', 'name', 'parent_id', 'broadcast_to_bale']),
             'tags'       => BlogTag::orderBy('name')->get(['id', 'name']),
         ];
     }

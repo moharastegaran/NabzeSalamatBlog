@@ -10,5 +10,8 @@ class BlogPostPublished
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public BlogPost $post) {}
+    public function __construct(
+        public BlogPost $post,
+        public bool $broadcastToBale = true,
+    ) {}
 }

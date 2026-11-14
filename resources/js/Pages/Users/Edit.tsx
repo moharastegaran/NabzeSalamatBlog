@@ -1,5 +1,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import AssetPicker from '@/Components/AssetPicker';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import type { Asset } from '@/types/models';
+import type { PageProps } from '@/types';
+import { useState } from 'react';
 
 interface Province {
     id: number;
@@ -13,6 +17,7 @@ interface EditUserData {
     email: string;
     mobile?: string;
     melli_code?: string;
+    profile_image?: string | null;
     city_id?: number;
     province_id?: number;
 }
@@ -96,11 +101,16 @@ const withIcon = `${BASE} pl-9`;
 const plain    = BASE;
 
 export default function EditUser({ editUser, currentRole, allowedRoles, provinces }: Props) {
+    const { auth } = usePage<PageProps>().props;
+    const canUpload = auth.user?.roles?.includes('admin') ?? false;
+    const [pickerOpen, setPickerOpen] = useState(false);
+
     const { data, setData, put, processing, errors } = useForm({
         name:        editUser.name,
         email:       editUser.email,
         mobile:      editUser.mobile ?? '',
         melli_code:  editUser.melli_code ?? '',
+        profile_image: editUser.profile_image ?? null,
         province_id: String(editUser.province_id ?? ''),
         city_id:     String(editUser.city_id ?? ''),
         password:               '',
@@ -142,6 +152,42 @@ export default function EditUser({ editUser, currentRole, allowedRoles, province
                                             <input type="text" value={data.name} onChange={e => setData('name', e.target.value)} className={withIcon} autoComplete="name" />
                                         </div>
                                         {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-800 mb-2">
+                                            تصویر پروفایل <span className="text-gray-500 font-normal">(اختیاری — تصویر نویسنده)</span>
+                                        </label>
+                                        {data.profile_image ? (
+                                            <div className="mb-3 flex items-start gap-3">
+                                                <img
+                                                    src={`/storage/${data.profile_image}`}
+                                                    alt=""
+                                                    className="h-20 w-20 rounded-full object-cover ring-1 ring-gray-200"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setData('profile_image', null)}
+                                                    className="mt-1 text-xs text-red-600 hover:text-red-700"
+                                                >
+                                                    حذف تصویر
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 ring-1 ring-dashed ring-gray-200">
+                                                <svg className="h-8 w-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                                </svg>
+                                            </div>
+                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={() => setPickerOpen(true)}
+                                            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                        >
+                                            {data.profile_image ? 'تغییر تصویر' : 'انتخاب از کتابخانه'}
+                                        </button>
+                                        {errors.profile_image && <p className="mt-1 text-xs text-red-600">{errors.profile_image}</p>}
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-3">
@@ -260,6 +306,14 @@ export default function EditUser({ editUser, currentRole, allowedRoles, province
                     </div>
                 </div>
             </div>
+
+            <AssetPicker
+                open={pickerOpen}
+                onClose={() => setPickerOpen(false)}
+                onSelect={(asset: Asset) => setData('profile_image', asset.path)}
+                accept="image"
+                canUpload={canUpload}
+            />
         </AuthenticatedLayout>
     );
 }

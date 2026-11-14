@@ -50,9 +50,10 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
             'flash' => [
-                'success'  => fn () => $request->session()->get('success'),
-                'error'    => fn () => $request->session()->get('error'),
-                'password' => fn () => $request->session()->get('password'),
+                'success'      => fn () => $request->session()->get('success'),
+                'error'        => fn () => $request->session()->get('error'),
+                'password'     => fn () => $request->session()->get('password'),
+                'bale_preview' => fn () => $request->session()->get('bale_preview'),
             ],
             'shopMaintenance' => fn () => (bool) cache()->get('shop_maintenance', false),
             'openTickets'     => fn () => $user

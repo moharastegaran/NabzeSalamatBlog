@@ -57,22 +57,24 @@ class UserController extends Controller
         $allowedSlugs = array_column($allowedRoles, 'slug');
 
         $validated = $request->validate([
-            'name'       => ['required', 'string', 'max:255'],
-            'email'      => ['required', 'email', 'unique:users,email'],
-            'mobile'     => ['nullable', 'string', 'max:20'],
-            'melli_code' => ['nullable', 'digits:10', 'unique:users,melli_code'],
-            'city_id'    => ['nullable', 'exists:cities,id'],
-            'password'   => ['required', 'string', 'min:8', 'confirmed'],
-            'role'       => ['required', 'string', 'in:' . implode(',', $allowedSlugs)],
+            'name'          => ['required', 'string', 'max:255'],
+            'email'         => ['required', 'email', 'unique:users,email'],
+            'mobile'        => ['nullable', 'string', 'max:20'],
+            'melli_code'    => ['nullable', 'digits:10', 'unique:users,melli_code'],
+            'profile_image' => ['nullable', 'string', 'max:500'],
+            'city_id'       => ['nullable', 'exists:cities,id'],
+            'password'      => ['required', 'string', 'min:8', 'confirmed'],
+            'role'          => ['required', 'string', 'in:' . implode(',', $allowedSlugs)],
         ]);
 
         $user = User::create([
-            'name'       => $validated['name'],
-            'email'      => $validated['email'],
-            'mobile'     => $validated['mobile'] ?? null,
-            'melli_code' => $validated['melli_code'] ?? null,
-            'city_id'    => $validated['city_id'] ?? null,
-            'password'   => bcrypt($validated['password']),
+            'name'          => $validated['name'],
+            'email'         => $validated['email'],
+            'mobile'        => $validated['mobile'] ?? null,
+            'melli_code'    => $validated['melli_code'] ?? null,
+            'profile_image' => $validated['profile_image'] ?: null,
+            'city_id'       => $validated['city_id'] ?? null,
+            'password'      => bcrypt($validated['password']),
         ]);
 
         $user->assignRole($validated['role']);
@@ -90,13 +92,14 @@ class UserController extends Controller
 
         return Inertia::render('Users/Edit', [
             'editUser' => [
-                'id'          => $user->id,
-                'name'        => $user->name,
-                'email'       => $user->email,
-                'mobile'      => $user->mobile,
-                'melli_code'  => $user->melli_code,
-                'city_id'     => $user->city_id,
-                'province_id' => $user->city?->province_id,
+                'id'            => $user->id,
+                'name'          => $user->name,
+                'email'         => $user->email,
+                'mobile'        => $user->mobile,
+                'melli_code'    => $user->melli_code,
+                'profile_image' => $user->profile_image,
+                'city_id'       => $user->city_id,
+                'province_id'   => $user->city?->province_id,
             ],
             'currentRole'  => $user->roles->first()?->name ?? '',
             'allowedRoles' => $allowedRoles,
@@ -112,21 +115,23 @@ class UserController extends Controller
         $allowedSlugs = array_column($allowedRoles, 'slug');
 
         $validated = $request->validate([
-            'name'       => ['required', 'string', 'max:255'],
-            'email'      => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
-            'mobile'     => ['nullable', 'string', 'max:20'],
-            'melli_code' => ['nullable', 'digits:10', Rule::unique('users', 'melli_code')->ignore($user->id)],
-            'city_id'    => ['nullable', 'exists:cities,id'],
-            'password'   => ['nullable', 'string', 'min:8', 'confirmed'],
-            'role'       => ['required', 'string', 'in:' . implode(',', $allowedSlugs)],
+            'name'          => ['required', 'string', 'max:255'],
+            'email'         => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'mobile'        => ['nullable', 'string', 'max:20'],
+            'melli_code'    => ['nullable', 'digits:10', Rule::unique('users', 'melli_code')->ignore($user->id)],
+            'profile_image' => ['nullable', 'string', 'max:500'],
+            'city_id'       => ['nullable', 'exists:cities,id'],
+            'password'      => ['nullable', 'string', 'min:8', 'confirmed'],
+            'role'          => ['required', 'string', 'in:' . implode(',', $allowedSlugs)],
         ]);
 
         $user->update([
-            'name'       => $validated['name'],
-            'email'      => $validated['email'],
-            'mobile'     => $validated['mobile'] ?? null,
-            'melli_code' => $validated['melli_code'] ?? null,
-            'city_id'    => $validated['city_id'] ?? null,
+            'name'          => $validated['name'],
+            'email'         => $validated['email'],
+            'mobile'        => $validated['mobile'] ?? null,
+            'melli_code'    => $validated['melli_code'] ?? null,
+            'profile_image' => $validated['profile_image'] ?: null,
+            'city_id'       => $validated['city_id'] ?? null,
         ]);
 
         if (!empty($validated['password'])) {

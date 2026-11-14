@@ -16,6 +16,10 @@ class BroadcastBlogPostToBale implements ShouldQueue
 
     public function handle(BlogPostPublished $event): void
     {
+        if (! $event->broadcastToBale) {
+            return;
+        }
+
         if (! $this->bale->isConfigured()) {
             return;
         }
@@ -23,6 +27,11 @@ class BroadcastBlogPostToBale implements ShouldQueue
         $post = $event->post->fresh(['author', 'categories']);
 
         if (! $post || $post->status !== 'published') {
+            return;
+        }
+
+        // Create/preview flow: send only after the editor confirms the edited message.
+        if ($this->bale->shouldSkipAutoBroadcast($post->id)) {
             return;
         }
 

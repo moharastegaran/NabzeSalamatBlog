@@ -560,7 +560,7 @@ function BlogAudioCard({ post }: { post: BlogPost }) {
             )}
 
             {/* Thumbnail */}
-            <div className="relative aspect-video overflow-hidden bg-gray-100 flex-shrink-0">
+            <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 flex-shrink-0">
                 {post.featured_image
                     ? <img src={`/storage/${post.featured_image}`} alt={post.title} className="w-full h-full object-cover" />
                     : <div className="w-full h-full bg-gradient-to-br from-[#F24F00]/20 to-[#075F26]/30" />

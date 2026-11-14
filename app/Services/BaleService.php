@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -23,6 +24,27 @@ class BaleService
     public function isConfigured(): bool
     {
         return $this->enabled && filled($this->token) && filled($this->channelId);
+    }
+
+    /** Mark a post so the publish listener must not auto-send (preview/confirm flow). */
+    public function markManualBroadcastOnly(int $postId): void
+    {
+        Cache::put($this->manualBroadcastCacheKey($postId), true, now()->addDay());
+    }
+
+    public function shouldSkipAutoBroadcast(int $postId): bool
+    {
+        return (bool) Cache::get($this->manualBroadcastCacheKey($postId));
+    }
+
+    public function clearManualBroadcastOnly(int $postId): void
+    {
+        Cache::forget($this->manualBroadcastCacheKey($postId));
+    }
+
+    private function manualBroadcastCacheKey(int $postId): string
+    {
+        return "blog_post:{$postId}:bale_manual_only";
     }
 
     public function getMe(): ?array

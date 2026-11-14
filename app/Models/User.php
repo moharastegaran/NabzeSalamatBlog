@@ -20,6 +20,7 @@ class User extends Authenticatable
         'email',
         'mobile',
         'melli_code',
+        'profile_image',
         'city_id',
         'password',
         'is_suspended',

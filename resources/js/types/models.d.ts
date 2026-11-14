@@ -4,6 +4,7 @@ export interface User {
     email: string;
     mobile?: string;
     melli_code?: string;
+    profile_image?: string | null;
     city_id?: number;
     city?: City;
     is_suspended: boolean;
