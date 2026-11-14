@@ -365,7 +365,7 @@ export default function BlogCategory({ category, posts, recentPosts, mostRead, s
 
                         {posts.data.length > 0 ? (
                             <>
-                                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-2">
+                                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                                     {posts.data.map(post => <PostCard key={post.id} post={post} />)}
                                 </div>
                                 {posts.last_page > 1 && <BlogPagination links={posts.links} className="mt-8" />}

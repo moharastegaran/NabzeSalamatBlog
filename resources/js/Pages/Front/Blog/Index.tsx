@@ -54,7 +54,6 @@ function PostCard({ post }: { post: BlogPost }) {
             href={route('front.blog.show', post.slug)}
             className="group flex flex-col overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
         >
-            {/* Image */}
             <div className="aspect-video w-full overflow-hidden bg-gray-100 flex-shrink-0">
                 {post.featured_image ? (
                     <img
@@ -63,7 +62,7 @@ function PostCard({ post }: { post: BlogPost }) {
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                 ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#F24F00]/15 to-[#075F26]/20">
                         <svg className="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -71,10 +70,8 @@ function PostCard({ post }: { post: BlogPost }) {
                 )}
             </div>
 
-            {/* Top accent on hover */}
             <div className="border-t-2 border-transparent group-hover:border-[#F24F00] transition-colors duration-200" />
 
-            {/* Body */}
             <div className="flex flex-1 flex-col gap-2 p-4">
                 {post.category && (
                     <span className="text-[11px] font-bold text-[#F24F00] uppercase tracking-wide">
@@ -170,7 +167,6 @@ function CategoriesSideWidget({
         <div className="bg-white p-4 shadow-sm">
             <SideboxHeader title="دسته‌بندی‌ها" />
             <div>
-                {/* All posts */}
                 <button
                     onClick={() => onSelect(undefined)}
                     className={`flex w-full items-center gap-2 py-2.5 border-b border-gray-100 text-sm transition-colors ${
@@ -287,30 +283,107 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                 url="/blog"
             />
 
-            {/* Page header */}
-            <div className="border-b border-gray-100 bg-white py-8">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-3">
-                        <span className="w-1 h-8 bg-[#F24F00] flex-shrink-0" />
-                        <div>
-                            <h1 className="text-2xl font-black text-gray-900 leading-tight">وبلاگ نبض سلامت</h1>
-                            <p className="mt-0.5 text-sm text-gray-500">آخرین مقالات، راهنماها و اخبار حوزه سلامت</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div className="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
 
-            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                {/* Breadcrumb */}
+                <nav className="mb-5 flex items-center gap-1.5 text-sm text-gray-400 flex-wrap">
+                    <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
+                    <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span className="text-gray-700 font-medium">وبلاگ</span>
+                </nav>
+
+                {/* Blog hub hero */}
+                <header className="blog-hero relative mb-8 overflow-hidden">
+                    <div className="absolute inset-0 bg-[#042F10]" />
+                    <div
+                        className="absolute inset-0 opacity-95"
+                        style={{
+                            background:
+                                'radial-gradient(ellipse 85% 75% at 100% 20%, rgba(242,79,0,0.6) 0%, transparent 55%), radial-gradient(ellipse 70% 90% at 0% 100%, rgba(7,95,38,0.95) 0%, transparent 55%)',
+                        }}
+                    />
+                    <div
+                        className="pointer-events-none absolute inset-0 opacity-[0.11]"
+                        style={{
+                            backgroundImage:
+                                'repeating-linear-gradient(-35deg, transparent, transparent 16px, rgba(255,255,255,0.07) 16px, rgba(255,255,255,0.07) 17px)',
+                        }}
+                    />
+
+                    <div className="relative px-5 py-9 sm:px-8 sm:py-11">
+                        <div className="blog-hero-meta max-w-3xl space-y-3">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#FDBA8C]">
+                                رسانه خبری سلامت
+                            </p>
+                            <h1 className="text-3xl font-black leading-tight text-white sm:text-4xl lg:text-[2.75rem]">
+                                وبلاگ نبض سلامت
+                            </h1>
+                            <p className="blog-hero-desc max-w-xl text-sm leading-7 text-white/85 sm:text-base">
+                                آخرین مقالات، راهنماها و اخبار حوزه سلامت، پزشکی و سبک زندگی
+                            </p>
+                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                                <span className="inline-flex items-center gap-1.5 bg-[#F24F00] px-3 py-1 text-xs font-bold text-white">
+                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    {posts.total.toLocaleString('fa-IR')} مقاله
+                                </span>
+                            </div>
+                        </div>
+
+                        {categories.length > 0 && (
+                            <div className="blog-hero-cats mt-7 flex flex-wrap gap-2 border-t border-white/15 pt-5">
+                                <button
+                                    type="button"
+                                    onClick={() => go({ category: undefined as any })}
+                                    className={`inline-flex items-center px-3 py-1.5 text-xs font-semibold transition-colors ${
+                                        !activeCategory
+                                            ? 'bg-[#F24F00] text-white'
+                                            : 'bg-white/10 text-white hover:bg-[#F24F00]'
+                                    }`}
+                                >
+                                    همه
+                                </button>
+                                {categories.map(cat => (
+                                    <button
+                                        key={cat.id}
+                                        type="button"
+                                        onClick={() => go({ category: (activeCategory === cat.slug ? undefined : cat.slug) as any })}
+                                        className={`inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold transition-colors ${
+                                            activeCategory === cat.slug
+                                                ? 'bg-[#F24F00] text-white'
+                                                : 'bg-white/10 text-white hover:bg-[#F24F00]'
+                                        }`}
+                                    >
+                                        {cat.name}
+                                        <span className="tabular-nums text-white/70">
+                                            {cat.posts_count.toLocaleString('fa-IR')}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="absolute bottom-0 inset-x-0 h-1 bg-[#F24F00]" />
+                </header>
+
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_272px] gap-7 items-start">
 
-                    {/* ── Main content ── */}
                     <main>
-                        {/* Sort bar */}
-                        <div className="mb-5 flex items-center justify-between gap-3 bg-white px-4 py-3 shadow-sm">
-                            <span className="text-sm text-gray-500">
-                                <span className="font-bold text-gray-800">{posts.total.toLocaleString('fa-IR')}</span>
-                                {' '}مقاله
-                            </span>
+                        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
+                                <span className="h-5 w-1.5 bg-[#F24F00] shrink-0" />
+                                <h2 className="text-base font-black text-gray-900 truncate">
+                                    {activeCategoryLabel
+                                        ? `مقالات ${activeCategoryLabel}`
+                                        : filters.search
+                                            ? 'نتایج جستجو'
+                                            : 'آخرین مقالات'}
+                                </h2>
+                            </div>
                             <div className="flex items-center gap-2">
                                 <span className="text-xs text-gray-400">مرتب‌سازی:</span>
                                 <div className="relative">
@@ -318,7 +391,7 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                                         value={activeSort}
                                         onChange={e => go({ sort: e.target.value })}
                                         className="appearance-none border border-gray-200 bg-white py-1.5 pe-8 ps-2 text-sm text-gray-700 focus:border-[#F24F00] focus:outline-none focus:ring-1 focus:ring-[#F24F00] transition-colors"
-                                        style={{backgroundImage: 'none'}}
+                                        style={{ backgroundImage: 'none' }}
                                     >
                                         {Object.entries(SORT_LABELS).map(([val, label]) => (
                                             <option key={val} value={val}>{label}</option>
@@ -335,7 +408,6 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                             </div>
                         </div>
 
-                        {/* Active filter badges */}
                         {(activeCategory || filters.search) && (
                             <div className="mb-4 flex flex-wrap items-center gap-2">
                                 <span className="text-xs text-gray-400">فیلترهای فعال:</span>
@@ -366,7 +438,6 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                             </div>
                         )}
 
-                        {/* Posts grid */}
                         {posts.data.length > 0 ? (
                             <>
                                 <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -378,9 +449,8 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                             </>
                         ) : (
                             <div className="flex flex-col items-center justify-center bg-white py-24 text-center shadow-sm">
-                                {/* Subtle illustration */}
-                                <div className="mb-5 flex h-16 w-16 items-center justify-center bg-gray-50">
-                                    <svg className="h-8 w-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                                <div className="mb-5 flex h-16 w-16 items-center justify-center bg-[#F24F00]/10">
+                                    <svg className="h-8 w-8 text-[#F24F00]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                 </div>
@@ -398,9 +468,7 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                         )}
                     </main>
 
-                    {/* ── Sidebar ── */}
                     <aside className="space-y-5 lg:sticky lg:top-28">
-
                         <SearchSideWidget
                             value={search}
                             onChange={setSearch}
@@ -416,11 +484,25 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                         )}
 
                         <SocialSideWidget />
-
                     </aside>
-
                 </div>
             </div>
+
+            <style>{`
+                @keyframes blog-fade-up {
+                    from { opacity: 0; transform: translateY(14px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .blog-hero { animation: blog-fade-up 0.55s ease-out both; }
+                .blog-hero-meta { animation: blog-fade-up 0.55s 0.1s ease-out both; }
+                .blog-hero-desc { animation: blog-fade-up 0.55s 0.16s ease-out both; }
+                .blog-hero-cats { animation: blog-fade-up 0.55s 0.22s ease-out both; }
+                @media (prefers-reduced-motion: reduce) {
+                    .blog-hero, .blog-hero-meta, .blog-hero-desc, .blog-hero-cats {
+                        animation: none;
+                    }
+                }
+            `}</style>
         </BlogLayout>
     );
 }
