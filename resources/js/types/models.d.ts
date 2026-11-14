@@ -5,6 +5,7 @@ export interface User {
     mobile?: string;
     melli_code?: string;
     profile_image?: string | null;
+    bio?: string | null;
     city_id?: number;
     city?: City;
     is_suspended: boolean;

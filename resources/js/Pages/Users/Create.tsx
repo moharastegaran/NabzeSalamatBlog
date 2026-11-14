@@ -1,5 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import AssetPicker from '@/Components/AssetPicker';
+import RichTextEditor from '@/Components/RichTextEditor';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import type { Asset } from '@/types/models';
 import type { PageProps } from '@/types';
@@ -98,6 +99,7 @@ export default function CreateUser({ allowedRoles, provinces }: Props) {
         mobile:     '',
         melli_code: '',
         profile_image: null as string | null,
+        bio:        '',
         province_id: '',
         city_id:    '',
         password:   '',
@@ -177,6 +179,21 @@ export default function CreateUser({ allowedRoles, provinces }: Props) {
                                             {data.profile_image ? 'تغییر تصویر' : 'انتخاب از کتابخانه'}
                                         </button>
                                         {errors.profile_image && <p className="mt-1 text-xs text-red-600">{errors.profile_image}</p>}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-800 mb-1">
+                                            بیوگرافی <span className="text-gray-500 font-normal">(اختیاری)</span>
+                                        </label>
+                                        <RichTextEditor
+                                            value={data.bio}
+                                            onChange={html => setData('bio', html)}
+                                            placeholder="معرفی کوتاه نویسنده…"
+                                            minHeight={200}
+                                            dir="rtl"
+                                            imageResize
+                                        />
+                                        {errors.bio && <p className="mt-1 text-xs text-red-600">{errors.bio}</p>}
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-3">

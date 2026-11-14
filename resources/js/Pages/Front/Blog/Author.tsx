@@ -9,6 +9,8 @@ import type { AdBanner, BlogPost, PaginatedData } from '@/types/models';
 interface AuthorSummary {
     id: number;
     name: string;
+    profile_image?: string | null;
+    bio?: string | null;
 }
 
 interface Props {
@@ -17,6 +19,15 @@ interface Props {
     recentPosts: BlogPost[];
     mostRead: BlogPost[];
     adBanners: AdBanner[];
+}
+
+function stripHtml(html: string): string {
+    return html.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function hasRichText(html?: string | null): boolean {
+    if (!html) return false;
+    return stripHtml(html).length > 0;
 }
 
 // ── Post card ─────────────────────────────────────────────────────────────────
@@ -39,7 +50,7 @@ function PostCard({ post }: { post: BlogPost }) {
                         className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                 ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#F24F00]/15 to-[#075F26]/20">
                         <svg className="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -124,20 +135,44 @@ function RecentWidget({ posts }: { posts: BlogPost[] }) {
     );
 }
 
+function AuthorAvatar({ author }: { author: AuthorSummary }) {
+    if (author.profile_image) {
+        return (
+            <img
+                src={`/storage/${author.profile_image}`}
+                alt={author.name}
+                className="h-full w-full object-cover"
+            />
+        );
+    }
+
+    return (
+        <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#F24F00] to-[#7A2700] text-3xl font-black text-white sm:text-4xl">
+            {author.name.charAt(0)}
+        </span>
+    );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function BlogAuthor({ author, posts, recentPosts, mostRead, adBanners }: Props) {
+    const bioText = hasRichText(author.bio) ? stripHtml(author.bio!) : '';
+    const seoDescription = bioText
+        ? bioText.slice(0, 160)
+        : `مقالات نوشته‌شده توسط ${author.name} در نبض سلامت`;
+
     return (
         <BlogLayout>
             <SeoHead
                 title={author.name}
-                description={`مقالات نوشته‌شده توسط ${author.name} در نبض سلامت`}
+                description={seoDescription}
+                image={author.profile_image ?? undefined}
                 url={`/blog/author/${author.id}`}
             />
 
-            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
 
                 {/* Breadcrumb */}
-                <nav className="mb-6 flex items-center gap-1.5 text-sm text-gray-400 flex-wrap">
+                <nav className="mb-5 flex items-center gap-1.5 text-sm text-gray-400 flex-wrap">
                     <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
                     <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -146,37 +181,77 @@ export default function BlogAuthor({ author, posts, recentPosts, mostRead, adBan
                     <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
-                    <span className="text-gray-700 font-medium">نویسنده: {author.name}</span>
+                    <span className="text-gray-700 font-medium">{author.name}</span>
                 </nav>
 
-                {/* Author header */}
-                <div className="mb-7 overflow-hidden bg-white shadow-sm border-b-4 border-[#F24F00]">
-                    <div className="h-1.5 w-full bg-[#F24F00]" />
-                    <div className="flex items-center gap-5 p-5">
-                        <div className="h-16 w-16 flex-none flex items-center justify-center bg-[#042F10] text-white text-2xl font-black shrink-0">
-                            {author.name.charAt(0)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <h1 className="text-2xl font-black text-gray-900">{author.name}</h1>
-                            <div className="mt-2 flex items-center gap-2">
-                                <span className="inline-flex items-center gap-1 bg-[#F24F00]/10 text-[#F24F00] text-xs font-bold px-2 py-0.5">
-                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    {posts.total.toLocaleString('fa-IR')} مقاله
-                                </span>
+                {/* Author hero — one composition */}
+                <header className="author-hero relative mb-8 overflow-hidden">
+                    <div className="absolute inset-0 bg-[#042F10]" />
+                    <div
+                        className="absolute inset-0 opacity-90"
+                        style={{
+                            background:
+                                'radial-gradient(ellipse 80% 70% at 100% 0%, rgba(242,79,0,0.55) 0%, transparent 55%), radial-gradient(ellipse 60% 80% at 0% 100%, rgba(7,95,38,0.9) 0%, transparent 50%)',
+                        }}
+                    />
+                    <div
+                        className="pointer-events-none absolute inset-0 opacity-[0.12]"
+                        style={{
+                            backgroundImage:
+                                'repeating-linear-gradient(-45deg, transparent, transparent 12px, rgba(255,255,255,0.07) 12px, rgba(255,255,255,0.07) 13px)',
+                        }}
+                    />
+
+                    <div className="relative px-5 pb-7 pt-8 sm:px-8 sm:pb-9 sm:pt-10">
+                        <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-end sm:gap-7 sm:text-right">
+                            <div className="author-avatar relative h-28 w-28 shrink-0 overflow-hidden rounded-full ring-4 ring-[#F24F00] shadow-[0_12px_40px_rgba(0,0,0,0.35)] sm:h-36 sm:w-36">
+                                <AuthorAvatar author={author} />
+                            </div>
+
+                            <div className="author-meta min-w-0 flex-1 space-y-3 sm:pb-1">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#F24F00]">
+                                    نویسنده نبض سلامت
+                                </p>
+                                <h1 className="text-3xl font-black leading-tight text-white sm:text-4xl">
+                                    {author.name}
+                                </h1>
+                                <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                                    <span className="inline-flex items-center gap-1.5 bg-[#F24F00] px-3 py-1 text-xs font-bold text-white">
+                                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        {posts.total.toLocaleString('fa-IR')} مقاله
+                                    </span>
+                                </div>
                             </div>
                         </div>
+
+                        {hasRichText(author.bio) && (
+                            <div className="author-bio mt-7 border-t border-white/15 pt-6">
+                                <div
+                                    className="blog-body max-w-3xl text-sm leading-7 text-white/90 [&_a]:text-[#FDBA8C] [&_blockquote]:border-[#F24F00] [&_blockquote]:text-white/75 [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white [&_p]:text-white/90 [&_strong]:text-white"
+                                    dangerouslySetInnerHTML={{ __html: author.bio! }}
+                                />
+                            </div>
+                        )}
                     </div>
-                </div>
+
+                    <div className="absolute bottom-0 inset-x-0 h-1 bg-[#F24F00]" />
+                </header>
 
                 {/* Main 2-column layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_272px] gap-7 items-start">
 
                     <main>
+                        <div className="mb-5 flex items-center gap-3">
+                            <span className="h-5 w-1.5 bg-[#F24F00] shrink-0" />
+                            <h2 className="text-base font-black text-gray-900">مقالات این نویسنده</h2>
+                            <span className="h-px flex-1 bg-gradient-to-l from-transparent to-gray-200" />
+                        </div>
+
                         {posts.data.length > 0 ? (
                             <>
-                                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-2">
+                                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                                     {posts.data.map(post => <PostCard key={post.id} post={post} />)}
                                 </div>
                                 {posts.last_page > 1 && <BlogPagination links={posts.links} className="mt-8" />}
@@ -184,8 +259,8 @@ export default function BlogAuthor({ author, posts, recentPosts, mostRead, adBan
                         ) : (
                             <div className="flex flex-col items-center justify-center bg-white py-20 text-center shadow-sm">
                                 <div className="mb-5">
-                                    <div className="flex h-20 w-20 items-center justify-center bg-gray-50">
-                                        <svg className="h-10 w-10 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                                    <div className="flex h-20 w-20 items-center justify-center bg-[#F24F00]/10">
+                                        <svg className="h-10 w-10 text-[#F24F00]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
                                     </div>
@@ -216,6 +291,26 @@ export default function BlogAuthor({ author, posts, recentPosts, mostRead, adBan
 
                 </div>
             </div>
+
+            <style>{`
+                @keyframes author-fade-up {
+                    from { opacity: 0; transform: translateY(14px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes author-scale-in {
+                    from { opacity: 0; transform: scale(0.92); }
+                    to { opacity: 1; transform: scale(1); }
+                }
+                .author-hero { animation: author-fade-up 0.55s ease-out both; }
+                .author-avatar { animation: author-scale-in 0.6s 0.08s ease-out both; }
+                .author-meta { animation: author-fade-up 0.55s 0.14s ease-out both; }
+                .author-bio { animation: author-fade-up 0.55s 0.22s ease-out both; }
+                @media (prefers-reduced-motion: reduce) {
+                    .author-hero, .author-avatar, .author-meta, .author-bio {
+                        animation: none;
+                    }
+                }
+            `}</style>
         </BlogLayout>
     );
 }

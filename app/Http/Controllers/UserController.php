@@ -62,6 +62,7 @@ class UserController extends Controller
             'mobile'        => ['nullable', 'string', 'max:20'],
             'melli_code'    => ['nullable', 'digits:10', 'unique:users,melli_code'],
             'profile_image' => ['nullable', 'string', 'max:500'],
+            'bio'           => ['nullable', 'string'],
             'city_id'       => ['nullable', 'exists:cities,id'],
             'password'      => ['required', 'string', 'min:8', 'confirmed'],
             'role'          => ['required', 'string', 'in:' . implode(',', $allowedSlugs)],
@@ -73,6 +74,7 @@ class UserController extends Controller
             'mobile'        => $validated['mobile'] ?? null,
             'melli_code'    => $validated['melli_code'] ?? null,
             'profile_image' => $validated['profile_image'] ?: null,
+            'bio'           => $validated['bio'] ?: null,
             'city_id'       => $validated['city_id'] ?? null,
             'password'      => bcrypt($validated['password']),
         ]);
@@ -98,6 +100,7 @@ class UserController extends Controller
                 'mobile'        => $user->mobile,
                 'melli_code'    => $user->melli_code,
                 'profile_image' => $user->profile_image,
+                'bio'           => $user->bio,
                 'city_id'       => $user->city_id,
                 'province_id'   => $user->city?->province_id,
             ],
@@ -120,6 +123,7 @@ class UserController extends Controller
             'mobile'        => ['nullable', 'string', 'max:20'],
             'melli_code'    => ['nullable', 'digits:10', Rule::unique('users', 'melli_code')->ignore($user->id)],
             'profile_image' => ['nullable', 'string', 'max:500'],
+            'bio'           => ['nullable', 'string'],
             'city_id'       => ['nullable', 'exists:cities,id'],
             'password'      => ['nullable', 'string', 'min:8', 'confirmed'],
             'role'          => ['required', 'string', 'in:' . implode(',', $allowedSlugs)],
@@ -131,6 +135,7 @@ class UserController extends Controller
             'mobile'        => $validated['mobile'] ?? null,
             'melli_code'    => $validated['melli_code'] ?? null,
             'profile_image' => $validated['profile_image'] ?: null,
+            'bio'           => $validated['bio'] ?: null,
             'city_id'       => $validated['city_id'] ?? null,
         ]);
 

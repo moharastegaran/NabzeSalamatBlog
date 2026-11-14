@@ -39,7 +39,6 @@ function PostCard({ post }: { post: BlogPost }) {
             href={route('front.blog.show', post.slug)}
             className="group flex flex-col overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
         >
-            {/* Image */}
             <div className="aspect-video w-full overflow-hidden bg-gray-100 flex-shrink-0">
                 {post.featured_image ? (
                     <img
@@ -48,7 +47,7 @@ function PostCard({ post }: { post: BlogPost }) {
                         className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                 ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#F24F00]/15 to-[#075F26]/20">
                         <svg className="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -56,10 +55,8 @@ function PostCard({ post }: { post: BlogPost }) {
                 )}
             </div>
 
-            {/* Top accent on hover */}
             <div className="border-t-2 border-transparent group-hover:border-[#F24F00] transition-colors duration-200" />
 
-            {/* Body */}
             <div className="flex flex-1 flex-col gap-2 p-4">
                 {post.tags && post.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
@@ -133,7 +130,7 @@ function SearchWidget({ slug, defaultValue }: { slug: string; defaultValue: stri
                 <input
                     value={q}
                     onChange={e => setQ(e.target.value)}
-                    placeholder="جستجو در اخبار..."
+                    placeholder="جستجو در این دسته..."
                     className="w-full border border-gray-200 bg-gray-50 px-3 py-2 pr-9 text-sm focus:border-[#F24F00] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#F24F00] transition-colors"
                 />
                 <button type="submit" className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#F24F00] transition-colors">
@@ -184,19 +181,15 @@ function RecentWidget({ posts }: { posts: BlogPost[] }) {
                         href={route('front.blog.show', post.slug)}
                         className="flex gap-3 py-2.5 border-b border-gray-50 last:border-0 group items-start"
                     >
-                        {/* Number badge */}
                         <div className="w-5 h-5 bg-gray-100 text-gray-400 text-[10px] font-bold flex-shrink-0 flex items-center justify-center mt-0.5">
                             {(index + 1).toLocaleString('fa-IR')}
                         </div>
-
-                        {/* Thumbnail */}
                         <div className="w-16 h-12 shrink-0 overflow-hidden bg-gray-100">
                             {post.featured_image
                                 ? <img src={`/storage/${post.featured_image}`} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                                 : <div className="w-full h-full bg-gray-200" />
                             }
                         </div>
-
                         <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                             <h4 className="text-xs font-semibold text-gray-800 line-clamp-2 leading-snug group-hover:text-[#F24F00] transition-colors">
                                 {post.title}
@@ -223,6 +216,9 @@ function SocialWidget() {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function BlogCategory({ category, posts, recentPosts, mostRead, search, adBanners }: Props) {
+    const heroImage = category.thumbnail || category.icon || null;
+    const showChildrenInHero = !category.parent_id && category.children.length > 0;
+
     return (
         <BlogLayout>
             <SeoHead
@@ -232,10 +228,10 @@ export default function BlogCategory({ category, posts, recentPosts, mostRead, s
                 url={`/blog/category/${category.slug}`}
             />
 
-            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
 
                 {/* Breadcrumb */}
-                <nav className="mb-6 flex items-center gap-1.5 text-sm text-gray-400 flex-wrap">
+                <nav className="mb-5 flex items-center gap-1.5 text-sm text-gray-400 flex-wrap">
                     <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
                     <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -257,36 +253,90 @@ export default function BlogCategory({ category, posts, recentPosts, mostRead, s
                     <span className="text-gray-700 font-medium">{category.name}</span>
                 </nav>
 
-                {/* Category header banner */}
-                <div className="mb-7 overflow-hidden bg-white shadow-sm border-b-4 border-[#F24F00]">
-                    {/* Top color strip */}
-                    <div className="h-1.5 w-full bg-[#F24F00]" />
-                    <div className="flex items-center gap-5 p-5">
-                        {(category.thumbnail || category.icon) && (
+                {/* Category hero — one composition */}
+                <header className="category-hero relative mb-8 overflow-hidden min-h-[220px] sm:min-h-[260px]">
+                    {heroImage ? (
+                        <>
                             <img
-                                src={`/storage/${category.thumbnail ?? category.icon}`}
-                                alt={category.name}
-                                className="h-20 w-20 flex-none object-cover ring-2 ring-[#F24F00]/20"
+                                src={`/storage/${heroImage}`}
+                                alt=""
+                                className="absolute inset-0 h-full w-full object-cover scale-105"
                             />
-                        )}
-                        <div className="flex-1 min-w-0">
-                            <h1 className="text-2xl font-black text-gray-900">{category.name}</h1>
+                            <div className="absolute inset-0 bg-gradient-to-l from-[#042F10]/95 via-[#042F10]/80 to-[#F24F00]/55" />
+                        </>
+                    ) : (
+                        <>
+                            <div className="absolute inset-0 bg-[#042F10]" />
+                            <div
+                                className="absolute inset-0 opacity-90"
+                                style={{
+                                    background:
+                                        'radial-gradient(ellipse 90% 80% at 0% 0%, rgba(242,79,0,0.65) 0%, transparent 55%), radial-gradient(ellipse 70% 90% at 100% 100%, rgba(7,95,38,0.95) 0%, transparent 50%)',
+                                }}
+                            />
+                        </>
+                    )}
+                    <div
+                        className="pointer-events-none absolute inset-0 opacity-[0.1]"
+                        style={{
+                            backgroundImage:
+                                'repeating-linear-gradient(45deg, transparent, transparent 14px, rgba(255,255,255,0.08) 14px, rgba(255,255,255,0.08) 15px)',
+                        }}
+                    />
+
+                    <div className="relative flex flex-col justify-end px-5 py-8 sm:px-8 sm:py-10">
+                        <div className="category-meta max-w-3xl space-y-3">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#FDBA8C]">
+                                {category.parent ? `زیرمجموعه ${category.parent.name}` : 'دسته‌بندی'}
+                            </p>
+                            <div className="flex items-start gap-4">
+                                {category.icon && category.thumbnail && (
+                                    <img
+                                        src={`/storage/${category.icon}`}
+                                        alt=""
+                                        className="category-icon mt-1 h-12 w-12 shrink-0 object-contain drop-shadow-lg sm:h-14 sm:w-14"
+                                    />
+                                )}
+                                <h1 className="text-3xl font-black leading-tight text-white sm:text-4xl">
+                                    {category.name}
+                                </h1>
+                            </div>
                             {category.description && (
-                                <p className="mt-1 text-sm text-gray-500 line-clamp-2">{category.description}</p>
+                                <p className="category-desc max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
+                                    {category.description}
+                                </p>
                             )}
-                            <div className="mt-2 flex items-center gap-2">
-                                <span className="inline-flex items-center gap-1 bg-[#F24F00]/10 text-[#F24F00] text-xs font-bold px-2 py-0.5">
-                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                                <span className="inline-flex items-center gap-1.5 bg-[#F24F00] px-3 py-1 text-xs font-bold text-white">
+                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                     {category.posts_count.toLocaleString('fa-IR')} مقاله
                                 </span>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                {/* Search result notice */}
+                        {showChildrenInHero && (
+                            <div className="category-children mt-6 flex flex-wrap gap-2 border-t border-white/15 pt-5">
+                                {category.children.map(child => (
+                                    <Link
+                                        key={child.id}
+                                        href={route('front.blog.category', child.slug)}
+                                        className="inline-flex items-center gap-2 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition-colors hover:bg-[#F24F00]"
+                                    >
+                                        {child.name}
+                                        <span className="tabular-nums text-white/70">
+                                            {child.posts_count.toLocaleString('fa-IR')}
+                                        </span>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="absolute bottom-0 inset-x-0 h-1 bg-[#F24F00]" />
+                </header>
+
                 {search && (
                     <div className="mb-5 flex items-center gap-2 text-sm text-gray-600 bg-[#F24F00]/5 border border-[#F24F00]/20 px-4 py-2.5">
                         <svg className="h-4 w-4 text-[#F24F00] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -302,11 +352,17 @@ export default function BlogCategory({ category, posts, recentPosts, mostRead, s
                     </div>
                 )}
 
-                {/* Main 2-column layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_272px] gap-7 items-start">
 
-                    {/* Posts */}
                     <main>
+                        <div className="mb-5 flex items-center gap-3">
+                            <span className="h-5 w-1.5 bg-[#F24F00] shrink-0" />
+                            <h2 className="text-base font-black text-gray-900">
+                                {search ? 'نتایج جستجو' : 'مقالات این دسته'}
+                            </h2>
+                            <span className="h-px flex-1 bg-gradient-to-l from-transparent to-gray-200" />
+                        </div>
+
                         {posts.data.length > 0 ? (
                             <>
                                 <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-2">
@@ -316,15 +372,12 @@ export default function BlogCategory({ category, posts, recentPosts, mostRead, s
                             </>
                         ) : (
                             <div className="flex flex-col items-center justify-center bg-white py-20 text-center shadow-sm">
-                                {/* Illustration */}
-                                <div className="mb-5 relative">
-                                    <div className="flex h-20 w-20 items-center justify-center bg-gray-50">
-                                        <svg className="h-10 w-10 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                                <div className="mb-5">
+                                    <div className="flex h-20 w-20 items-center justify-center bg-[#F24F00]/10">
+                                        <svg className="h-10 w-10 text-[#F24F00]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
                                     </div>
-                                    <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-[#F24F00]/20" />
-                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#075F26]/20" />
                                 </div>
                                 <p className="text-sm font-semibold text-gray-700">
                                     {search ? `نتیجه‌ای برای «${search}» یافت نشد` : 'هنوز مقاله‌ای منتشر نشده است'}
@@ -346,9 +399,7 @@ export default function BlogCategory({ category, posts, recentPosts, mostRead, s
                         )}
                     </main>
 
-                    {/* Sidebar */}
                     <aside className="space-y-5 lg:sticky lg:top-28">
-
                         <div className="bg-white p-4 shadow-sm">
                             <SearchWidget slug={category.slug} defaultValue={search} />
                         </div>
@@ -378,11 +429,26 @@ export default function BlogCategory({ category, posts, recentPosts, mostRead, s
                         <div className="bg-white p-4 shadow-sm">
                             <SocialWidget />
                         </div>
-
                     </aside>
-
                 </div>
             </div>
+
+            <style>{`
+                @keyframes category-fade-up {
+                    from { opacity: 0; transform: translateY(14px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .category-hero { animation: category-fade-up 0.55s ease-out both; }
+                .category-meta { animation: category-fade-up 0.55s 0.1s ease-out both; }
+                .category-desc { animation: category-fade-up 0.55s 0.16s ease-out both; }
+                .category-children { animation: category-fade-up 0.55s 0.22s ease-out both; }
+                .category-icon { animation: category-fade-up 0.55s 0.08s ease-out both; }
+                @media (prefers-reduced-motion: reduce) {
+                    .category-hero, .category-meta, .category-desc, .category-children, .category-icon {
+                        animation: none;
+                    }
+                }
+            `}</style>
         </BlogLayout>
     );
 }

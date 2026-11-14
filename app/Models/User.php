@@ -21,6 +21,7 @@ class User extends Authenticatable
         'mobile',
         'melli_code',
         'profile_image',
+        'bio',
         'city_id',
         'password',
         'is_suspended',

@@ -186,7 +186,12 @@ class BlogController extends Controller
             ->get(['id', 'title', 'slug', 'featured_image', 'published_at']);
 
         return Inertia::render('Front/Blog/Author', [
-            'author'      => ['id' => $author->id, 'name' => $author->name],
+            'author' => [
+                'id'            => $author->id,
+                'name'          => $author->name,
+                'profile_image' => $author->profile_image,
+                'bio'           => $author->bio,
+            ],
             'posts'       => $posts,
             'recentPosts' => $recentPosts,
             'mostRead'    => $this->mostRead(),
