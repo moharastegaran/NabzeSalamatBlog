@@ -365,7 +365,7 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                         {/* Brand */}
                         <div className="md:col-span-1 flex flex-col gap-4">
                             <Link href={route('front.landing')}>
-                                <ApplicationLogo className="object-contain w-auto brightness-0 invert opacity-80" />
+                                <ApplicationLogo className="object-contain w-auto max-w-[200px] brightness-0 invert opacity-80" />
                             </Link>
                             <div
                                 className="text-sm leading-6 text-gray-400 [&_p]:m-0 [&_p+p]:mt-2 [&_a]:text-[#F24F00] hover:[&_a]:underline [&_strong]:font-semibold [&_em]:italic"

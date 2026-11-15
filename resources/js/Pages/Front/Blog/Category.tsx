@@ -143,25 +143,34 @@ function SearchWidget({ slug, defaultValue }: { slug: string; defaultValue: stri
     );
 }
 
+function sortChildrenByPostsDesc(children: CategoryChild[]): CategoryChild[] {
+    return [...children].sort((a, b) => b.posts_count - a.posts_count);
+}
+
 function ChildrenWidget({ children }: { children: CategoryChild[] }) {
+    const sorted = sortChildrenByPostsDesc(children);
+
     return (
         <div>
             <SideboxHeader title="زیردسته‌ها" />
-            <div>
-                {children.map(child => (
+            <div className="space-y-2">
+                {sorted.map(child => (
                     <Link
                         key={child.id}
                         href={route('front.blog.category', child.slug)}
-                        className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0 text-sm text-gray-700 hover:text-[#F24F00] transition-colors group bg-transparent hover:bg-[#F24F00]/5 px-1"
+                        className="group flex items-stretch overflow-hidden border border-gray-100 bg-white shadow-sm transition-colors hover:border-[#F24F00]/40"
                     >
-                        <span className="flex items-center gap-2">
-                            <svg className="h-3 w-3 text-gray-300 group-hover:text-[#F24F00] transition-colors -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <span className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2.5 text-sm text-gray-700 group-hover:text-[#F24F00]">
+                            <svg className="h-3 w-3 shrink-0 text-gray-300 group-hover:text-[#F24F00] transition-colors -scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                             </svg>
-                            {child.name}
+                            <span className="truncate font-medium">{child.name}</span>
                         </span>
-                        <span className="text-[11px] font-bold bg-[#F24F00]/10 text-[#F24F00] px-1.5 py-0.5 tabular-nums">
-                            {child.posts_count.toLocaleString('fa-IR')}
+                        <span className="flex shrink-0 flex-col items-center justify-center border-r border-gray-100 bg-[#F24F00]/5 px-3 py-2.5 text-center">
+                            <span className="text-sm font-black tabular-nums text-[#F24F00]">
+                                {child.posts_count.toLocaleString('fa-IR')}
+                            </span>
+                            <span className="text-[10px] font-medium text-[#F24F00]/70">مقاله</span>
                         </span>
                     </Link>
                 ))}
@@ -217,7 +226,8 @@ function SocialWidget() {
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function BlogCategory({ category, posts, recentPosts, mostRead, search, adBanners }: Props) {
     const heroImage = category.thumbnail || category.icon || null;
-    const showChildrenInHero = !category.parent_id && category.children.length > 0;
+    const sortedChildren = sortChildrenByPostsDesc(category.children);
+    const showChildrenInHero = !category.parent_id && sortedChildren.length > 0;
 
     return (
         <BlogLayout>
@@ -318,15 +328,20 @@ export default function BlogCategory({ category, posts, recentPosts, mostRead, s
 
                         {showChildrenInHero && (
                             <div className="category-children mt-6 flex flex-wrap gap-2 border-t border-white/15 pt-5">
-                                {category.children.map(child => (
+                                {sortedChildren.map(child => (
                                     <Link
                                         key={child.id}
                                         href={route('front.blog.category', child.slug)}
-                                        className="inline-flex items-center gap-2 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition-colors hover:bg-[#F24F00]"
+                                        className="group inline-flex max-w-full items-stretch overflow-hidden bg-white/10 backdrop-blur-sm transition-colors hover:bg-[#F24F00]"
                                     >
-                                        {child.name}
-                                        <span className="tabular-nums text-white/70">
-                                            {child.posts_count.toLocaleString('fa-IR')}
+                                        <span className="truncate px-3 py-2 text-xs font-semibold text-white sm:text-sm">
+                                            {child.name}
+                                        </span>
+                                        <span className="flex shrink-0 items-center gap-1 border-r border-white/15 bg-black/20 px-2.5 py-2">
+                                            <span className="text-xs font-black tabular-nums text-white">
+                                                {child.posts_count.toLocaleString('fa-IR')}
+                                            </span>
+                                            <span className="text-[10px] font-medium text-white/65">مقاله</span>
                                         </span>
                                     </Link>
                                 ))}
@@ -404,9 +419,9 @@ export default function BlogCategory({ category, posts, recentPosts, mostRead, s
                             <SearchWidget slug={category.slug} defaultValue={search} />
                         </div>
 
-                        {!category.parent_id && category.children.length > 0 && (
+                        {!category.parent_id && sortedChildren.length > 0 && (
                             <div className="bg-white p-4 shadow-sm">
-                                <ChildrenWidget children={category.children} />
+                                <ChildrenWidget children={sortedChildren} />
                             </div>
                         )}
 

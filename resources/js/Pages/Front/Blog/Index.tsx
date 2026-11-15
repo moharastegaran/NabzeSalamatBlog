@@ -29,6 +29,10 @@ const SORT_LABELS: Record<string, string> = {
     most_viewed: 'پربازدیدترین',
 };
 
+function sortByPostsDesc<T extends { posts_count: number }>(items: T[]): T[] {
+    return [...items].sort((a, b) => b.posts_count - a.posts_count);
+}
+
 // ── Local helpers ─────────────────────────────────────────────────────────────
 
 function SideboxHeader({ title }: { title: string }) {
@@ -155,7 +159,9 @@ function CategoriesSideWidget({
     activeCategory?: string;
     onSelect: (slug?: string) => void;
 }) {
-    const activeParentId = categories.find(cat =>
+    const sortedCategories = sortByPostsDesc(categories);
+
+    const activeParentId = sortedCategories.find(cat =>
         cat.children.some(c => c.slug === activeCategory)
     )?.id ?? null;
 
@@ -166,43 +172,56 @@ function CategoriesSideWidget({
     return (
         <div className="bg-white p-4 shadow-sm">
             <SideboxHeader title="دسته‌بندی‌ها" />
-            <div>
+            <div className="space-y-2">
                 <button
                     onClick={() => onSelect(undefined)}
-                    className={`flex w-full items-center gap-2 py-2.5 border-b border-gray-100 text-sm transition-colors ${
-                        !activeCategory ? 'text-[#F24F00] font-bold' : 'text-gray-700 hover:text-[#F24F00]'
+                    className={`flex w-full items-center gap-2 border px-3 py-2.5 text-sm transition-colors ${
+                        !activeCategory
+                            ? 'border-[#F24F00]/40 bg-[#F24F00]/5 font-bold text-[#F24F00]'
+                            : 'border-gray-100 bg-white text-gray-700 hover:border-[#F24F00]/40 hover:text-[#F24F00]'
                     }`}
                 >
                     <span className={`w-1.5 h-1.5 flex-shrink-0 rounded-full ${!activeCategory ? 'bg-[#F24F00]' : 'bg-gray-300'}`} />
                     همه اخبار
                 </button>
 
-                {categories.map(cat => {
-                    const hasChildren = cat.children.length > 0;
+                {sortedCategories.map(cat => {
+                    const children = sortByPostsDesc(cat.children);
+                    const hasChildren = children.length > 0;
                     const isOpen      = openId === cat.id;
                     const isActive    = activeCategory === cat.slug;
-                    const hasActiveChild = cat.children.some(c => c.slug === activeCategory);
+                    const hasActiveChild = children.some(c => c.slug === activeCategory);
 
                     return (
-                        <div key={cat.id} className="border-b border-gray-100 last:border-0">
-                            <div className="flex w-full items-center">
+                        <div key={cat.id} className="space-y-1.5">
+                            <div
+                                className={`group flex items-stretch overflow-hidden border shadow-sm transition-colors ${
+                                    isActive || hasActiveChild
+                                        ? 'border-[#F24F00]/40'
+                                        : 'border-gray-100 hover:border-[#F24F00]/40'
+                                }`}
+                            >
                                 <button
                                     onClick={() => onSelect(isActive ? undefined : cat.slug)}
-                                    className={`flex flex-1 items-center gap-2 py-2.5 text-sm transition-colors ${
+                                    className={`flex min-w-0 flex-1 items-center gap-2 px-3 py-2.5 text-sm transition-colors ${
                                         isActive || hasActiveChild
-                                            ? 'text-[#F24F00] font-bold'
-                                            : 'text-gray-700 hover:text-[#F24F00]'
+                                            ? 'font-bold text-[#F24F00]'
+                                            : 'text-gray-700 group-hover:text-[#F24F00]'
                                     }`}
                                 >
-                                    <span className={`w-1.5 h-1.5 flex-shrink-0 rounded-full transition-colors ${isActive || hasActiveChild ? 'bg-[#F24F00]' : 'bg-gray-300'}`} />
-                                    {cat.name}
+                                    <span className="truncate font-medium">{cat.name}</span>
                                 </button>
-
+                                <span className="flex shrink-0 flex-col items-center justify-center border-r border-gray-100 bg-[#F24F00]/5 px-3 py-2.5 text-center">
+                                    <span className="text-sm font-black tabular-nums text-[#F24F00]">
+                                        {cat.posts_count.toLocaleString('fa-IR')}
+                                    </span>
+                                    <span className="text-[10px] font-medium text-[#F24F00]/70">مقاله</span>
+                                </span>
                                 {hasChildren && (
                                     <button
                                         onClick={() => toggleOpen(cat.id)}
                                         aria-label={isOpen ? 'بستن' : 'باز کردن'}
-                                        className="px-2 py-2.5 text-gray-300 hover:text-[#F24F00] transition-colors"
+                                        className="px-2.5 text-gray-300 hover:text-[#F24F00] transition-colors"
                                     >
                                         <svg
                                             className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
@@ -215,19 +234,30 @@ function CategoriesSideWidget({
                             </div>
 
                             {hasChildren && isOpen && (
-                                <div className="bg-gray-50/60 border-t border-gray-50 pb-0.5">
-                                    {cat.children.map(child => (
+                                <div className="space-y-1.5 pr-3">
+                                    {children.map(child => (
                                         <button
                                             key={child.id}
                                             onClick={() => onSelect(activeCategory === child.slug ? undefined : child.slug)}
-                                            className={`flex w-full items-center gap-2 py-2 pr-5 text-xs transition-colors ${
+                                            className={`group flex w-full items-stretch overflow-hidden border shadow-sm transition-colors ${
                                                 activeCategory === child.slug
-                                                    ? 'text-[#F24F00] font-bold'
-                                                    : 'text-gray-600 hover:text-[#F24F00]'
+                                                    ? 'border-[#F24F00]/40'
+                                                    : 'border-gray-100 hover:border-[#F24F00]/40'
                                             }`}
                                         >
-                                            <span className={`h-px w-3 flex-shrink-0 ${activeCategory === child.slug ? 'bg-[#F24F00]' : 'bg-gray-300'}`} />
-                                            {child.name}
+                                            <span className={`flex min-w-0 flex-1 items-center px-3 py-2 text-xs transition-colors ${
+                                                activeCategory === child.slug
+                                                    ? 'font-bold text-[#F24F00]'
+                                                    : 'text-gray-600 group-hover:text-[#F24F00]'
+                                            }`}>
+                                                <span className="truncate font-medium">{child.name}</span>
+                                            </span>
+                                            <span className="flex shrink-0 flex-col items-center justify-center border-r border-gray-100 bg-[#F24F00]/5 px-2.5 py-2 text-center">
+                                                <span className="text-xs font-black tabular-nums text-[#F24F00]">
+                                                    {child.posts_count.toLocaleString('fa-IR')}
+                                                </span>
+                                                <span className="text-[9px] font-medium text-[#F24F00]/70">مقاله</span>
+                                            </span>
                                         </button>
                                     ))}
                                 </div>
@@ -270,6 +300,7 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
 
     const activeSort = filters.sort ?? 'newest';
     const activeCategory = filters.category;
+    const sortedCategories = sortByPostsDesc(categories);
 
     const activeCategoryLabel = categories
         .flatMap(c => [c, ...c.children])
@@ -333,12 +364,12 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                             </div>
                         </div>
 
-                        {categories.length > 0 && (
+                        {sortedCategories.length > 0 && (
                             <div className="blog-hero-cats mt-7 flex flex-wrap gap-2 border-t border-white/15 pt-5">
                                 <button
                                     type="button"
                                     onClick={() => go({ category: undefined as any })}
-                                    className={`inline-flex items-center px-3 py-1.5 text-xs font-semibold transition-colors ${
+                                    className={`inline-flex items-center px-3 py-2 text-xs font-semibold transition-colors ${
                                         !activeCategory
                                             ? 'bg-[#F24F00] text-white'
                                             : 'bg-white/10 text-white hover:bg-[#F24F00]'
@@ -346,20 +377,25 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                                 >
                                     همه
                                 </button>
-                                {categories.map(cat => (
+                                {sortedCategories.map(cat => (
                                     <button
                                         key={cat.id}
                                         type="button"
                                         onClick={() => go({ category: (activeCategory === cat.slug ? undefined : cat.slug) as any })}
-                                        className={`inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold transition-colors ${
+                                        className={`group inline-flex max-w-full items-stretch overflow-hidden transition-colors ${
                                             activeCategory === cat.slug
-                                                ? 'bg-[#F24F00] text-white'
-                                                : 'bg-white/10 text-white hover:bg-[#F24F00]'
+                                                ? 'bg-[#F24F00]'
+                                                : 'bg-white/10 hover:bg-[#F24F00]'
                                         }`}
                                     >
-                                        {cat.name}
-                                        <span className="tabular-nums text-white/70">
-                                            {cat.posts_count.toLocaleString('fa-IR')}
+                                        <span className="truncate px-3 py-2 text-xs font-semibold text-white sm:text-sm">
+                                            {cat.name}
+                                        </span>
+                                        <span className="flex shrink-0 items-center gap-1 border-r border-white/15 bg-black/20 px-2.5 py-2">
+                                            <span className="text-xs font-black tabular-nums text-white">
+                                                {cat.posts_count.toLocaleString('fa-IR')}
+                                            </span>
+                                            <span className="text-[10px] font-medium text-white/65">مقاله</span>
                                         </span>
                                     </button>
                                 ))}
@@ -475,9 +511,9 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                             onSubmit={submitSearch}
                         />
 
-                        {categories.length > 0 && (
+                        {sortedCategories.length > 0 && (
                             <CategoriesSideWidget
-                                categories={categories}
+                                categories={sortedCategories}
                                 activeCategory={activeCategory}
                                 onSelect={slug => go({ category: slug as any })}
                             />

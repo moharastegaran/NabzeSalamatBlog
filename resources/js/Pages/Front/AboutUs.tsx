@@ -107,10 +107,9 @@ export default function AboutUs({ content }: Props) {
             />
 
             <div
-                className="relative bg-gray-900 overflow-hidden"
+                className="relative bg-gray-900 overflow-hidden bg-cover bg-left bg-no-repeat sm:bg-[length:100%]"
                 style={{
-                    background: `linear-gradient(to left,rgb(17 24 39 / 0.92), rgb(17 24 39 / 0.75)), url(${aboutBG}) no-repeat left center`,
-                    backgroundSize: '100%',
+                    backgroundImage: `linear-gradient(to left,rgb(17 24 39 / 0.92), rgb(17 24 39 / 0.75)), url(${aboutBG})`,
                 }}
             >
                 <div className="absolute inset-y-0 right-0 w-1.5 bg-[#F24F00]" />
