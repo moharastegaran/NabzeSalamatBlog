@@ -86,7 +86,7 @@ export default function BlogLayout({ children }: PropsWithChildren) {
             {/* ════════════════════════════════════════════
                 HEADER
             ════════════════════════════════════════════ */}
-            <header className="sticky top-0 z-50 shadow-md">
+            <header className="relative sticky top-0 z-50 shadow-md">
 
                 {/* ── 1 · Dark topbar ──────────────────────────────────────── */}
                 <div className="bg-[#042F10] text-gray-300 text-xs">
@@ -386,7 +386,7 @@ export default function BlogLayout({ children }: PropsWithChildren) {
                                             aria-label={social.label}
                                             className="w-8 h-8 bg-gray-800 hover:bg-[#F24F00] text-gray-400 hover:text-white flex items-center justify-center transition-colors"
                                         >
-                                            <Icon className="w-4 h-4" />
+                                            <Icon className="w-4 h-4" variant="onDark" />
                                         </a>
                                     );
                                 })}

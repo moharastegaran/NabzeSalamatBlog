@@ -44,7 +44,7 @@ export default function SocialFollowWidget({ variant = 'buttons', className = ''
                         rel="noopener noreferrer"
                         className={`flex flex-1 flex-col items-center gap-1.5 py-3 hover:opacity-90 transition-opacity ${social.buttonClass}`}
                     >
-                        <Icon className="h-5 w-5" />
+                        <Icon className="h-5 w-5" variant="onDark" />
                         <span className="text-[11px] font-medium">{social.label}</span>
                     </a>
                 );

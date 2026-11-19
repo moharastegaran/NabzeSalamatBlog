@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import BlogLayout from '@/Layouts/BlogLayout';
@@ -6,6 +6,8 @@ import AdBannerSlot from '@/Components/AdBannerSlot';
 import MostReadWidget from '@/Components/MostReadWidget';
 import SeoHead from '@/Components/SeoHead';
 import SocialFollowWidget from '@/Components/SocialFollowWidget';
+import GooglePreferredSourceButton from '@/Components/GooglePreferredSourceButton';
+import ReadingProgressBar from '@/Components/ReadingProgressBar';
 import type { AdBanner, BlogComment, BlogPost, BlogTag, PostFieldValue, PostMedia } from '@/types/models';
 import type { PageProps } from '@/types';
 import { breadcrumbJsonLd } from '@/utils/seoBreadcrumbs';
@@ -300,7 +302,7 @@ function ActionSidebar({ commentCount }: { commentCount: number }) {
     };
 
     return (
-        <div className="sticky top-6 flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-3">
             {/* Telegram */}
             <a
                 href={pageUrl ? `https://t.me/share/url?url=${shareUrl}` : '#'}
@@ -530,6 +532,7 @@ function useReadingTimeBeacon(token: string | null) {
 export default function BlogShow({ post, related, recentPosts, mostRead, adBanners, viewToken }: Props) {
     const date = post.published_at ? formatDate(post.published_at) : null;
     const comments = post.approved_comments ?? [];
+    const articleRef = useRef<HTMLElement>(null);
 
     const [copiedShort, setCopiedShort] = useState(false);
     const copyShortLink = () => {
@@ -614,22 +617,24 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                 jsonLd={[articleJsonLd, breadcrumbJsonLd(breadcrumbTrail, app.url)]}
             />
 
+            <ReadingProgressBar targetRef={articleRef} />
+
             <div className="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
 
                 {/* 3-column: RTL → col1=right(action) | col2=middle(article) | col3=left(sidebar) */}
                 <div className="grid grid-cols-1 lg:grid-cols-[50px_1fr_325px] gap-8 items-start">
 
-                    {/* Thin right action sidebar */}
-                    <div className="hidden lg:block">
+                    {/* Thin right action sidebar — sticky must be on the grid item itself */}
+                    <div className="hidden lg:block sticky top-48 self-start">
                         <ActionSidebar commentCount={comments.length} />
                     </div>
 
                     {/* Main article */}
-                    <article className="min-w-0 space-y-8">
+                    <article ref={articleRef} className="min-w-0 space-y-8">
 
                         <div className="article-shell article-shell-accent overflow-hidden">
                             {/* Meta / breadcrumb strip */}
-                            <div className="border-b border-gray-100 bg-gradient-to-l from-[#F24F00]/[0.06] to-transparent px-4 py-3 sm:px-6">
+                            <div className="flex flex-wrap items-center justify-between border-b border-gray-100 bg-gradient-to-l from-[#F24F00]/[0.06] to-transparent px-4 py-3 sm:px-6">
                                 <nav aria-label="مسیر صفحه" className="text-sm text-gray-500">
                                     <ol className="flex flex-wrap items-center gap-2">
                                         <li className="inline-flex items-center gap-2">
@@ -659,56 +664,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                                         )}
                                     </ol>
                                 </nav>
-                            </div>
-
-                            <div className="px-4 pt-6 sm:px-6 sm:pt-8">
-                                {/* Title block */}
-                                <header className="space-y-3">
-                                    {post.subtitle && (
-                                        <div className="inline-flex items-start gap-2">
-                                            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 bg-[#F24F00]" />
-                                            <p className="text-sm font-semibold text-[#F24F00] leading-snug">{post.subtitle}</p>
-                                        </div>
-                                    )}
-                                    <h1 className="text-2xl font-black text-gray-900 leading-snug sm:text-[1.75rem] lg:leading-[1.35]">
-                                        {post.title}
-                                    </h1>
-                                    {post.excerpt && (
-                                        <p className="border-r-4 border-[#F24F00] bg-[#F24F00]/5 px-4 py-3 text-[0.95rem] font-medium leading-8 text-gray-800">
-                                            {post.excerpt}
-                                        </p>
-                                    )}
-                                </header>
-
-                                {/* Byline */}
-                                <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-gray-100 py-3.5 text-xs text-gray-600">
-                                    {post.author && (
-                                        <Link
-                                            href={route('front.blog.author', post.author.id)}
-                                            className="inline-flex items-center gap-2 font-semibold text-gray-800 hover:text-[#F24F00] transition-colors"
-                                        >
-                                            {post.author.profile_image ? (
-                                                <img
-                                                    src={`/storage/${post.author.profile_image}`}
-                                                    alt=""
-                                                    className="h-8 w-8 rounded-full object-cover ring-2 ring-[#F24F00]/25"
-                                                />
-                                            ) : (
-                                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#042F10] text-xs font-black text-white">
-                                                    {post.author.name.charAt(0)}
-                                                </span>
-                                            )}
-                                            {post.author.name}
-                                        </Link>
-                                    )}
-                                    {date && (
-                                        <span className="inline-flex items-center gap-1">
-                                            <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
-                                            </svg>
-                                            {date}
-                                        </span>
-                                    )}
+                                <div className='flex gap-3 text-xs text-gray-500 font-normal'>
                                     {post.time_to_read && (
                                         <span className="inline-flex items-center gap-1">
                                             <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -726,6 +682,61 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                                             {post.views.toLocaleString('fa-IR')} بازدید
                                         </span>
                                     )}
+                                </div>
+                            </div>
+
+                            <div className="px-4 pt-6 sm:px-6 sm:pt-8">
+                                {/* Title block */}
+                                <header className="space-y-3">
+                                    {post.subtitle && (
+                                        <div className="inline-flex items-start gap-2">
+                                            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 bg-[#F24F00]" />
+                                            <p className="text-sm font-semibold text-[#F24F00] leading-snug">{post.subtitle}</p>
+                                        </div>
+                                    )}
+                                    <h1 className="text-2xl font-black text-gray-900 leading-snug sm:text-[1.75rem] lg:leading-[1.35]">
+                                        {post.title}
+                                    </h1>
+                                    {post.excerpt && (
+                                        <p className="bg-[#F24F00]/5 px-4 py-3 text-[0.95rem] font-medium leading-8 text-gray-800">
+                                            {post.excerpt}
+                                        </p>
+                                    )}
+                                </header>
+
+                                {/* Byline */}
+                                <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-gray-100 py-3.5 text-xs text-gray-600">
+                                    {post.author && (
+                                        <Link
+                                            href={route('front.blog.author', post.author.id)}
+                                            className="inline-flex items-center gap-2 font-semibold text-gray-800 hover:text-[#F24F00] transition-colors"
+                                        >
+                                            {post.author.profile_image ? (
+                                                <img
+                                                    src={`/storage/${post.author.profile_image}`}
+                                                    alt=""
+                                                    className="h-16 w-16 rounded-full object-cover ring-2 ring-[#F24F00]/25"
+                                                />
+                                            ) : (
+                                                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#042F10] text-xs font-black text-white">
+                                                    {post.author.name.charAt(0)}
+                                                </span>
+                                            )}
+                                            <div className='flex flex-col gap-1 text-sm'>
+                                                {post.author.name}
+                                                { date && (<span className="text-xs text-gray-500 font-normal">منتشر شده در {date}</span>)}
+                                            </div>
+                                        </Link>
+                                    )}
+                                    {/* {date && (
+                                        <span className="inline-flex items-center gap-1">
+                                            <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+                                            </svg>
+                                            {date}
+                                        </span>
+                                    )} */}
+                                    
                                     {comments.length > 0 && (
                                         <span className="inline-flex items-center gap-1">
                                             <svg className="h-3.5 w-3.5 text-[#F24F00]/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -734,10 +745,21 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                                             {comments.length} نظر
                                         </span>
                                     )}
+
+                                    <div className='me-2 ms-auto'>
+                                        <GooglePreferredSourceButton 
+                                        theme="light" 
+                                        lang="fa"
+                                        label='نبض سلامت را در گوگل بیشتر ببینید' />
+                                    </div>
                                 </div>
 
                                 <div className="mt-4 lg:hidden">
                                     <MobileShareBar commentCount={comments.length} />
+                                </div>
+
+                                <div className="mt-4">
+                                    {/* <GooglePreferredSourceButton theme="light" lang="fa" /> */}
                                 </div>
                             </div>
 
@@ -858,7 +880,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                         )}
 
                         {/* Comments */}
-                        <div id="post-comments" className="article-shell scroll-mt-6 overflow-hidden p-4 sm:p-6">
+                        <div id="post-comments" className="article-shell scroll-mt-48 overflow-hidden p-4 sm:p-6">
                             <h2 className="mb-5 flex items-center gap-2 text-base font-black text-gray-900">
                                 <span className="inline-block h-3 w-1.5 bg-[#F24F00]" />
                                 نظرات
@@ -894,7 +916,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                     </article>
 
                     {/* Left sidebar */}
-                    <aside className="space-y-6 lg:sticky lg:top-6">
+                    <aside className="space-y-6 lg:sticky lg:top-48">
 
                         {/* Most read this week */}
                         {mostRead.length > 0 && (
