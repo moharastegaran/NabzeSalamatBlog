@@ -1,15 +1,17 @@
 import { useState, useMemo, useRef } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BlogPost, PaginatedData } from '@/types/models';
+import CategoryMultiSelect from '@/Components/CategoryMultiSelect';
+import { BlogCategory, BlogPost, PaginatedData } from '@/types/models';
 import { toJalali } from '@/utils/date';
 import type { PageProps } from '@/types';
 
 interface Props {
     posts: PaginatedData<BlogPost>;
-    activeCategory?: { id: number; name: string } | null;
+    categories: Pick<BlogCategory, 'id' | 'name' | 'parent_id'>[];
+    activeCategory?: { id: number; name: string; parent_id?: number | null } | null;
     statusCounts: Record<string, number>;
-    filters: { search: string };
+    filters: { search: string; category: number | null };
 }
 
 const statusLabel: Record<string, string> = { draft: 'پیش‌نویس', scheduled: 'زمان‌بندی شده', published: 'منتشر شده' };
@@ -19,7 +21,7 @@ const statusClass: Record<string, string> = {
     published: 'bg-green-50 text-green-700',
 };
 
-export default function BlogIndex({ posts, activeCategory, statusCounts, filters }: Props) {
+export default function BlogIndex({ posts, categories, activeCategory, statusCounts, filters }: Props) {
     const { auth } = usePage<PageProps>().props;
     const canCreate = auth.user.permissions.includes('blog.create');
     const canEdit   = auth.user.permissions.includes('blog.edit');
@@ -30,6 +32,7 @@ export default function BlogIndex({ posts, activeCategory, statusCounts, filters
     const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const statusOptions = Object.entries(statusCounts);
+    const selectedCategoryIds = activeCategory ? [activeCategory.id] : [];
 
     const filteredPosts = useMemo(() => {
         return posts.data.filter(post =>
@@ -37,16 +40,36 @@ export default function BlogIndex({ posts, activeCategory, statusCounts, filters
         );
     }, [posts.data, selectedStatus]);
 
+    const navigateFilters = (next: { category?: number | null; search?: string }) => {
+        const category = next.category !== undefined ? next.category : (activeCategory?.id ?? null);
+        const search = next.search !== undefined ? next.search : searchQuery;
+
+        router.get(
+            route('blog.index'),
+            {
+                ...(category ? { category } : {}),
+                ...(search ? { search } : {}),
+            },
+            { preserveState: true, preserveScroll: true, replace: true },
+        );
+    };
+
     const handleSearch = (value: string) => {
         setSearchQuery(value);
         if (searchTimeout.current) clearTimeout(searchTimeout.current);
         searchTimeout.current = setTimeout(() => {
-            router.get(
-                route('blog.index'),
-                { ...(activeCategory ? { category: activeCategory.id } : {}), ...(value ? { search: value } : {}) },
-                { preserveState: true, preserveScroll: true, replace: true },
-            );
+            navigateFilters({ search: value });
         }, 350);
+    };
+
+    const handleCategoryChange = (ids: number[]) => {
+        navigateFilters({ category: ids[0] ?? null });
+    };
+
+    const toggleCategoryChip = (categoryId: number) => {
+        navigateFilters({
+            category: activeCategory?.id === categoryId ? null : categoryId,
+        });
     };
 
     const destroy = (post: BlogPost) => {
@@ -54,6 +77,9 @@ export default function BlogIndex({ posts, activeCategory, statusCounts, filters
             router.delete(route('blog.destroy', post.id));
         }
     };
+
+    const hasActiveFilters = Boolean(filters.search || activeCategory);
+    const showEmptyUnfiltered = posts.data.length === 0 && !hasActiveFilters;
 
     return (
         <AuthenticatedLayout
@@ -76,16 +102,8 @@ export default function BlogIndex({ posts, activeCategory, statusCounts, filters
             <div className="lg:py-8 lg:px-0 px-4 py-5">
                 <div className="mx-auto max-w-8xl sm:px-6 lg:px-8 space-y-4">
 
-                    {activeCategory && (
-                        <div className="flex items-center gap-2 rounded-md bg-indigo-50 px-4 py-2.5 text-sm text-indigo-700">
-                            <span>فیلتر دسته‌بندی:</span>
-                            <span className="font-semibold">{activeCategory.name}</span>
-                            <Link href={route('blog.index')} className="mr-auto text-indigo-400 hover:text-indigo-700">✕ حذف فیلتر</Link>
-                        </div>
-                    )}
-
-                    {(posts.data.length > 0 || filters.search !== '') && (
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-lg bg-white px-4 py-3 shadow-sm">
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between rounded-lg bg-white px-4 py-3 shadow-sm">
+                        <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
                             <div className="relative flex-1 max-w-sm">
                                 <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -100,31 +118,45 @@ export default function BlogIndex({ posts, activeCategory, statusCounts, filters
                                 />
                             </div>
 
-                            {statusOptions.length > 0 && (
-                                <div className="flex items-center text-sm">
-                                    <button
-                                        onClick={() => setSelectedStatus(null)}
-                                        className={`px-3 py-1 transition-colors ${selectedStatus === null ? 'font-semibold text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
-                                    >
-                                        همه
-                                    </button>
-                                    {statusOptions.map(([status, count]) => (
-                                        <span key={status} className="flex items-center">
-                                            <span className="text-gray-300 select-none">|</span>
-                                            <button
-                                                onClick={() => setSelectedStatus(selectedStatus === status ? null : status)}
-                                                className={`px-3 py-1 transition-colors ${selectedStatus === status ? 'font-semibold text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
-                                            >
-                                                {statusLabel[status] ?? status} ({count})
-                                            </button>
-                                        </span>
-                                    ))}
-                                </div>
+                            {categories.length > 0 && (
+                                <CategoryMultiSelect
+                                    categories={categories}
+                                    selected={selectedCategoryIds}
+                                    onChange={handleCategoryChange}
+                                    single
+                                    hideSelectedChips
+                                    placeholder="همه دسته‌بندی‌ها"
+                                    className="w-full sm:w-56 shrink-0"
+                                />
                             )}
                         </div>
-                    )}
 
-                    {posts.data.length === 0 && filters.search === '' ? (
+                        {statusOptions.length > 0 && (
+                            <div className="flex flex-wrap items-center text-sm">
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedStatus(null)}
+                                    className={`px-3 py-1 transition-colors ${selectedStatus === null ? 'font-semibold text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                    همه
+                                </button>
+                                {statusOptions.map(([status, count]) => (
+                                    <span key={status} className="flex items-center">
+                                        <span className="text-gray-300 select-none">|</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setSelectedStatus(selectedStatus === status ? null : status)}
+                                            className={`px-3 py-1 transition-colors ${selectedStatus === status ? 'font-semibold text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+                                        >
+                                            {statusLabel[status] ?? status} ({count})
+                                        </button>
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {showEmptyUnfiltered ? (
                         <div className="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-200 bg-white py-16 text-center">
                             <svg className="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
@@ -142,6 +174,15 @@ export default function BlogIndex({ posts, activeCategory, statusCounts, filters
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                             <p className="text-sm text-gray-500">نتیجه‌ای برای فیلتر انتخابی یافت نشد.</p>
+                            {activeCategory && (
+                                <button
+                                    type="button"
+                                    onClick={() => navigateFilters({ category: null })}
+                                    className="mt-1 text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                                >
+                                    حذف فیلتر دسته‌بندی
+                                </button>
+                            )}
                         </div>
                     ) : (
                         <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
@@ -180,15 +221,24 @@ export default function BlogIndex({ posts, activeCategory, statusCounts, filters
                                                 <td className="px-4 py-3 text-sm">
                                                     {post.categories && post.categories.length > 0 ? (
                                                         <div className="flex flex-wrap gap-1">
-                                                            {post.categories.map(cat => (
-                                                                <Link
-                                                                    key={cat.id}
-                                                                    href={route('blog.index', { category: cat.id })}
-                                                                    className="inline-flex rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600 hover:bg-indigo-100"
-                                                                >
-                                                                    {cat.name}
-                                                                </Link>
-                                                            ))}
+                                                            {post.categories.map(cat => {
+                                                                const isActive = activeCategory?.id === cat.id;
+                                                                return (
+                                                                    <button
+                                                                        key={cat.id}
+                                                                        type="button"
+                                                                        onClick={() => toggleCategoryChip(cat.id)}
+                                                                        title={isActive ? 'حذف فیلتر این دسته' : 'فیلتر بر اساس این دسته'}
+                                                                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${
+                                                                            isActive
+                                                                                ? 'bg-indigo-600 text-white ring-1 ring-indigo-600'
+                                                                                : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
+                                                                        }`}
+                                                                    >
+                                                                        {cat.name}
+                                                                    </button>
+                                                                );
+                                                            })}
                                                         </div>
                                                     ) : (
                                                         <span className="text-gray-400">—</span>

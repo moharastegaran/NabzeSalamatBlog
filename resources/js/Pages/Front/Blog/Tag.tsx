@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
 import AdBannerSlot from '@/Components/AdBannerSlot';
 import MostReadWidget from '@/Components/MostReadWidget';
@@ -7,6 +7,8 @@ import SeoHead from '@/Components/SeoHead';
 import SocialFollowWidget from '@/Components/SocialFollowWidget';
 import BlogPagination from '@/Components/BlogPagination';
 import type { AdBanner, BlogPost, BlogTag, PaginatedData } from '@/types/models';
+import type { PageProps } from '@/types';
+import { breadcrumbJsonLd } from '@/utils/seoBreadcrumbs';
 
 interface TagWithMeta extends BlogTag {
     posts_count: number;
@@ -186,27 +188,40 @@ function SocialWidget() {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function BlogTag({ tag, posts, recentPosts, mostRead, search, adBanners }: Props) {
+    const { app } = usePage<PageProps>().props;
+
     return (
         <BlogLayout>
             <SeoHead
                 title={`#${tag.name}`}
                 description={`مقالات برچسب ${tag.name} در نبض سلامت`}
                 url={`/blog/tag/${tag.slug}`}
+                jsonLd={breadcrumbJsonLd([
+                    { name: 'خانه', url: '/' },
+                    { name: 'وبلاگ', url: '/blog' },
+                    { name: `#${tag.name}`, url: `/blog/tag/${tag.slug}` },
+                ], app.url)}
             />
 
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
                 {/* Breadcrumb */}
-                <nav className="mb-6 flex items-center gap-1.5 text-sm text-gray-400 flex-wrap">
-                    <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
-                    <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <Link href={route('front.blog.index')} className="hover:text-gray-600 transition-colors">وبلاگ</Link>
-                    <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span className="text-gray-700 font-medium">#{tag.name}</span>
+                <nav aria-label="مسیر صفحه" className="mb-6 text-sm text-gray-400">
+                    <ol className="flex flex-wrap items-center gap-1.5">
+                        <li className="inline-flex items-center gap-1.5">
+                            <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
+                            <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </li>
+                        <li className="inline-flex items-center gap-1.5">
+                            <Link href={route('front.blog.index')} className="hover:text-gray-600 transition-colors">وبلاگ</Link>
+                            <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </li>
+                        <li className="text-gray-700 font-medium" aria-current="page">#{tag.name}</li>
+                    </ol>
                 </nav>
 
                 {/* Tag header */}
@@ -251,7 +266,7 @@ export default function BlogTag({ tag, posts, recentPosts, mostRead, search, adB
                 {/* Main 2-column layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_272px] gap-7 items-start">
 
-                    <main>
+                    <div>
                         {posts.data.length > 0 ? (
                             <>
                                 <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-2">
@@ -286,7 +301,7 @@ export default function BlogTag({ tag, posts, recentPosts, mostRead, search, adB
                                 )}
                             </div>
                         )}
-                    </main>
+                    </div>
 
                     <aside className="space-y-5 lg:sticky lg:top-28">
                         <div className="bg-white p-4 shadow-sm">

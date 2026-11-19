@@ -8,6 +8,7 @@ import SeoHead from '@/Components/SeoHead';
 import SocialFollowWidget from '@/Components/SocialFollowWidget';
 import type { AdBanner, BlogComment, BlogPost, BlogTag, PostFieldValue, PostMedia } from '@/types/models';
 import type { PageProps } from '@/types';
+import { breadcrumbJsonLd } from '@/utils/seoBreadcrumbs';
 
 interface Props {
     post: BlogPost & { approved_comments: BlogComment[] };
@@ -542,9 +543,11 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
     useReadingTimeBeacon(viewToken);
 
     const { app } = usePage<PageProps>().props;
-    const description = post.excerpt
+    const description = post.meta_description
+        || post.excerpt
         || post.subtitle
         || undefined;
+    const seoTitle = post.meta_title || post.title;
     const category = post.category ?? post.categories?.[0] ?? null;
     const cats = post.categories ?? [];
     const primaryCategory = (cats.length > 0 ? cats[cats.length - 1] : null) ?? post.category ?? null;
@@ -558,11 +561,11 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
         ? `${app.url}/storage/${post.featured_image}`
         : undefined;
 
-    const jsonLd = {
+    const articleJsonLd = {
         '@context': 'https://schema.org',
         '@type': 'NewsArticle',
-        headline: post.title,
-        description: description ?? post.title,
+        headline: seoTitle,
+        description: description ?? seoTitle,
         image: imageUrl ? [imageUrl] : undefined,
         datePublished: post.published_at ?? undefined,
         dateModified: post.updated_at ?? post.published_at ?? undefined,
@@ -574,7 +577,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
             name: app.name,
             logo: {
                 '@type': 'ImageObject',
-                url: `${app.url}/favicon-32x32.png`,
+                url: `${app.url}/android-chrome-512x512.png`,
             },
         },
         mainEntityOfPage: {
@@ -585,10 +588,22 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
         inLanguage: 'fa-IR',
     };
 
+    const breadcrumbTrail = [
+        { name: 'خانه', url: '/' },
+        { name: 'وبلاگ', url: '/blog' },
+        ...(parentCategory
+            ? [{ name: parentCategory.name, url: `/blog/category/${parentCategory.slug}` }]
+            : []),
+        ...(primaryCategory
+            ? [{ name: primaryCategory.name, url: `/blog/category/${primaryCategory.slug}` }]
+            : []),
+        { name: seoTitle, url: `/blog/${post.slug}` },
+    ];
+
     return (
         <BlogLayout>
             <SeoHead
-                title={post.title}
+                title={seoTitle}
                 description={description}
                 image={post.featured_image}
                 url={`/blog/${post.slug}`}
@@ -596,7 +611,7 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                 publishedTime={post.published_at}
                 modifiedTime={post.updated_at ?? post.published_at}
                 author={post.author?.name}
-                jsonLd={jsonLd}
+                jsonLd={[articleJsonLd, breadcrumbJsonLd(breadcrumbTrail, app.url)]}
             />
 
             <div className="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
@@ -615,26 +630,34 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
                         <div className="article-shell article-shell-accent overflow-hidden">
                             {/* Meta / breadcrumb strip */}
                             <div className="border-b border-gray-100 bg-gradient-to-l from-[#F24F00]/[0.06] to-transparent px-4 py-3 sm:px-6">
-                                <nav className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
-                                    <Link href="/" className="hover:text-gray-700 transition-colors">خانه</Link>
-                                    <span className="text-gray-300">/</span>
-                                    <Link href={route('front.blog.index')} className="hover:text-gray-700 transition-colors">وبلاگ</Link>
-                                    {primaryCategory && (
-                                        <>
-                                            {parentCategory && (
-                                                <>
-                                                    <span className="text-gray-300">/</span>
-                                                    <Link href={route('front.blog.category', parentCategory.slug)} className="hover:text-[#F24F00] transition-colors">
-                                                        {parentCategory.name}
-                                                    </Link>
-                                                </>
+                                <nav aria-label="مسیر صفحه" className="text-sm text-gray-500">
+                                    <ol className="flex flex-wrap items-center gap-2">
+                                        <li className="inline-flex items-center gap-2">
+                                            <Link href="/" className="hover:text-gray-700 transition-colors">خانه</Link>
+                                            <span className="text-gray-300" aria-hidden="true">/</span>
+                                        </li>
+                                        <li className="inline-flex items-center gap-2">
+                                            <Link href={route('front.blog.index')} className="hover:text-gray-700 transition-colors">وبلاگ</Link>
+                                            {(parentCategory || primaryCategory) && (
+                                                <span className="text-gray-300" aria-hidden="true">/</span>
                                             )}
-                                            <span className="text-gray-300">/</span>
-                                            <Link href={route('front.blog.category', primaryCategory.slug)} className="font-medium text-[#F24F00] hover:opacity-80 transition-opacity">
-                                                {primaryCategory.name}
-                                            </Link>
-                                        </>
-                                    )}
+                                        </li>
+                                        {parentCategory && (
+                                            <li className="inline-flex items-center gap-2">
+                                                <Link href={route('front.blog.category', parentCategory.slug)} className="hover:text-[#F24F00] transition-colors">
+                                                    {parentCategory.name}
+                                                </Link>
+                                                <span className="text-gray-300" aria-hidden="true">/</span>
+                                            </li>
+                                        )}
+                                        {primaryCategory && (
+                                            <li>
+                                                <Link href={route('front.blog.category', primaryCategory.slug)} className="font-medium text-[#F24F00] hover:opacity-80 transition-opacity" aria-current="page">
+                                                    {primaryCategory.name}
+                                                </Link>
+                                            </li>
+                                        )}
+                                    </ol>
                                 </nav>
                             </div>
 

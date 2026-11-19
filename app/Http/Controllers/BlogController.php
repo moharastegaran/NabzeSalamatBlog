@@ -7,6 +7,7 @@ use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogTag;
 use App\Services\PostViewTracker;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -24,22 +25,31 @@ class BlogController extends Controller
             ->get();
     }
 
-    public function index(Request $request): Response
+    public function index(Request $request): Response|RedirectResponse
     {
+        // Canonical category URLs live at /blog/category/{slug} (M2M). Legacy ?category= redirects.
         $categorySlug = $request->query('category');
-        $search       = $request->query('search');
-        $sort         = $request->query('sort', 'newest');
+        if (filled($categorySlug)) {
+            $params = $request->except('category');
+
+            return redirect()->route('front.blog.category', array_filter([
+                'slug'   => $categorySlug,
+                'search' => $params['search'] ?? null,
+            ]), 301);
+        }
+
+        $search = $request->query('search');
+        $sort   = $request->query('sort', 'newest');
 
         $query = BlogPost::published()
             ->with(['author:id,name', 'category:id,name,slug', 'tags:id,name,slug'])
             ->withCount('approvedComments')
-            ->when($categorySlug, fn ($q) => $q->whereHas('category', fn ($q) => $q->where('slug', $categorySlug)))
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
                       ->orWhere('excerpt', 'like', "%{$search}%")
                       ->orWhereHas('tags', fn ($q) => $q->where('name', 'like', "%{$search}%"))
-                      ->orWhereHas('category', fn ($q) => $q->where('name', 'like', "%{$search}%"));
+                      ->orWhereHas('categories', fn ($q) => $q->where('name', 'like', "%{$search}%"));
                 });
             });
 
@@ -84,9 +94,8 @@ class BlogController extends Controller
             'posts'      => $posts,
             'categories' => $categories,
             'filters'    => [
-                'category' => $categorySlug,
-                'search'   => $search,
-                'sort'     => $sort,
+                'search' => $search,
+                'sort'   => $sort,
             ],
             'adBanners'  => AdBanner::activeForLocation('blog')->get(),
         ]);

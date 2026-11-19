@@ -142,11 +142,15 @@ EXPOSE 9000
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["php-fpm"]
 
-# Stage 6: Inertia SSR Node server (prod)
+# Stage 6: Inertia SSR Node server (prod) — self-contained image for crawlers
 FROM node:20-alpine AS ssr
 WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 COPY --from=node-builder /app/bootstrap/ssr ./bootstrap/ssr
 EXPOSE 13714
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=5 \
+    CMD node -e "require('http').request({host:'127.0.0.1',port:13714,method:'HEAD'},r=>process.exit(0)).on('error',()=>process.exit(1)).end()"
 CMD ["node", "bootstrap/ssr/ssr.js"]
 
 # Stage 7: nginx with static files baked in (prod only)

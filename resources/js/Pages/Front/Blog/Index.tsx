@@ -1,10 +1,12 @@
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { useState, type FormEvent } from 'react';
 import BlogLayout from '@/Layouts/BlogLayout';
 import SeoHead from '@/Components/SeoHead';
 import SocialFollowWidget from '@/Components/SocialFollowWidget';
 import BlogPagination from '@/Components/BlogPagination';
 import type { BlogPost, PaginatedData } from '@/types/models';
+import type { PageProps } from '@/types';
+import { breadcrumbJsonLd } from '@/utils/seoBreadcrumbs';
 
 interface CategoryLeaf {
     id: number;
@@ -20,7 +22,7 @@ interface CategoryNode extends CategoryLeaf {
 interface Props {
     posts: PaginatedData<BlogPost>;
     categories: CategoryNode[];
-    filters: { category?: string; search?: string; sort?: string };
+    filters: { search?: string; sort?: string };
 }
 
 const SORT_LABELS: Record<string, string> = {
@@ -150,67 +152,37 @@ function SearchSideWidget({
     );
 }
 
-function CategoriesSideWidget({
-    categories,
-    activeCategory,
-    onSelect,
-}: {
-    categories: CategoryNode[];
-    activeCategory?: string;
-    onSelect: (slug?: string) => void;
-}) {
+function CategoriesSideWidget({ categories }: { categories: CategoryNode[] }) {
     const sortedCategories = sortByPostsDesc(categories);
-
-    const activeParentId = sortedCategories.find(cat =>
-        cat.children.some(c => c.slug === activeCategory)
-    )?.id ?? null;
-
-    const [openId, setOpenId] = useState<number | null>(activeParentId);
-
+    const [openId, setOpenId] = useState<number | null>(null);
     const toggleOpen = (id: number) => setOpenId(prev => prev === id ? null : id);
 
     return (
         <div className="bg-white p-4 shadow-sm">
             <SideboxHeader title="دسته‌بندی‌ها" />
             <div className="space-y-2">
-                <button
-                    onClick={() => onSelect(undefined)}
-                    className={`flex w-full items-center gap-2 border px-3 py-2.5 text-sm transition-colors ${
-                        !activeCategory
-                            ? 'border-[#F24F00]/40 bg-[#F24F00]/5 font-bold text-[#F24F00]'
-                            : 'border-gray-100 bg-white text-gray-700 hover:border-[#F24F00]/40 hover:text-[#F24F00]'
-                    }`}
+                <Link
+                    href={route('front.blog.index')}
+                    className="flex w-full items-center gap-2 border border-[#F24F00]/40 bg-[#F24F00]/5 px-3 py-2.5 text-sm font-bold text-[#F24F00] transition-colors"
                 >
-                    <span className={`w-1.5 h-1.5 flex-shrink-0 rounded-full ${!activeCategory ? 'bg-[#F24F00]' : 'bg-gray-300'}`} />
+                    <span className="w-1.5 h-1.5 flex-shrink-0 rounded-full bg-[#F24F00]" />
                     همه اخبار
-                </button>
+                </Link>
 
                 {sortedCategories.map(cat => {
                     const children = sortByPostsDesc(cat.children);
                     const hasChildren = children.length > 0;
-                    const isOpen      = openId === cat.id;
-                    const isActive    = activeCategory === cat.slug;
-                    const hasActiveChild = children.some(c => c.slug === activeCategory);
+                    const isOpen = openId === cat.id;
 
                     return (
                         <div key={cat.id} className="space-y-1.5">
-                            <div
-                                className={`group flex items-stretch overflow-hidden border shadow-sm transition-colors ${
-                                    isActive || hasActiveChild
-                                        ? 'border-[#F24F00]/40'
-                                        : 'border-gray-100 hover:border-[#F24F00]/40'
-                                }`}
-                            >
-                                <button
-                                    onClick={() => onSelect(isActive ? undefined : cat.slug)}
-                                    className={`flex min-w-0 flex-1 items-center gap-2 px-3 py-2.5 text-sm transition-colors ${
-                                        isActive || hasActiveChild
-                                            ? 'font-bold text-[#F24F00]'
-                                            : 'text-gray-700 group-hover:text-[#F24F00]'
-                                    }`}
+                            <div className="group flex items-stretch overflow-hidden border border-gray-100 shadow-sm transition-colors hover:border-[#F24F00]/40">
+                                <Link
+                                    href={route('front.blog.category', cat.slug)}
+                                    className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2.5 text-sm text-gray-700 transition-colors group-hover:text-[#F24F00]"
                                 >
                                     <span className="truncate font-medium">{cat.name}</span>
-                                </button>
+                                </Link>
                                 <span className="flex shrink-0 flex-col items-center justify-center border-r border-gray-100 bg-[#F24F00]/5 px-3 py-2.5 text-center">
                                     <span className="text-sm font-black tabular-nums text-[#F24F00]">
                                         {cat.posts_count.toLocaleString('fa-IR')}
@@ -219,6 +191,7 @@ function CategoriesSideWidget({
                                 </span>
                                 {hasChildren && (
                                     <button
+                                        type="button"
                                         onClick={() => toggleOpen(cat.id)}
                                         aria-label={isOpen ? 'بستن' : 'باز کردن'}
                                         className="px-2.5 text-gray-300 hover:text-[#F24F00] transition-colors"
@@ -236,20 +209,12 @@ function CategoriesSideWidget({
                             {hasChildren && isOpen && (
                                 <div className="space-y-1.5 pr-3">
                                     {children.map(child => (
-                                        <button
+                                        <Link
                                             key={child.id}
-                                            onClick={() => onSelect(activeCategory === child.slug ? undefined : child.slug)}
-                                            className={`group flex w-full items-stretch overflow-hidden border shadow-sm transition-colors ${
-                                                activeCategory === child.slug
-                                                    ? 'border-[#F24F00]/40'
-                                                    : 'border-gray-100 hover:border-[#F24F00]/40'
-                                            }`}
+                                            href={route('front.blog.category', child.slug)}
+                                            className="group flex w-full items-stretch overflow-hidden border border-gray-100 shadow-sm transition-colors hover:border-[#F24F00]/40"
                                         >
-                                            <span className={`flex min-w-0 flex-1 items-center px-3 py-2 text-xs transition-colors ${
-                                                activeCategory === child.slug
-                                                    ? 'font-bold text-[#F24F00]'
-                                                    : 'text-gray-600 group-hover:text-[#F24F00]'
-                                            }`}>
+                                            <span className="flex min-w-0 flex-1 items-center px-3 py-2 text-xs text-gray-600 transition-colors group-hover:text-[#F24F00]">
                                                 <span className="truncate font-medium">{child.name}</span>
                                             </span>
                                             <span className="flex shrink-0 flex-col items-center justify-center border-r border-gray-100 bg-[#F24F00]/5 px-2.5 py-2 text-center">
@@ -258,7 +223,7 @@ function CategoriesSideWidget({
                                                 </span>
                                                 <span className="text-[9px] font-medium text-[#F24F00]/70">مقاله</span>
                                             </span>
-                                        </button>
+                                        </Link>
                                     ))}
                                 </div>
                             )}
@@ -282,13 +247,13 @@ function SocialSideWidget() {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function BlogIndex({ posts, categories, filters }: Props) {
+    const { app } = usePage<PageProps>().props;
     const [search, setSearch] = useState(filters.search ?? '');
 
     const go = (patch: Partial<typeof filters>) => {
         const merged = { ...filters, ...patch };
         const params: Record<string, string> = {};
-        if (merged.category) params.category = merged.category;
-        if (merged.search)   params.search   = merged.search;
+        if (merged.search) params.search = merged.search;
         if (merged.sort && merged.sort !== 'newest') params.sort = merged.sort;
         router.get(route('front.blog.index'), params, { preserveState: true, preserveScroll: false });
     };
@@ -299,12 +264,7 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
     };
 
     const activeSort = filters.sort ?? 'newest';
-    const activeCategory = filters.category;
     const sortedCategories = sortByPostsDesc(categories);
-
-    const activeCategoryLabel = categories
-        .flatMap(c => [c, ...c.children])
-        .find(c => c.slug === activeCategory)?.name;
 
     return (
         <BlogLayout>
@@ -312,17 +272,25 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                 title="وبلاگ"
                 description="آخرین اخبار و مقالات حوزه سلامت، پزشکی و سبک زندگی در وبلاگ نبض سلامت."
                 url="/blog"
+                jsonLd={breadcrumbJsonLd([
+                    { name: 'خانه', url: '/' },
+                    { name: 'وبلاگ', url: '/blog' },
+                ], app.url)}
             />
 
             <div className="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
 
                 {/* Breadcrumb */}
-                <nav className="mb-5 flex items-center gap-1.5 text-sm text-gray-400 flex-wrap">
-                    <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
-                    <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span className="text-gray-700 font-medium">وبلاگ</span>
+                <nav aria-label="مسیر صفحه" className="mb-5 text-sm text-gray-400">
+                    <ol className="flex flex-wrap items-center gap-1.5">
+                        <li className="inline-flex items-center gap-1.5">
+                            <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
+                            <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </li>
+                        <li className="text-gray-700 font-medium" aria-current="page">وبلاگ</li>
+                    </ol>
                 </nav>
 
                 {/* Blog hub hero */}
@@ -366,27 +334,14 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
 
                         {sortedCategories.length > 0 && (
                             <div className="blog-hero-cats mt-7 flex flex-wrap gap-2 border-t border-white/15 pt-5">
-                                <button
-                                    type="button"
-                                    onClick={() => go({ category: undefined as any })}
-                                    className={`inline-flex items-center px-3 py-2 text-xs font-semibold transition-colors ${
-                                        !activeCategory
-                                            ? 'bg-[#F24F00] text-white'
-                                            : 'bg-white/10 text-white hover:bg-[#F24F00]'
-                                    }`}
-                                >
+                                <span className="inline-flex items-center bg-[#F24F00] px-3 py-2 text-xs font-semibold text-white">
                                     همه
-                                </button>
+                                </span>
                                 {sortedCategories.map(cat => (
-                                    <button
+                                    <Link
                                         key={cat.id}
-                                        type="button"
-                                        onClick={() => go({ category: (activeCategory === cat.slug ? undefined : cat.slug) as any })}
-                                        className={`group inline-flex max-w-full items-stretch overflow-hidden transition-colors ${
-                                            activeCategory === cat.slug
-                                                ? 'bg-[#F24F00]'
-                                                : 'bg-white/10 hover:bg-[#F24F00]'
-                                        }`}
+                                        href={route('front.blog.category', cat.slug)}
+                                        className="group inline-flex max-w-full items-stretch overflow-hidden bg-white/10 transition-colors hover:bg-[#F24F00]"
                                     >
                                         <span className="truncate px-3 py-2 text-xs font-semibold text-white sm:text-sm">
                                             {cat.name}
@@ -397,7 +352,7 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                                             </span>
                                             <span className="text-[10px] font-medium text-white/65">مقاله</span>
                                         </span>
-                                    </button>
+                                    </Link>
                                 ))}
                             </div>
                         )}
@@ -408,16 +363,12 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
 
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_272px] gap-7 items-start">
 
-                    <main>
+                    <div>
                         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                             <div className="flex items-center gap-3 min-w-0">
                                 <span className="h-5 w-1.5 bg-[#F24F00] shrink-0" />
                                 <h2 className="text-base font-black text-gray-900 truncate">
-                                    {activeCategoryLabel
-                                        ? `مقالات ${activeCategoryLabel}`
-                                        : filters.search
-                                            ? 'نتایج جستجو'
-                                            : 'آخرین مقالات'}
+                                    {filters.search ? 'نتایج جستجو' : 'آخرین مقالات'}
                                 </h2>
                             </div>
                             <div className="flex items-center gap-2">
@@ -444,33 +395,20 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                             </div>
                         </div>
 
-                        {(activeCategory || filters.search) && (
+                        {filters.search && (
                             <div className="mb-4 flex flex-wrap items-center gap-2">
                                 <span className="text-xs text-gray-400">فیلترهای فعال:</span>
-                                {activeCategoryLabel && (
-                                    <span className="inline-flex items-center gap-1.5 bg-[#F24F00]/10 text-[#F24F00] text-xs font-semibold px-2.5 py-1">
-                                        {activeCategoryLabel}
-                                        <button
-                                            onClick={() => go({ category: undefined as any })}
-                                            className="hover:opacity-70 transition-opacity leading-none"
-                                            aria-label="حذف فیلتر دسته‌بندی"
-                                        >
-                                            ✕
-                                        </button>
-                                    </span>
-                                )}
-                                {filters.search && (
-                                    <span className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-700 text-xs font-semibold px-2.5 py-1">
-                                        «{filters.search}»
-                                        <button
-                                            onClick={() => { setSearch(''); go({ search: undefined as any }); }}
-                                            className="hover:opacity-70 transition-opacity leading-none"
-                                            aria-label="حذف فیلتر جستجو"
-                                        >
-                                            ✕
-                                        </button>
-                                    </span>
-                                )}
+                                <span className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-700 text-xs font-semibold px-2.5 py-1">
+                                    «{filters.search}»
+                                    <button
+                                        type="button"
+                                        onClick={() => { setSearch(''); go({ search: undefined as any }); }}
+                                        className="hover:opacity-70 transition-opacity leading-none"
+                                        aria-label="حذف فیلتر جستجو"
+                                    >
+                                        ✕
+                                    </button>
+                                </span>
                             </div>
                         )}
 
@@ -492,9 +430,10 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                                 </div>
                                 <p className="text-sm font-semibold text-gray-600">مقاله‌ای یافت نشد</p>
                                 <p className="mt-1 text-xs text-gray-400">با فیلتر دیگری امتحان کنید یا فیلترها را پاک کنید.</p>
-                                {(filters.search || filters.category) && (
+                                {filters.search && (
                                     <button
-                                        onClick={() => { setSearch(''); go({ search: undefined as any, category: undefined as any }); }}
+                                        type="button"
+                                        onClick={() => { setSearch(''); go({ search: undefined as any }); }}
                                         className="mt-4 inline-flex items-center gap-1.5 bg-[#F24F00] px-4 py-2 text-xs font-bold text-white hover:opacity-90 transition-opacity"
                                     >
                                         پاک کردن فیلترها
@@ -502,7 +441,7 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                                 )}
                             </div>
                         )}
-                    </main>
+                    </div>
 
                     <aside className="space-y-5 lg:sticky lg:top-28">
                         <SearchSideWidget
@@ -512,11 +451,7 @@ export default function BlogIndex({ posts, categories, filters }: Props) {
                         />
 
                         {sortedCategories.length > 0 && (
-                            <CategoriesSideWidget
-                                categories={sortedCategories}
-                                activeCategory={activeCategory}
-                                onSelect={slug => go({ category: slug as any })}
-                            />
+                            <CategoriesSideWidget categories={sortedCategories} />
                         )}
 
                         <SocialSideWidget />

@@ -44,14 +44,18 @@ class BlogPostController extends Controller
             ->pluck('count', 'status');
 
         $activeCategory = $categoryId
-            ? BlogCategory::find($categoryId, ['id', 'name'])
+            ? BlogCategory::find($categoryId, ['id', 'name', 'parent_id'])
             : null;
 
         return Inertia::render('Blog/Index', [
             'posts'          => $posts,
+            'categories'     => BlogCategory::orderBy('name')->get(['id', 'name', 'parent_id']),
             'activeCategory' => $activeCategory,
             'statusCounts'   => $statusCounts,
-            'filters'        => ['search' => $search],
+            'filters'        => [
+                'search'   => $search,
+                'category' => $categoryId ? (int) $categoryId : null,
+            ],
         ]);
     }
 
@@ -224,6 +228,8 @@ class BlogPostController extends Controller
             'title'            => ['required', 'string', 'max:255'],
             'subtitle'         => ['nullable', 'string'],
             'excerpt'          => ['nullable', 'string', 'max:500'],
+            'meta_title'       => ['nullable', 'string', 'max:255'],
+            'meta_description' => ['nullable', 'string', 'max:320'],
             'body'             => ['required', 'string'],
             'status'           => ['required', 'in:draft,scheduled,published'],
             'publish_at'       => ['required_if:status,scheduled', 'nullable', 'date', 'after:now'],

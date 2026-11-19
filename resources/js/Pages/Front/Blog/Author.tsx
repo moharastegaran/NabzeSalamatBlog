@@ -1,10 +1,12 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import BlogLayout from '@/Layouts/BlogLayout';
 import AdBannerSlot from '@/Components/AdBannerSlot';
 import MostReadWidget from '@/Components/MostReadWidget';
 import SeoHead from '@/Components/SeoHead';
 import BlogPagination from '@/Components/BlogPagination';
 import type { AdBanner, BlogPost, PaginatedData } from '@/types/models';
+import type { PageProps } from '@/types';
+import { breadcrumbJsonLd } from '@/utils/seoBreadcrumbs';
 
 interface AuthorSummary {
     id: number;
@@ -155,6 +157,7 @@ function AuthorAvatar({ author }: { author: AuthorSummary }) {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function BlogAuthor({ author, posts, recentPosts, mostRead, adBanners }: Props) {
+    const { app } = usePage<PageProps>().props;
     const bioText = hasRichText(author.bio) ? stripHtml(author.bio!) : '';
     const seoDescription = bioText
         ? bioText.slice(0, 160)
@@ -167,21 +170,32 @@ export default function BlogAuthor({ author, posts, recentPosts, mostRead, adBan
                 description={seoDescription}
                 image={author.profile_image ?? undefined}
                 url={`/blog/author/${author.id}`}
+                jsonLd={breadcrumbJsonLd([
+                    { name: 'خانه', url: '/' },
+                    { name: 'وبلاگ', url: '/blog' },
+                    { name: author.name, url: `/blog/author/${author.id}` },
+                ], app.url)}
             />
 
             <div className="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
 
                 {/* Breadcrumb */}
-                <nav className="mb-5 flex items-center gap-1.5 text-sm text-gray-400 flex-wrap">
-                    <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
-                    <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <Link href={route('front.blog.index')} className="hover:text-gray-600 transition-colors">وبلاگ</Link>
-                    <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span className="text-gray-700 font-medium">{author.name}</span>
+                <nav aria-label="مسیر صفحه" className="mb-5 text-sm text-gray-400">
+                    <ol className="flex flex-wrap items-center gap-1.5">
+                        <li className="inline-flex items-center gap-1.5">
+                            <Link href="/" className="hover:text-gray-600 transition-colors">خانه</Link>
+                            <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </li>
+                        <li className="inline-flex items-center gap-1.5">
+                            <Link href={route('front.blog.index')} className="hover:text-gray-600 transition-colors">وبلاگ</Link>
+                            <svg className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </li>
+                        <li className="text-gray-700 font-medium" aria-current="page">{author.name}</li>
+                    </ol>
                 </nav>
 
                 {/* Author hero — one composition */}
@@ -242,7 +256,7 @@ export default function BlogAuthor({ author, posts, recentPosts, mostRead, adBan
                 {/* Main 2-column layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_272px] gap-7 items-start">
 
-                    <main>
+                    <div>
                         <div className="mb-5 flex items-center gap-3">
                             <span className="h-5 w-1.5 bg-[#F24F00] shrink-0" />
                             <h2 className="text-base font-black text-gray-900">مقالات این نویسنده</h2>
@@ -269,7 +283,7 @@ export default function BlogAuthor({ author, posts, recentPosts, mostRead, adBan
                                 <p className="mt-1 text-xs text-gray-400">این نویسنده هنوز مقاله‌ای منتشر نکرده است.</p>
                             </div>
                         )}
-                    </main>
+                    </div>
 
                     <aside className="space-y-5 lg:sticky lg:top-28">
                         {mostRead.length > 0 && (

@@ -21,6 +21,8 @@ interface FormData {
     title: string;
     subtitle: string;
     excerpt: string;
+    meta_title: string;
+    meta_description: string;
     body: string;
     status: 'draft' | 'scheduled' | 'published';
     publish_at: string;
@@ -28,6 +30,9 @@ interface FormData {
     tag_ids: number[];
     featured_image: string | null;
 }
+
+const META_TITLE_MAX = 255;
+const META_DESC_MAX = 320;
 
 interface BalePreviewState {
     postId: number;
@@ -44,6 +49,8 @@ export default function BlogCreate({ categories, tags }: Props) {
         title: '',
         subtitle: '',
         excerpt: '',
+        meta_title: '',
+        meta_description: '',
         body: '',
         status: 'draft',
         publish_at: '',
@@ -87,6 +94,8 @@ export default function BlogCreate({ categories, tags }: Props) {
         data.append('title', form.title);
         data.append('subtitle', form.subtitle);
         data.append('excerpt', form.excerpt);
+        data.append('meta_title', form.meta_title);
+        data.append('meta_description', form.meta_description);
         data.append('body', form.body);
         data.append('status', form.status);
         if (form.status === 'scheduled' && form.publish_at) data.append('publish_at', form.publish_at);
@@ -185,6 +194,50 @@ export default function BlogCreate({ categories, tags }: Props) {
                                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             />
                             {errors.excerpt && <p className="mt-1 text-xs text-red-600">{errors.excerpt}</p>}
+                        </div>
+
+                        {/* SEO */}
+                        <div className="rounded-lg border border-gray-100 bg-gray-50/70 p-4 space-y-4">
+                            <div>
+                                <h3 className="text-sm font-semibold text-gray-800">سئو (اختیاری)</h3>
+                                <p className="mt-0.5 text-xs text-gray-500">
+                                    در صورت خالی بودن، از عنوان و خلاصه مقاله استفاده می‌شود.
+                                </p>
+                            </div>
+                            <div>
+                                <div className="mb-1 flex items-center justify-between gap-3">
+                                    <label className="block text-sm font-medium text-gray-700">عنوان متا</label>
+                                    <span className={`text-xs tabular-nums ${form.meta_title.length >= META_TITLE_MAX ? 'text-red-600' : 'text-gray-400'}`}>
+                                        {form.meta_title.length.toLocaleString('fa-IR')} / {META_TITLE_MAX.toLocaleString('fa-IR')}
+                                    </span>
+                                </div>
+                                <input
+                                    type="text"
+                                    value={form.meta_title}
+                                    onChange={e => setForm(p => ({ ...p, meta_title: e.target.value.slice(0, META_TITLE_MAX) }))}
+                                    maxLength={META_TITLE_MAX}
+                                    placeholder={form.title || 'عنوان نمایش‌داده‌شده در نتایج جستجو'}
+                                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                />
+                                {errors.meta_title && <p className="mt-1 text-xs text-red-600">{errors.meta_title}</p>}
+                            </div>
+                            <div>
+                                <div className="mb-1 flex items-center justify-between gap-3">
+                                    <label className="block text-sm font-medium text-gray-700">توضیحات متا</label>
+                                    <span className={`text-xs tabular-nums ${form.meta_description.length >= META_DESC_MAX ? 'text-red-600' : 'text-gray-400'}`}>
+                                        {form.meta_description.length.toLocaleString('fa-IR')} / {META_DESC_MAX.toLocaleString('fa-IR')}
+                                    </span>
+                                </div>
+                                <textarea
+                                    value={form.meta_description}
+                                    onChange={e => setForm(p => ({ ...p, meta_description: e.target.value.slice(0, META_DESC_MAX) }))}
+                                    rows={2}
+                                    maxLength={META_DESC_MAX}
+                                    placeholder={form.excerpt || 'توضیح کوتاه برای موتورهای جستجو'}
+                                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                />
+                                {errors.meta_description && <p className="mt-1 text-xs text-red-600">{errors.meta_description}</p>}
+                            </div>
                         </div>
 
                         {/* Body */}

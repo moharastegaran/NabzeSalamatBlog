@@ -247,12 +247,13 @@ export default function HealthTimeline() {
                             </div>
                         </div>
 
-                        <div className="relative bg-gray-100" style={{ height: 'min(75vh, 900px)' }}>
+                        {/* All month PDFs are 960×540 (16:9) — height tracks container width on all viewports */}
+                        <div className="relative w-full overflow-hidden bg-gray-100 aspect-[960/540]">
                             <iframe
                                 key={selected.pdf}
-                                src={`${selected.pdf}#view=FitH&toolbar=0`}
+                                src={`${selected.pdf}#view=FitH&toolbar=0&navpanes=0`}
                                 title={`گاه‌شمار سلامت — ${selected.name}`}
-                                className="absolute inset-0 w-full h-full border-0"
+                                className="absolute inset-0 h-full w-full border-0"
                             />
                         </div>
                     </div>

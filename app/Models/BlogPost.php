@@ -20,6 +20,8 @@ class BlogPost extends Model
         'slug',
         'short_link',
         'excerpt',
+        'meta_title',
+        'meta_description',
         'body',
         'featured_image',
         'video_url',

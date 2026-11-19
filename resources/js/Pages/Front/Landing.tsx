@@ -4,6 +4,7 @@ import BlogLayout from '@/Layouts/BlogLayout';
 import SeoHead from '@/Components/SeoHead';
 import { AdBanner, BlogPost, BlogTag, PostFieldValue } from '@/types/models';
 import { NavCategory, PageProps } from '@/types';
+import { SOCIAL_LINKS } from '@/constants/socials';
 
 interface Props {
     sliderPosts: BlogPost[];
@@ -1065,12 +1066,52 @@ function RoundtableCarousel({ posts }: { posts: BlogPost[] }) {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, recentPosts, analyzePosts, tags, videoPosts, audioPosts, eventPosts, roundtablePosts, adBanners }: Props) {
-    const { navCategories } = usePage<PageProps>().props;
+    const { navCategories, app } = usePage<PageProps>().props;
     const [adsState, setAdsState] = useState<'visible' | 'fading' | 'hidden'>('visible');
     const dismissAds = () => {
         setAdsState('fading');
         setTimeout(() => setAdsState('hidden'), 500);
     };
+
+    const siteUrl = (app?.url ?? '').replace(/\/$/, '');
+    const siteName = app?.name ?? 'نبض سلامت';
+    const logoUrl = `${siteUrl}/android-chrome-512x512.png`;
+    const homeJsonLd = [
+        {
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: siteName,
+            url: `${siteUrl}/`,
+            logo: {
+                '@type': 'ImageObject',
+                url: logoUrl,
+            },
+            sameAs: SOCIAL_LINKS.map(s => s.href),
+        },
+        {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: siteName,
+            url: `${siteUrl}/`,
+            inLanguage: 'fa-IR',
+            publisher: {
+                '@type': 'Organization',
+                name: siteName,
+                logo: {
+                    '@type': 'ImageObject',
+                    url: logoUrl,
+                },
+            },
+            potentialAction: {
+                '@type': 'SearchAction',
+                target: {
+                    '@type': 'EntryPoint',
+                    urlTemplate: `${siteUrl}/blog?search={search_term_string}`,
+                },
+                'query-input': 'required name=search_term_string',
+            },
+        },
+    ];
 
     return (
         <BlogLayout>
@@ -1078,6 +1119,8 @@ export default function Landing({ sliderPosts, suggestionPosts, trendingPosts, r
                 title="نبض سلامت"
                 description="نبض سلامت؛ رسانه خبری تخصصی حوزه سلامت، پزشکی و سبک زندگی سالم."
                 url="/"
+                image="/android-chrome-512x512.png"
+                jsonLd={homeJsonLd}
             />
             <h1 className="sr-only">نبض سلامت — رسانه خبری سلامت</h1>
 

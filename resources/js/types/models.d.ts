@@ -85,6 +85,8 @@ export interface BlogPost {
     subtitle?: string | null;
     slug: string;
     excerpt?: string;
+    meta_title?: string | null;
+    meta_description?: string | null;
     body: string;
     featured_image?: string;
     video_url?: string | null;
