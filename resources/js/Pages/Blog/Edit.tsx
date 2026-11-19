@@ -12,6 +12,8 @@ import { localDateTimeStr } from '@/utils/date';
 import { useState, useRef } from 'react';
 import React from 'react';
 
+const EXCERPT_MAX = 500;
+
 interface Props {
     post: BlogPost & { tags: BlogTag[] };
     categories: Pick<BlogCategory, 'id' | 'name' | 'parent_id'>[];
@@ -350,11 +352,25 @@ export default function BlogEdit({ post, categories, tags, postMedia, fieldDefin
 
                         {/* Excerpt */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">خلاصه</label>
+                            <div className="mb-1 flex items-center justify-between gap-3">
+                                <label className="block text-sm font-medium text-gray-700">خلاصه</label>
+                                <span
+                                    className={`text-xs tabular-nums ${
+                                        form.excerpt.length >= EXCERPT_MAX
+                                            ? 'font-medium text-red-600'
+                                            : form.excerpt.length >= EXCERPT_MAX * 0.9
+                                              ? 'text-amber-600'
+                                              : 'text-gray-400'
+                                    }`}
+                                >
+                                    {form.excerpt.length.toLocaleString('fa-IR')} / {EXCERPT_MAX.toLocaleString('fa-IR')}
+                                </span>
+                            </div>
                             <textarea
                                 value={form.excerpt}
-                                onChange={e => setForm(p => ({ ...p, excerpt: e.target.value }))}
+                                onChange={e => setForm(p => ({ ...p, excerpt: e.target.value.slice(0, EXCERPT_MAX) }))}
                                 rows={2}
+                                maxLength={EXCERPT_MAX}
                                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             />
                             {errors.excerpt && <p className="mt-1 text-xs text-red-600">{errors.excerpt}</p>}
@@ -372,6 +388,7 @@ export default function BlogEdit({ post, categories, tags, postMedia, fieldDefin
                                 imageResize
                                 showStats
                                 showFullscreen
+                                assetPicker={{ canUpload, forVideo: true }}
                             />
                             {errors.body && <p className="mt-1 text-xs text-red-600">{errors.body}</p>}
                         </div>
