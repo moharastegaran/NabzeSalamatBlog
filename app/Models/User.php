@@ -13,7 +13,10 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, Notifiable;
+    use HasFactory, Notifiable;
+    use HasRoles {
+        hasRole as protected spatieHasRole;
+    }
 
     protected $fillable = [
         'name',
@@ -51,5 +54,59 @@ class User extends Authenticatable
     public function posts(): HasMany
     {
         return $this->hasMany(\App\Models\BlogPost::class, 'author_id');
+    }
+
+    /**
+     * Supadmin inherits every check that targets the admin role.
+     */
+    public function hasRole($roles, ?string $guard = null): bool
+    {
+        if ($this->getRoleNames()->contains('supadmin') && $this->roleCheckIncludesAdmin($roles)) {
+            return true;
+        }
+
+        return $this->spatieHasRole($roles, $guard);
+    }
+
+    /**
+     * @param  string|int|array|Role|\Illuminate\Support\Collection|\BackedEnum  $roles
+     */
+    private function roleCheckIncludesAdmin(mixed $roles): bool
+    {
+        if (is_string($roles)) {
+            if (str_contains($roles, '|')) {
+                foreach (explode('|', $roles) as $role) {
+                    if (trim($role) === 'admin') {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            return $roles === 'admin';
+        }
+
+        if ($roles instanceof Role) {
+            return $roles->name === 'admin';
+        }
+
+        if ($roles instanceof \BackedEnum) {
+            return $roles->value === 'admin';
+        }
+
+        if ($roles instanceof \Illuminate\Support\Collection) {
+            return $roles->contains(fn ($role) => $this->roleCheckIncludesAdmin($role));
+        }
+
+        if (is_array($roles)) {
+            foreach ($roles as $role) {
+                if ($this->roleCheckIncludesAdmin($role)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

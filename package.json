@@ -33,6 +33,7 @@
         "@types/quill": "^2.0.14",
         "@types/react-draft-wysiwyg": "^1.13.9",
         "apexcharts": "^5.11.0",
+        "jszip": "^3.10.2",
         "moment-jalaali": "^0.10.4",
         "num2persian": "^4.3.0",
         "quill": "^2.0.3",

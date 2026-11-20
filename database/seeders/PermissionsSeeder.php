@@ -22,7 +22,7 @@ class PermissionsSeeder extends Seeder
         $permissions = [
             'users.create', 'users.edit', 'users.delete',
             'tickets.assign', 'tickets.close', 'tickets.respond',
-            'blog.create', 'blog.edit', 'blog.delete',
+            'blog.create', 'blog.edit', 'blog.delete', 'blog.instagram',
             'blog_categories.create', 'blog_categories.edit', 'blog_categories.delete',
             'tags.create', 'tags.delete',
             'comments.approve', 'comments.discard',
@@ -37,8 +37,16 @@ class PermissionsSeeder extends Seeder
             Permission::create(['name' => $name]);
         }
 
+        $adminPermissions = array_values(array_filter(
+            $permissions,
+            fn (string $name) => $name !== 'blog.instagram'
+        ));
+
         $admin = Role::create(['name' => 'مدیر کل', 'slug' => 'admin', 'guard_name' => 'web']);
-        $admin->givePermissionTo($permissions);
+        $admin->givePermissionTo($adminPermissions);
+
+        $supadmin = Role::create(['name' => 'سوپرادمین', 'slug' => 'supadmin', 'guard_name' => 'web']);
+        $supadmin->givePermissionTo($permissions);
 
         $contributor = Role::create(['name' => 'همکار محتوا', 'slug' => 'contributor', 'guard_name' => 'web']);
         $contributor->givePermissionTo([

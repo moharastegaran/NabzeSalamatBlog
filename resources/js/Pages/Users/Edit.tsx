@@ -5,6 +5,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import type { Asset } from '@/types/models';
 import type { PageProps } from '@/types';
 import { useState } from 'react';
+import { hasRole } from '@/utils/roles';
 
 interface Province {
     id: number;
@@ -104,7 +105,7 @@ const plain    = BASE;
 
 export default function EditUser({ editUser, currentRole, allowedRoles, provinces }: Props) {
     const { auth } = usePage<PageProps>().props;
-    const canUpload = auth.user?.roles?.includes('admin') ?? false;
+    const canUpload = hasRole(auth.user?.roles, 'admin');
     const [pickerOpen, setPickerOpen] = useState(false);
 
     const { data, setData, put, processing, errors } = useForm({

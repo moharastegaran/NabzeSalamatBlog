@@ -5,6 +5,7 @@ import { useState } from 'react';
 import AssetPicker from '@/Components/AssetPicker';
 import MultiSelect from '@/Components/MultiSelect';
 import type { Asset } from '@/types/models';
+import { hasRole } from '@/utils/roles';
 
 interface ParentOption {
     id: number;
@@ -40,7 +41,7 @@ function ImagePreview({ path, onClear, label }: { path: string; onClear: () => v
 
 export default function BlogCategoryCreate({ parents }: Props) {
     const { auth } = usePage<PageProps>().props;
-    const canUpload = auth.user?.roles?.includes('admin') ?? false;
+    const canUpload = hasRole(auth.user?.roles, 'admin');
 
     const [form, setForm] = useState({ name: '', slug: '', description: '', parent_id: null as number | null, icon: '', thumbnail: '', broadcast_to_bale: false });
     const [errors, setErrors]           = useState<Record<string, string>>({});

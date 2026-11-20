@@ -143,14 +143,16 @@ ENTRYPOINT ["/entrypoint.sh"]
 CMD ["php-fpm"]
 
 # Stage 6: Inertia SSR Node server (prod) — self-contained image for crawlers
+# Reuse node-builder modules: Vite SSR leaves react/@inertiajs/react/etc. external,
+# and those packages live under devDependencies, so `npm ci --omit=dev` cannot boot ssr.js.
 FROM node:20-alpine AS ssr
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+COPY --from=node-builder /app/package.json /app/package-lock.json ./
+COPY --from=node-builder /app/node_modules ./node_modules
 COPY --from=node-builder /app/bootstrap/ssr ./bootstrap/ssr
 EXPOSE 13714
-HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=5 \
-    CMD node -e "require('http').request({host:'127.0.0.1',port:13714,method:'HEAD'},r=>process.exit(0)).on('error',()=>process.exit(1)).end()"
+HEALTHCHECK --interval=15s --timeout=5s --start-period=25s --retries=8 \
+    CMD node -e "require('http').request({host:'127.0.0.1',port:13714,method:'GET'},r=>process.exit(0)).on('error',()=>process.exit(1)).end()"
 CMD ["node", "bootstrap/ssr/ssr.js"]
 
 # Stage 7: nginx with static files baked in (prod only)

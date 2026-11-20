@@ -553,8 +553,9 @@ export default function BlogShow({ post, related, recentPosts, mostRead, adBanne
     const seoTitle = post.meta_title || post.title;
     const category = post.category ?? post.categories?.[0] ?? null;
     const cats = post.categories ?? [];
-    const primaryCategory = (cats.length > 0 ? cats[cats.length - 1] : null) ?? post.category ?? null;
-    const parentCategory = primaryCategory && 'parent' in primaryCategory ? primaryCategory.parent ?? null : null;
+    const leafFromCats = cats.length > 0 ? cats[cats.length - 1] : null;
+    const primaryCategory = leafFromCats ?? post.category ?? null;
+    const parentCategory = leafFromCats?.parent ?? null;
     const sidebarCategories = [
         ...(parentCategory ? [parentCategory] : []),
         ...(primaryCategory ? [primaryCategory] : []),

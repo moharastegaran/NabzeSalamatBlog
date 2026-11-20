@@ -4,6 +4,7 @@ import axios from 'axios';
 import NotificationBell, { type NotificationItem } from '@/Components/NotificationBell';
 import FlashToast from '@/Components/FlashToast';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import { hasAnyRole, hasRole } from '@/utils/roles';
 
 function IconDashboard() {
     return (
@@ -770,11 +771,11 @@ export default function Authenticated({
     const user = auth.user;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [collapsed, setCollapsed]     = useState(false);
-    const canAdmin       = !!user.roles?.includes('admin');
-    const canViewReports = user.roles?.includes('admin') || user.roles?.includes('cfo');
-    const canBlog        = user.roles?.includes('admin') || user.roles?.includes('writer');
+    const canAdmin       = hasRole(user.roles, 'admin');
+    const canViewReports = hasAnyRole(user.roles, 'admin', 'cfo');
+    const canBlog        = hasAnyRole(user.roles, 'admin', 'writer');
     const canAssets      = canAdmin;
-    const canWithdrawal  = !!user.is_withdrawal && (user.roles?.includes('sales_retail') || user.roles?.includes('sales_manager'));
+    const canWithdrawal  = !!user.is_withdrawal && hasAnyRole(user.roles, 'sales_retail', 'sales_manager');
 
     const [usersOpen, setUsersOpen]     = useState(!!route().current('users.*'));
     const [blogOpen, setBlogOpen]       = useState(!!route().current('blog.*') || !!route().current('analytics.blog'));
@@ -812,22 +813,19 @@ export default function Authenticated({
         return () => clearInterval(interval);
     }, []);
 
-    const canViewUsers =
-        user.roles?.includes('admin') || user.roles?.includes('sales_manager') || user.roles?.includes('cfo');
+    const canViewUsers = hasAnyRole(user.roles, 'admin', 'sales_manager', 'cfo');
 
-    const canCreateUser =
-        user.roles?.includes('admin') || user.roles?.includes('cfo') || user.roles?.includes('sales_manager');
+    const canCreateUser = hasAnyRole(user.roles, 'admin', 'cfo', 'sales_manager');
 
-    const canAnnounce =
-        user.roles?.includes('admin') || user.roles?.includes('cfo');
+    const canAnnounce = hasAnyRole(user.roles, 'admin', 'cfo');
 
     const canAdBanners    = canAdmin;
 
-    const canGallery =
-        user.roles?.includes('admin') || user.roles?.includes('cfo');
+    const canGallery = hasAnyRole(user.roles, 'admin', 'cfo');
 
     const roleLabel: Record<string, string> = {
         admin: 'مدیر کل',
+        supadmin: 'سوپرادمین',
         sales_manager: 'مدیر منطقه',
         sales_retail: 'نماینده',
         cfo: 'مدیر مالی',

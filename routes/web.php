@@ -178,6 +178,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/blog-posts/create',      [BlogPostController::class, 'create'])->name('blog.create');
         Route::post('/blog-posts',            [BlogPostController::class, 'store']) ->name('blog.store');
         Route::get('/blog-posts/{blog}/edit', [BlogPostController::class, 'edit'])  ->name('blog.edit');
+        Route::get('/blog-posts/{blog}/instagram', [BlogPostController::class, 'instagram'])
+            ->middleware('permission:blog.instagram')
+            ->name('blog.instagram');
         Route::put('/blog-posts/{blog}',      [BlogPostController::class, 'update'])->name('blog.update');
         Route::delete('/blog-posts/{blog}',   [BlogPostController::class, 'destroy'])->name('blog.destroy');
         Route::post('/blog-posts/{blog}/broadcast-bale', [BlogPostController::class, 'broadcastBale'])

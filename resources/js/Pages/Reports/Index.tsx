@@ -2,6 +2,7 @@
 import { PageProps } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { ReactNode, useState } from 'react';
+import { hasAnyRole } from '@/utils/roles';
 
 interface ColumnDef {
     key: string;
@@ -169,7 +170,7 @@ function ExportCard({
 
 export default function ReportsIndex() {
     const { auth } = usePage<PageProps>().props;
-    const isAuthorized = auth.user.roles?.includes('admin') || auth.user.roles?.includes('cfo');
+    const isAuthorized = hasAnyRole(auth.user.roles, 'admin', 'cfo');
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-bold leading-tight text-gray-800">گزارش‌ساز</h2>}>

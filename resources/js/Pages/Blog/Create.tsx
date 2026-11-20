@@ -9,6 +9,7 @@ import type { PageProps } from '@/types';
 import { useEffect, useState } from 'react';
 import PersianDateTimePicker from '@/Components/PersianDateTimePicker';
 import { localDateTimeStr } from '@/utils/date';
+import { hasRole } from '@/utils/roles';
 
 const EXCERPT_MAX = 500;
 
@@ -42,7 +43,7 @@ interface BalePreviewState {
 
 export default function BlogCreate({ categories, tags }: Props) {
     const { auth, flash } = usePage<PageProps>().props;
-    const canUpload = auth.user?.roles?.includes('admin') ?? false;
+    const canUpload = hasRole(auth.user?.roles, 'admin');
     const canCreateTags = auth.user?.permissions?.includes('tags.create') ?? false;
 
     const [form, setForm] = useState<FormData>({

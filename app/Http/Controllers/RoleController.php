@@ -75,7 +75,7 @@ class RoleController extends Controller
 
     public function destroy(Role $role): RedirectResponse
     {
-        if (in_array($role->slug, ['admin', 'contributor', 'writer'])) {
+        if (in_array($role->slug, ['admin', 'supadmin', 'contributor', 'writer'], true)) {
             return back()->with('error', 'نقش‌های اصلی سیستم قابل حذف نیستند.');
         }
 

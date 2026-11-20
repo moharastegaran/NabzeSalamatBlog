@@ -222,6 +222,70 @@ class BlogPostController extends Controller
         return redirect()->route('blog.index')->with('success', 'مقاله حذف شد.');
     }
 
+    public function instagram(Request $request, BlogPost $blog): Response
+    {
+        abort_unless($request->user()?->can('blog.instagram'), 403);
+
+        $blog->load(['categories:id,name,slug']);
+
+        $lastCategory = $blog->categories->last();
+
+        return Inertia::render('Blog/InstagramGenerator', [
+            'post' => [
+                'id'             => $blog->id,
+                'title'          => $blog->title,
+                'subtitle'       => $blog->subtitle,
+                'excerpt'        => $blog->excerpt,
+                'description'    => $this->firstBodyParagraph($blog->body),
+                'slug'           => $blog->slug,
+                'short_link'     => $blog->short_link,
+                'featured_image' => $blog->featured_image,
+                'category'       => $lastCategory
+                    ? ['id' => $lastCategory->id, 'name' => $lastCategory->name, 'slug' => $lastCategory->slug]
+                    : null,
+            ],
+            'defaults' => [
+                'color'           => '#075F26',
+                'highlight_color' => '#E8A88A',
+                'background_color'=> '#FFFFFF',
+                'url'             => url('/blog/'.$blog->slug),
+                'app_url'         => rtrim((string) config('app.url'), '/'),
+            ],
+        ]);
+    }
+
+    /**
+     * Plain-text first paragraph from Quill/HTML body for Instagram copy.
+     */
+    private function firstBodyParagraph(?string $body): string
+    {
+        $html = trim((string) $body);
+        if ($html === '') {
+            return '';
+        }
+
+        if (preg_match('/<p\b[^>]*>(.*?)<\/p>/is', $html, $match)) {
+            $text = html_entity_decode(strip_tags($match[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        } else {
+            $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        }
+
+        $text = preg_replace('/\s+/u', ' ', trim($text)) ?? '';
+
+        // If the first <p> was empty (spacer), fall back to the first non-empty paragraph.
+        if ($text === '' && preg_match_all('/<p\b[^>]*>(.*?)<\/p>/is', $html, $matches)) {
+            foreach ($matches[1] as $chunk) {
+                $candidate = html_entity_decode(strip_tags($chunk), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                $candidate = preg_replace('/\s+/u', ' ', trim($candidate)) ?? '';
+                if ($candidate !== '') {
+                    return $candidate;
+                }
+            }
+        }
+
+        return $text;
+    }
+
     private function validatePost(Request $request, ?BlogPost $post = null): array
     {
         return $request->validate([

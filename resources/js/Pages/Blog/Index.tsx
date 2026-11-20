@@ -23,9 +23,10 @@ const statusClass: Record<string, string> = {
 
 export default function BlogIndex({ posts, categories, activeCategory, statusCounts, filters }: Props) {
     const { auth } = usePage<PageProps>().props;
-    const canCreate = auth.user.permissions.includes('blog.create');
-    const canEdit   = auth.user.permissions.includes('blog.edit');
-    const canDelete = auth.user.permissions.includes('blog.delete');
+    const canCreate    = auth.user.permissions.includes('blog.create');
+    const canEdit      = auth.user.permissions.includes('blog.edit');
+    const canDelete    = auth.user.permissions.includes('blog.delete');
+    const canInstagram = auth.user.permissions.includes('blog.instagram');
 
     const [searchQuery, setSearchQuery] = useState(filters.search);
     const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
@@ -274,6 +275,17 @@ export default function BlogIndex({ posts, categories, activeCategory, statusCou
                                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                                 </svg>
                                                             </a>
+                                                        )}
+                                                        {canInstagram && (
+                                                            <Link
+                                                                href={route('blog.instagram', post.id)}
+                                                                title="محتوای اینستاگرام"
+                                                                className="rounded p-1.5 text-gray-400 hover:bg-pink-50 hover:text-pink-600 transition-colors"
+                                                            >
+                                                                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                                                    <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 1.5A4.25 4.25 0 003.5 7.75v8.5A4.25 4.25 0 007.75 20.5h8.5a4.25 4.25 0 004.25-4.25v-8.5A4.25 4.25 0 0016.25 3.5h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 1.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zm5.25-.88a1.13 1.13 0 110 2.25 1.13 1.13 0 010-2.25z" />
+                                                                </svg>
+                                                            </Link>
                                                         )}
                                                         {canEdit && (
                                                             <Link

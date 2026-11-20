@@ -23,12 +23,24 @@ createServer((page) =>
             const ziggy = (page.props as { ziggy?: ZiggyConfig & { location: string } }).ziggy;
 
             // Make Ziggy's route() available during SSR (Blade @routes only exists in the browser).
-            globalThis.route = ((name: string, params: unknown, absolute: boolean, config: ZiggyConfig) =>
-                ziggyRoute(name, params as never, absolute, {
-                    ...(ziggy ?? {}),
-                    location: new URL(ziggy?.location ?? 'http://localhost'),
+            // Guard missing ziggy/routes (e.g. error pages) so SSR does not throw mid-render.
+            globalThis.route = ((name: string, params: unknown, absolute: boolean, config: ZiggyConfig) => {
+                const merged = {
+                    ...(ziggy ?? { url: '/', port: null, defaults: {}, routes: {} }),
                     ...config,
-                })) as typeof ziggyRoute;
+                    location: new URL(ziggy?.location ?? config?.url ?? 'http://localhost'),
+                } as ZiggyConfig & { location: URL };
+
+                if (!merged.routes) {
+                    merged.routes = {};
+                }
+
+                try {
+                    return ziggyRoute(name, params as never, absolute, merged);
+                } catch {
+                    return typeof name === 'string' ? `/${name.replace(/\./g, '/')}` : '/';
+                }
+            }) as typeof ziggyRoute;
 
             return <App {...props} />;
         },

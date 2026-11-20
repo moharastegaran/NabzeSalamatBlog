@@ -9,6 +9,7 @@ import type { PageProps } from '@/types';
 import PersianDatePicker from '@/Components/PersianDatePicker';
 import PersianDateTimePicker from '@/Components/PersianDateTimePicker';
 import { localDateTimeStr } from '@/utils/date';
+import { hasRole } from '@/utils/roles';
 import { useState, useRef } from 'react';
 import React from 'react';
 
@@ -269,7 +270,7 @@ function MediaCollection({
 
 export default function BlogEdit({ post, categories, tags, postMedia, fieldDefinitions, fieldValues, mediaCollections }: Props) {
     const { auth } = usePage<PageProps>().props;
-    const canUpload = auth.user?.roles?.includes('admin') ?? false;
+    const canUpload = hasRole(auth.user?.roles, 'admin');
     const canCreateTags = auth.user?.permissions?.includes('tags.create') ?? false;
 
     const scalarDefs = fieldDefinitions.filter(d => d.field_type !== 'file');

@@ -4,6 +4,7 @@ import { FormEventHandler, useRef, useState } from 'react';
 import { PageProps } from '@/types';
 import InputError from '@/Components/InputError';
 import SelectInput from '@/Components/SelectInput';
+import { hasAnyRole } from '@/utils/roles';
 
 interface Props {
     users: { id: number; name: string }[];
@@ -11,7 +12,7 @@ interface Props {
 
 export default function TicketsCreate({ users }: Props) {
     const { auth } = usePage<PageProps>().props;
-    const canSelectRecipient = auth.user.roles.includes('admin') || auth.user.roles.includes('cfo');
+    const canSelectRecipient = hasAnyRole(auth.user.roles, 'admin', 'cfo');
 
     const fileRef = useRef<HTMLInputElement>(null);
     const [errors, setErrors] = useState<Record<string, string>>({});

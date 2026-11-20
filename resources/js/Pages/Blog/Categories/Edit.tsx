@@ -6,6 +6,7 @@ import { useState } from 'react';
 import AssetPicker from '@/Components/AssetPicker';
 import MultiSelect from '@/Components/MultiSelect';
 import type { Asset, CategoryFieldDefinition, CategoryFieldType } from '@/types/models';
+import { hasRole } from '@/utils/roles';
 
 interface ParentOption {
     id: number;
@@ -457,7 +458,7 @@ function SelectChoicesEditor({
 
 export default function BlogCategoryEdit({ category, parents, fieldDefinitions, mediaCollections }: Props) {
     const { auth } = usePage<PageProps>().props;
-    const canUpload = auth.user?.roles?.includes('admin') ?? false;
+    const canUpload = hasRole(auth.user?.roles, 'admin');
 
     const [form, setForm] = useState({
         name:              category.name,

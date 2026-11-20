@@ -77,7 +77,7 @@ class HandleInertiaRequests extends Middleware
                     'url'   => route('front.blog.show', $post->slug, absolute: false),
                 ])
                 ->values(),
-            'contactUnread'   => fn () => $user && in_array('admin', $user->getRoleNames()->toArray())
+            'contactUnread'   => fn () => $user && $user->hasRole('admin')
                 ? ContactMessage::whereNull('read_at')->count()
                 : 0,
             'navCategories'   => fn () => BlogCategory::whereNull('parent_id')
