@@ -299,7 +299,7 @@ export default function InstagramGenerator({ post, defaults }: Props) {
                                     onClick={() => void downloadOne('post')}
                                     className="flex w-full items-center justify-center gap-2 rounded-md bg-[#F24F00] px-3 py-2.5 text-sm font-semibold text-white hover:bg-[#d44400] disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                    دانلود پست (۱۰۸۰×۱۳۵۰)
+                                    دانلود پست (۱۰۸۰×۱۴۴۰)
                                 </button>
                                 <button
                                     type="button"
@@ -326,7 +326,7 @@ export default function InstagramGenerator({ post, defaults }: Props) {
 
                         <section className="space-y-4">
                             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                                <PreviewCard title="پست اینستاگرام" subtitle="۱۰۸۰ × ۱۳۵۰">
+                                <PreviewCard title="پست اینستاگرام" subtitle="۱۰۸۰ × ۱۴۴۰">
                                     <canvas
                                         ref={postCanvasRef}
                                         width={IG_POST_SIZE.width}

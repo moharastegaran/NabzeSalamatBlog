@@ -17,6 +17,8 @@ export interface AuthUser {
     mobile?: string;
     roles: string[];
     permissions: string[];
+    /** True for admin and supadmin (server-side hasRole inheritance). */
+    is_admin?: boolean;
 }
 
 export type PageProps<

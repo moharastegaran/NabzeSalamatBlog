@@ -771,9 +771,9 @@ export default function Authenticated({
     const user = auth.user;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [collapsed, setCollapsed]     = useState(false);
-    const canAdmin       = hasRole(user.roles, 'admin');
-    const canViewReports = hasAnyRole(user.roles, 'admin', 'cfo');
-    const canBlog        = hasAnyRole(user.roles, 'admin', 'writer');
+    const canAdmin       = !!user.is_admin || hasRole(user.roles, 'admin');
+    const canViewReports = canAdmin || hasRole(user.roles, 'cfo');
+    const canBlog        = canAdmin || hasRole(user.roles, 'writer');
     const canAssets      = canAdmin;
     const canWithdrawal  = !!user.is_withdrawal && hasAnyRole(user.roles, 'sales_retail', 'sales_manager');
 
@@ -813,15 +813,15 @@ export default function Authenticated({
         return () => clearInterval(interval);
     }, []);
 
-    const canViewUsers = hasAnyRole(user.roles, 'admin', 'sales_manager', 'cfo');
+    const canViewUsers = canAdmin || hasAnyRole(user.roles, 'sales_manager', 'cfo');
 
-    const canCreateUser = hasAnyRole(user.roles, 'admin', 'cfo', 'sales_manager');
+    const canCreateUser = canAdmin || hasAnyRole(user.roles, 'cfo', 'sales_manager');
 
-    const canAnnounce = hasAnyRole(user.roles, 'admin', 'cfo');
+    const canAnnounce = canAdmin || hasRole(user.roles, 'cfo');
 
     const canAdBanners    = canAdmin;
 
-    const canGallery = hasAnyRole(user.roles, 'admin', 'cfo');
+    const canGallery = canAdmin || hasRole(user.roles, 'cfo');
 
     const roleLabel: Record<string, string> = {
         admin: 'مدیر کل',

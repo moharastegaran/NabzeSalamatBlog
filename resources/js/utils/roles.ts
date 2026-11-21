@@ -1,10 +1,20 @@
-/** Supadmin inherits every check that targets the admin role. */
-export function hasRole(roles: string[] | undefined | null, role: string): boolean {
-    if (!roles?.length) return false;
-    if (roles.includes(role)) return true;
-    return role === 'admin' && roles.includes('supadmin');
+function asRoleList(roles: unknown): string[] {
+    if (!roles) return [];
+    if (Array.isArray(roles)) return roles.map(String);
+    if (typeof roles === 'object') {
+        return Object.values(roles as Record<string, unknown>).map(String);
+    }
+    return [String(roles)];
 }
 
-export function hasAnyRole(roles: string[] | undefined | null, ...wanted: string[]): boolean {
+/** Supadmin inherits every check that targets the admin role. */
+export function hasRole(roles: unknown, role: string): boolean {
+    const list = asRoleList(roles);
+    if (!list.length) return false;
+    if (list.includes(role)) return true;
+    return role === 'admin' && list.includes('supadmin');
+}
+
+export function hasAnyRole(roles: unknown, ...wanted: string[]): boolean {
     return wanted.some((role) => hasRole(roles, role));
 }

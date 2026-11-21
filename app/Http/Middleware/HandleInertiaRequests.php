@@ -45,8 +45,11 @@ class HandleInertiaRequests extends Middleware
                     'name'        => $user->name,
                     'email'       => $user->email,
                     'mobile'      => $user->mobile,
-                    'roles'       => $user->getRoleNames(),
-                    'permissions' => $user->getAllPermissions()->pluck('name'),
+                    // Plain arrays so the React sidebar can reliably use .includes()
+                    'roles'       => $user->getRoleNames()->values()->all(),
+                    'permissions' => $user->getAllPermissions()->pluck('name')->values()->all(),
+                    // Supadmin inherits admin via User::hasRole()
+                    'is_admin'    => $user->hasRole('admin'),
                 ] : null,
             ],
             'flash' => [

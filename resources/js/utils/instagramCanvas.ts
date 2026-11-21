@@ -1,4 +1,4 @@
-export const IG_POST_SIZE = { width: 1080, height: 1350 } as const;
+export const IG_POST_SIZE = { width: 1080, height: 1440 } as const;
 export const IG_STORY_SIZE = { width: 1080, height: 1920 } as const;
 
 export type InstagramFormat = 'post' | 'story';
@@ -28,6 +28,8 @@ const BRAND_GREEN = '#042F10';
 const PUBLICATION_NAME = 'نبض خبر';
 const PUBLICATION_TAGLINE = 'پایگاه خبری و تحلیلی در حوزه سلامت و دارو';
 const CTA_LABEL = 'مشاهده کامل خبر';
+const GLOBE_ICON_URL = '/ic-globe.png';
+const REDIRECT_ICON_URL = '/ic-redirect.png';
 
 function loadImage(src: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
@@ -37,6 +39,14 @@ function loadImage(src: string): Promise<HTMLImageElement> {
         img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
         img.src = src;
     });
+}
+
+/** Ensure display host has a www. prefix when missing. */
+function withWwwHost(host: string): string {
+    const h = host.trim().replace(/^https?:\/\//i, '').split('/')[0] || host.trim();
+    if (!h) return h;
+    if (/^www\./i.test(h)) return h;
+    return `www.${h}`;
 }
 
 function hexToRgba(hex: string, alpha: number): string {
@@ -112,38 +122,39 @@ function drawRoundedRect(
 
 type TextSegment = { text: string; highlighted: boolean };
 
-function splitHighlighted(text: string, highlight: string): TextSegment[] {
-    const needle = highlight.trim();
-    if (!needle || !text.includes(needle)) {
-        return [{ text, highlighted: false }];
-    }
-    const parts = text.split(needle);
-    const segments: TextSegment[] = [];
-    parts.forEach((part, i) => {
-        if (part) segments.push({ text: part, highlighted: false });
-        if (i < parts.length - 1) segments.push({ text: needle, highlighted: true });
-    });
-    return segments.length ? segments : [{ text, highlighted: false }];
-}
-
-/** Mark words whose glyph range overlaps the highlight substring inside `line`. */
+/** Mark words whose glyph range overlaps any `|`-separated highlight phrase in `line`. */
 function wordHighlightFlags(line: string, highlight: string): boolean[] {
     const words = line.split(/\s+/).filter(Boolean);
     const flags = words.map(() => false);
-    const needle = highlight.trim();
-    if (!needle) return flags;
+    const needles = highlight
+        .split('|')
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .sort((a, b) => b.length - a.length);
+    if (!needles.length) return flags;
 
-    const idx = line.indexOf(needle);
-    if (idx < 0) return flags;
+    type Hit = { start: number; end: number };
+    const hits: Hit[] = [];
+    for (const needle of needles) {
+        let from = 0;
+        while (from < line.length) {
+            const idx = line.indexOf(needle, from);
+            if (idx < 0) break;
+            const end = idx + needle.length;
+            const overlaps = hits.some((h) => idx < h.end && end > h.start);
+            if (!overlaps) hits.push({ start: idx, end });
+            from = idx + needle.length;
+        }
+    }
+    if (!hits.length) return flags;
 
-    const hiEnd = idx + needle.length;
     let searchFrom = 0;
     for (let i = 0; i < words.length; i++) {
         const start = line.indexOf(words[i], searchFrom);
         if (start < 0) continue;
         const end = start + words[i].length;
         searchFrom = end;
-        if (end > idx && start < hiEnd) flags[i] = true;
+        if (hits.some((h) => end > h.start && start < h.end)) flags[i] = true;
     }
     return flags;
 }
@@ -215,7 +226,7 @@ function drawHighlightedParagraph(
         }
 
         if (align !== 'justify' || words.length === 1) {
-            const segments = splitHighlighted(line, highlight);
+            const segments = splitMultiHighlighted(line, highlight);
             let x = xRight;
             for (const seg of segments) {
                 ctx.fillStyle = seg.highlighted ? highlightColor : color;
@@ -304,12 +315,13 @@ function drawBoxedHighlightParagraph(
         xRight,
         y,
         maxWidth,
-        lineHeight,
+        lineHeight: lineHeightOpt,
         font,
         color,
         boxColor,
         maxLines = 4,
     } = opts;
+    const lineHeight = lineHeightOpt + 12;
 
     ctx.font = font;
     ctx.textAlign = 'right';
@@ -380,19 +392,20 @@ async function paintPost(
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, width, height);
 
-    const padX = 64;
+    const pad = 90;
+    const padX = pad;
     const contentRight = width - padX;
     const maxTextWidth = width - padX * 2;
 
     // ── Header ────────────────────────────────────────────────────────────
-    const headerTop = 48;
+    const headerTop = pad;
     let headerBottom = headerTop + 80;
 
     const categoryLabel = content.category.trim() || PUBLICATION_NAME;
 
     try {
         const logo = await loadImage(content.logoUrl);
-        const logoH = 72;
+        const logoH = 104;
         const logoW = (logo.width / logo.height) * logoH;
         ctx.drawImage(logo, padX, headerTop, logoW, logoH);
         headerBottom = headerTop + logoH;
@@ -412,16 +425,26 @@ async function paintPost(
     ctx.fillStyle = '#6b7280';
     const tagLines = wrapText(ctx, PUBLICATION_TAGLINE, 380);
     let tagY = headerTop + 62;
+    let taglineBottom = tagY;
     for (const line of tagLines.slice(0, 2)) {
         ctx.fillText(line, contentRight, tagY);
+        taglineBottom = tagY;
         tagY += 24;
     }
-    headerBottom = Math.max(headerBottom, tagY);
+    headerBottom = Math.max(headerBottom, tagY) + 90;
+
+    // Thin vertical separator — only as tall as the publication tagline
+    ctx.strokeStyle = titleGreen;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(contentRight + 12, headerTop + 17);
+    ctx.lineTo(contentRight + 12, taglineBottom + 5);
+    ctx.stroke();
 
     // ── Headline (green + orange highlight boxes) ─────────────────────────
-    let y = headerBottom + 48;
-    const titleSize = 50;
-    const titleLH = 79;
+    let y = headerBottom;
+    const titleSize = 52;
+    const titleLH = 87;
     const titleRightInset = 0; // extra space from the right wrapper edge
     const titleBlock = drawBoxedHighlightParagraph(ctx, {
         text: content.title || 'عنوان خبر',
@@ -435,10 +458,12 @@ async function paintPost(
         boxColor: boxOrange,
         maxLines: 3,
     });
-    y = titleBlock.bottom + 28;
+    // Pull image up toward the title (titleBlock.bottom includes trailing lineHeight)
+    y = titleBlock.bottom - 48;
 
     // ── Featured image (inset, rounded) ───────────────────────────────────
-    const footerReserve = 110;
+    // Extra bottom pad shortens the image from below and leaves more canvas margin
+    const footerReserve = pad + 60;
     const imgPad = padX;
     const imgX = imgPad;
     const imgY = y;
@@ -473,7 +498,7 @@ async function paintPost(
     ctx.restore();
 
     // ── Footer: globe + app_url | line → secondary circle at end ──────────
-    const footerMidY = height - 52;
+    const footerMidY = height - Math.round(footerReserve * 0.7);
     const footerEndX = width - padX;
     const circleR = 6;
 
@@ -487,33 +512,37 @@ async function paintPost(
     } catch {
         appHost = (content.appUrl || '').replace(/^https?:\/\//, '').split('/')[0] || appHost;
     }
+    appHost = withWwwHost(appHost);
 
     ctx.font = '600 22px PeydaWebFaNum, Tahoma, sans-serif';
     ctx.textAlign = 'left';
     ctx.direction = 'ltr';
     ctx.textBaseline = 'middle';
 
-    const globeR = 11;
+    const globeSize = 28;
     const globeX = padX;
-    const globeCx = globeX + globeR;
-
-    // Worldwide / globe icon
-    ctx.strokeStyle = '#6b7280';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(globeCx, footerMidY, globeR, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.ellipse(globeCx, footerMidY, globeR * 0.45, globeR, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(globeX, footerMidY);
-    ctx.lineTo(globeX + globeR * 2, footerMidY);
-    ctx.stroke();
+    try {
+        const globe = await loadImage(GLOBE_ICON_URL);
+        ctx.drawImage(
+            globe,
+            globeX,
+            footerMidY - globeSize / 2,
+            globeSize,
+            globeSize,
+        );
+    } catch {
+        // keep footer usable even if the icon asset is missing
+        ctx.strokeStyle = '#6b7280';
+        ctx.lineWidth = 2;
+        const r = globeSize / 2;
+        ctx.beginPath();
+        ctx.arc(globeX + r, footerMidY, r - 1, 0, Math.PI * 2);
+        ctx.stroke();
+    }
 
     // app_url host
-    const urlX = globeX + globeR * 2 + 12;
-    ctx.fillStyle = '#4b5563';
+    const urlX = globeX + globeSize + 12;
+    ctx.fillStyle = titleGreen;
     ctx.fillText(appHost, urlX, footerMidY + 1);
     const urlW = ctx.measureText(appHost).width;
 
@@ -521,7 +550,7 @@ async function paintPost(
     const lineStartX = urlX + urlW + 18;
     const lineEndX = footerEndX - circleR;
     if (lineEndX > lineStartX) {
-        ctx.strokeStyle = '#d1d5db';
+        ctx.strokeStyle = titleGreen;
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
         ctx.beginPath();
@@ -560,12 +589,13 @@ async function paintStory(
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, width, height);
 
-    const padX = 72;
+    const pad = 120;
+    const padX = pad;
     const contentRight = width - padX;
     const maxTextWidth = width - padX * 2;
 
     // ── Header ────────────────────────────────────────────────────────────
-    const headerTop = 64;
+    const headerTop = pad;
     let logoBottom = headerTop + 90;
 
     try {
@@ -593,21 +623,24 @@ async function paintStory(
     ctx.fillStyle = '#5b6270';
     const tagLines = wrapText(ctx, PUBLICATION_TAGLINE, 420);
     let tagY = headerTop + 72;
+    let taglineBottom = tagY;
     for (const line of tagLines.slice(0, 2)) {
         ctx.fillText(line, contentRight, tagY);
+        taglineBottom = tagY;
         tagY += 30;
     }
 
-    // Thin vertical separator near the right header block
-    ctx.strokeStyle = '#d1d5db';
+    // Thin vertical separator — only as tall as the publication tagline
+    const storyHeaderBottom = Math.max(logoBottom, tagY);
+    ctx.strokeStyle = accent;
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(contentRight + 12, headerTop + 12);
-    ctx.lineTo(contentRight + 12, headerTop + 96);
+    ctx.moveTo(contentRight + 12, headerTop + 17);
+    ctx.lineTo(contentRight + 12, taglineBottom + 5);
     ctx.stroke();
 
     // ── Headline ──────────────────────────────────────────────────────────
-    let y = Math.max(logoBottom, tagY) + 72;
+    let y = storyHeaderBottom + 96;
     const titleFontSize = 52;
     const titleLH = 70;
 
@@ -624,7 +657,7 @@ async function paintStory(
         maxLines: 4,
         align: 'justify',
     });
-    y = titleBlock.bottom + 36;
+    y = titleBlock.bottom + 12;
 
     // ── Description + vertical accent ─────────────────────────────────────
     const descFontSize = 30;
@@ -659,57 +692,23 @@ async function paintStory(
         ctx.lineTo(contentRight - 4, lineBottom);
         ctx.stroke();
 
-        y = descBlock.bottom + 40;
+        y = descBlock.bottom + 55;
     }
-
-    // ── CTA button ────────────────────────────────────────────────────────
-    ctx.font = '700 28px PeydaWebFaNum, Tahoma, sans-serif';
-    ctx.direction = 'rtl';
-    const ctaText = CTA_LABEL;
-    const ctaTextW = ctx.measureText(ctaText).width;
-    const iconGap = 16;
-    const iconSize = 26;
-    const ctaPadX = 36;
-    const ctaH = 64;
-    const ctaW = ctaTextW + iconSize + iconGap + ctaPadX * 2;
-    const ctaX = padX;
-    const ctaY = y;
-
-    ctx.fillStyle = accent;
-    drawRoundedRect(ctx, ctaX, ctaY, ctaW, ctaH, 14);
-    ctx.fill();
-
-    // External-link icon (left side of button content in LTR box = visual left)
-    const iconX = ctaX + ctaPadX;
-    const iconY = ctaY + (ctaH - iconSize) / 2;
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2.5;
-    ctx.lineJoin = 'round';
-    ctx.strokeRect(iconX + 4, iconY + 8, iconSize - 12, iconSize - 12);
-    ctx.beginPath();
-    ctx.moveTo(iconX + iconSize - 6, iconY + 6);
-    ctx.lineTo(iconX + iconSize - 6, iconY + 14);
-    ctx.moveTo(iconX + iconSize - 6, iconY + 6);
-    ctx.lineTo(iconX + iconSize - 14, iconY + 6);
-    ctx.moveTo(iconX + 10, iconY + iconSize - 10);
-    ctx.lineTo(iconX + iconSize - 6, iconY + 6);
-    ctx.stroke();
-
-    ctx.fillStyle = '#ffffff';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(ctaText, ctaX + ctaW - ctaPadX, ctaY + ctaH / 2 + 1);
-    ctx.textBaseline = 'alphabetic';
 
     // ── Featured image + Instagram safe-zone bottom padding ───────────────
     // Meta Story boxing: keep chrome margins; image continues into safeBottom
     // with a gradient that fades the page background into the photo.
-    const safeTop = Math.round(height * 0.1);
-    const safeBottom = Math.round(height * 0.1);
+    const safeTop = pad;
+    const safeBottom = pad;
     // Start image 3% higher → +3% featured_image height; shrink top gradient by 3%
     const imageTop = Math.max(height * 0.52, safeTop + height * 0.25);
     const imageBottom = height - safeBottom;
     const imageHeight = Math.max(120, height - imageTop);
+
+    // Keep CTA above the image/fade so long copy never parks it under the wash
+    const ctaH = 64;
+    const ctaGapAboveImage = 28;
+    const ctaY = Math.min(y, imageTop - ctaH - ctaGapAboveImage);
 
     ctx.save();
     ctx.beginPath();
@@ -767,6 +766,47 @@ async function paintStory(
         ctx.fillStyle = safeFade;
         ctx.fillRect(0, fadeTop, width, fadeSpan);
     }
+
+    // ── CTA button (drawn last so it stays vivid above image/gradients) ───
+    ctx.font = '700 28px PeydaWebFaNum, Tahoma, sans-serif';
+    ctx.direction = 'rtl';
+    const ctaText = CTA_LABEL;
+    const ctaTextW = ctx.measureText(ctaText).width;
+    const iconGap = 16;
+    const iconSize = 26;
+    const ctaPadX = 36;
+    const ctaW = ctaTextW + iconSize + iconGap + ctaPadX * 2;
+    const ctaX = padX;
+
+    ctx.fillStyle = accent;
+    drawRoundedRect(ctx, ctaX, ctaY, ctaW, ctaH, 14);
+    ctx.fill();
+
+    const iconX = ctaX + ctaPadX;
+    const iconY = ctaY + (ctaH - iconSize) / 2;
+    try {
+        const redirectIcon = await loadImage(REDIRECT_ICON_URL);
+        ctx.drawImage(redirectIcon, iconX, iconY, iconSize, iconSize);
+    } catch {
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
+        ctx.strokeRect(iconX + 4, iconY + 8, iconSize - 12, iconSize - 12);
+        ctx.beginPath();
+        ctx.moveTo(iconX + iconSize - 6, iconY + 6);
+        ctx.lineTo(iconX + iconSize - 6, iconY + 14);
+        ctx.moveTo(iconX + iconSize - 6, iconY + 6);
+        ctx.lineTo(iconX + iconSize - 14, iconY + 6);
+        ctx.moveTo(iconX + 10, iconY + iconSize - 10);
+        ctx.lineTo(iconX + iconSize - 6, iconY + 6);
+        ctx.stroke();
+    }
+
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(ctaText, ctaX + ctaW - ctaPadX, ctaY + ctaH / 2 + 1);
+    ctx.textBaseline = 'alphabetic';
 }
 
 export async function renderInstagramCanvas(
