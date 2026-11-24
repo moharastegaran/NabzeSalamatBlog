@@ -148,28 +148,19 @@ class BlogPostBroadcastFormatter
         $lines[] = self::MEDICAL_SEPARATOR;
         $lines[] = '📡 با '.config('app.name', 'نبض سلامت').' همراه باشید';
 
-        $socialLinks = array_filter([
+        $socialLinks = array_values(array_filter([
             $this->socialMarkdownLink('سایت', (string) config('app.url')),
             $this->socialMarkdownLink('بله', (string) config('services.social.bale')),
             $this->socialMarkdownLink('واتساپ', (string) config('services.social.whatsapp')),
             $this->socialMarkdownLink('تلگرام', (string) config('services.social.telegram')),
             $this->socialMarkdownLink('اینستاگرام', (string) config('services.social.instagram')),
-        ]);
+        ]));
 
         if ($socialLinks !== []) {
             $lines[] = implode(' | ', $socialLinks);
         }
 
         return $lines;
-    }
-
-    private function shortPostUrl(BlogPost $post): ?string
-    {
-        if (! filled($post->short_link)) {
-            return null;
-        }
-
-        return url('/'.$post->short_link);
     }
 
     private function socialMarkdownLink(string $label, string $url): ?string
@@ -179,6 +170,15 @@ class BlogPostBroadcastFormatter
         }
 
         return $this->markdownLink($label, $url);
+    }
+
+    private function shortPostUrl(BlogPost $post): ?string
+    {
+        if (! filled($post->short_link)) {
+            return null;
+        }
+
+        return url('/'.$post->short_link);
     }
 
     private function markdownLink(string $label, string $url): string

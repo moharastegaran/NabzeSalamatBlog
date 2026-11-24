@@ -4,6 +4,7 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import CategoryMultiSelect from '@/Components/CategoryMultiSelect';
 import { BlogCategory, BlogPost, PaginatedData } from '@/types/models';
 import { toJalali } from '@/utils/date';
+import { markdownToTelegramField, serializeTelegramTags } from '@/utils/telegramClipboard';
 import type { PageProps } from '@/types';
 
 interface Props {
@@ -30,7 +31,9 @@ export default function BlogIndex({ posts, categories, activeCategory, statusCou
 
     const [searchQuery, setSearchQuery] = useState(filters.search);
     const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+    const [copiedPostId, setCopiedPostId] = useState<number | null>(null);
     const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const copiedTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const statusOptions = Object.entries(statusCounts);
     const selectedCategoryIds = activeCategory ? [activeCategory.id] : [];
@@ -77,6 +80,42 @@ export default function BlogIndex({ posts, categories, activeCategory, statusCou
         if (confirm(`آیا از حذف مقاله "${post.title}" اطمینان دارید؟`)) {
             router.delete(route('blog.destroy', post.id));
         }
+    };
+
+    const copyBroadcastCaption = async (post: BlogPost) => {
+        if (!post.caption_plain) return;
+
+        const markdown = post.caption_plain;
+        const field = markdownToTelegramField(markdown);
+        let copied = false;
+
+        try {
+            if (typeof ClipboardItem !== 'undefined') {
+                // text/plain stays markdown so Bale keeps formatting it.
+                // The x-td-field formats are what Telegram Desktop pastes as real text links.
+                const item = new ClipboardItem({
+                    'text/plain': new Blob([markdown], { type: 'text/plain' }),
+                    'web application/x-td-field-text': new Blob([field.text], { type: 'text/plain' }),
+                    'web application/x-td-field-tags': new Blob([serializeTelegramTags(field.tags)], { type: 'application/octet-stream' }),
+                });
+                await navigator.clipboard.write([item]);
+                copied = true;
+            }
+        } catch {
+            copied = false;
+        }
+
+        if (!copied) {
+            try {
+                await navigator.clipboard.writeText(markdown);
+            } catch {
+                return;
+            }
+        }
+
+        setCopiedPostId(post.id);
+        if (copiedTimeout.current) clearTimeout(copiedTimeout.current);
+        copiedTimeout.current = setTimeout(() => setCopiedPostId(null), 2000);
     };
 
     const hasActiveFilters = Boolean(filters.search || activeCategory);
@@ -277,6 +316,7 @@ export default function BlogIndex({ posts, categories, activeCategory, statusCou
                                                             </a>
                                                         )}
                                                         {canInstagram && (
+                                                            <>
                                                             <Link
                                                                 href={route('blog.instagram', post.id)}
                                                                 title="محتوای اینستاگرام"
@@ -286,6 +326,25 @@ export default function BlogIndex({ posts, categories, activeCategory, statusCou
                                                                     <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 1.5A4.25 4.25 0 003.5 7.75v8.5A4.25 4.25 0 007.75 20.5h8.5a4.25 4.25 0 004.25-4.25v-8.5A4.25 4.25 0 0016.25 3.5h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 1.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zm5.25-.88a1.13 1.13 0 110 2.25 1.13 1.13 0 010-2.25z" />
                                                                 </svg>
                                                             </Link>
+                                                            <button
+                                                                type="button"
+                                                                title={copiedPostId === post.id ? 'کپشن کپی شد' : 'کپی کپشن بله و تلگرام'}
+                                                                aria-label={copiedPostId === post.id ? 'کپشن کپی شد' : 'کپی کپشن بله و تلگرام'}
+                                                                onClick={() => copyBroadcastCaption(post)}
+                                                                className={`rounded p-1.5 transition-colors ${copiedPostId === post.id ? 'bg-sky-50 text-sky-600' : 'text-gray-400 hover:bg-sky-50 hover:text-sky-600'}`}
+                                                            >
+                                                                {copiedPostId === post.id ? (
+                                                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                                    </svg>
+                                                                ) : (
+                                                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                                                        <rect x="9" y="9" width="13" height="13" rx="2" />
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                                                                    </svg>
+                                                                )}
+                                                            </button>
+                                                            </>
                                                         )}
                                                         {canEdit && (
                                                             <Link

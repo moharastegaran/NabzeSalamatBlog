@@ -111,6 +111,7 @@ export interface BlogPost {
     approved_comments?: BlogComment[];
     comments_count?: number;
     approved_comments_count?: number;
+    caption_plain?: string;
 }
 
 export interface PostFieldValue {

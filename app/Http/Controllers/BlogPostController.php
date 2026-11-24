@@ -37,6 +37,16 @@ class BlogPostController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        if ($request->user()?->can('blog.instagram')) {
+            $formatter = app(BlogPostBroadcastFormatter::class);
+
+            $posts->getCollection()->transform(function (BlogPost $post) use ($formatter) {
+                $post->setAttribute('caption_plain', $formatter->format($post));
+
+                return $post;
+            });
+        }
+
         $statusCounts = BlogPost::when($categoryId, $categoryFilter)
             ->when($search, $searchFilter)
             ->selectRaw('status, count(*) as count')
