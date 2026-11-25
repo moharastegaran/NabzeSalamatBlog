@@ -67,6 +67,54 @@ function findLinkClose(text: string, from: number): number {
     return -1;
 }
 
+/** Phone browsers. Desktop keeps the markdown clipboard that Telegram Desktop offers to format. */
+export function isMobileClient(): boolean {
+    if (typeof navigator === 'undefined') return false;
+
+    const ua = navigator.userAgent || '';
+    if (/Android|iPhone|iPad|iPod/i.test(ua)) return true;
+
+    return navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+}
+
+/**
+ * HTML Telegram Android pastes as text links.
+ * A phone clipboard with text/html is applied on paste; there is no desktop-style banner.
+ */
+export function telegramFieldToHtml(field: { text: string; tags: TelegramTag[] }): string {
+    const tags = [...field.tags].sort((a, b) => a.offset - b.offset);
+    let html = '';
+    let cursor = 0;
+
+    for (const tag of tags) {
+        if (tag.offset < cursor || tag.length <= 0 || tag.offset > field.text.length) continue;
+
+        html += htmlText(field.text.slice(cursor, tag.offset));
+        const label = field.text.slice(tag.offset, Math.min(field.text.length, tag.offset + tag.length));
+        html += `<a href="${escapeAttr(tag.id)}">${escapeHtml(label)}</a>`;
+        cursor = tag.offset + tag.length;
+    }
+
+    html += htmlText(field.text.slice(cursor));
+
+    return html;
+}
+
+function htmlText(value: string): string {
+    return escapeHtml(value).replace(/\r\n|\r|\n/g, '<br>');
+}
+
+function escapeHtml(value: string): string {
+    return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function escapeAttr(value: string): string {
+    return escapeHtml(value).replace(/"/g, '&quot;');
+}
+
 /** QDataStream (Qt 5, big-endian) encoding of Telegram's text-link tags. */
 export function serializeTelegramTags(tags: TelegramTag[]): Uint8Array {
     const bytes: number[] = [];

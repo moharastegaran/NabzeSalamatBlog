@@ -4,7 +4,7 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import CategoryMultiSelect from '@/Components/CategoryMultiSelect';
 import { BlogCategory, BlogPost, PaginatedData } from '@/types/models';
 import { toJalali } from '@/utils/date';
-import { markdownToTelegramField, serializeTelegramTags } from '@/utils/telegramClipboard';
+import { isMobileClient, markdownToTelegramField, serializeTelegramTags, telegramFieldToHtml } from '@/utils/telegramClipboard';
 import type { PageProps } from '@/types';
 
 interface Props {
@@ -91,13 +91,21 @@ export default function BlogIndex({ posts, categories, activeCategory, statusCou
 
         try {
             if (typeof ClipboardItem !== 'undefined') {
-                // text/plain stays markdown so Bale keeps formatting it.
-                // The x-td-field formats are what Telegram Desktop pastes as real text links.
-                const item = new ClipboardItem({
-                    'text/plain': new Blob([markdown], { type: 'text/plain' }),
-                    'web application/x-td-field-text': new Blob([field.text], { type: 'text/plain' }),
-                    'web application/x-td-field-tags': new Blob([serializeTelegramTags(field.tags)], { type: 'application/octet-stream' }),
-                });
+                // text/plain stays markdown so Bale, and Telegram on iPhone, can still read it.
+                // Phones also get text/html: Telegram Android applies those links on paste
+                // and does not show the desktop "apply markdown formatting" banner.
+                // Desktop must not include HTML, or that banner disappears.
+                const plain = new Blob([markdown], { type: 'text/plain' });
+                const item = new ClipboardItem(isMobileClient()
+                    ? {
+                        'text/plain': plain,
+                        'text/html': new Blob([telegramFieldToHtml(field)], { type: 'text/html' }),
+                    }
+                    : {
+                        'text/plain': plain,
+                        'web application/x-td-field-text': new Blob([field.text], { type: 'text/plain' }),
+                        'web application/x-td-field-tags': new Blob([serializeTelegramTags(field.tags)], { type: 'application/octet-stream' }),
+                    });
                 await navigator.clipboard.write([item]);
                 copied = true;
             }
